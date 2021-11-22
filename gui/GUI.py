@@ -2,16 +2,19 @@ import tkinter as tk
 from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
-# from smaract.connexion_smaract import smaract_class
+import scripts
 
 class App(object):
-    def __init__(self, root):
+    def __init__(self, root, microscope, positioner):
         ''' Initialize GUI
         
         '''
         # Title
-        root.title("Tomo Controller for Quattro and Smaract device - Alpha version")
+        root.title("Tomo Controller for Quattro and Smaract positioner - version 0.1")
         # root.iconbitmap('PI.ico')
+
+        self.microscope = microscope
+        self.positioner = positioner
         
         # Window size
         screenwidth = root.winfo_screenwidth()
@@ -149,16 +152,15 @@ class App(object):
         self.lbl_folder2.config(text="..."+file_path[-20:])
         return 0
 
-    def eucentric(self, positioner):
+    def eucentric(self):
         ''' Set the eucentric point
         '''
         self.lbl_eucent.config(bg='orange')
-        '''
-        
-        '''
-        positioner.getpos()
-        self.lbl_eucent.config(bg='green')
-        return 0
+        set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
+        if set_eucentric_status == 0:
+            self.lbl_eucent.config(bg='green')
+            return 0
+        return 1
     
     def z_up(self):
         step = self.ent_z_step.get()
@@ -188,8 +190,11 @@ class App(object):
         self.lbl_acquisition.config(bg="orange")
         '''
         '''
-        self.lbl_acquisition.config(bg="green")
-        return 0
+        # set_tomo_status = scripts.tomo_acquisition(self.microscope.micro_settings, self.positioner.smaract_settings, drift_correction=False)
+        # if set_tomo_status == 0:
+        #     self.lbl_acquisition.config(bg='green')
+        #     return 0
+        return 1
 
 if __name__ == "__main__":
     root = tk.Tk()
