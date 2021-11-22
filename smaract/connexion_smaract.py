@@ -74,15 +74,15 @@ class smaract_class(object):
 
         if len(AvailableSys_list) >= 1 and AvailableSys_list[0] != 0:
             self.smart.SA_AddSystemToInitSystemsList(AvailableSys_list[0]) #3919851221
-            InitSystems_state = self.smart.SA_InitSystems(ctypes.c_ulong(0))
-            if InitSystems_state == 0:
+            InitSystems_status = self.smart.SA_InitSystems(ctypes.c_ulong(0))
+            if InitSystems_status == 0:
                 # Dll version
                 version = ctypes.c_uint32()
-                version_state = self.smart.SA_GetDLLVersion(ctypes.byref(version))
+                version_status = self.smart.SA_GetDLLVersion(ctypes.byref(version))
 
                 # Init state
                 InitState = ctypes.c_uint32()
-                InitState_state = self.smart.SA_GetInitState(ctypes.byref(InitState))
+                self.InitState_status = self.smart.SA_GetInitState(ctypes.byref(InitState))
 
                 logging.info(' Initialization... OK')
                 logging.info(' System ID:       ' + str(list(AvailableSys_array)[0]))
@@ -90,10 +90,12 @@ class smaract_class(object):
                 logging.info(' Init state:      ' + str(InitState.value) + ' ' + str(self.find_status_message(self.state_codes, InitState.value)))
                 logging.info(' ---------------------------------------')
             else:
-                self.check_status([InitSystems_state])
+                self.check_status([InitSystems_status])
+                self.InitState_status = 1
         else:
             self.check_status([AvailableSys_state], 'No systems detected: ')
             logging.info(' Check if MCS-3D is turned on. Check USB connexion.')
+            self.InitState_status = 1
 
         self.range_limits = {'z_min':ctypes.c_int32(-1900000),
                             'z_max':  ctypes.c_int32(1900000),

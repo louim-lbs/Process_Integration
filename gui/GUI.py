@@ -30,14 +30,22 @@ class App(object):
         frm_ini = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//4, height=height//4, bg='#202020')
         frm_ini.place(x=0, y=0)
 
-        self.micro1 = tk.StringVar(value='red')
+        if self.microscope.InitState_status == 0:
+            micro1_value = 'green'
+        else:
+            micro1_value = 'red'
+        self.micro1 = tk.StringVar(value=micro1_value)
         self.lbl_micro1 = tk.Label(master=frm_ini, width=1, height=1, bg=self.micro1.get())
         self.lbl_micro1.place(x=180, y=20)
 
         self.lbl_micro2 = tk.Label(master=frm_ini, width=20, height=1, bg='#2B2B2B', fg='white', text="Microscope", justify='left')
         self.lbl_micro2.place(x=20, y=20)
 
-        self.smara1 = tk.StringVar(value='red')
+        if self.positioner.InitState_status == 0:
+            smara1_value = 'green'
+        else:
+            smara1_value = 'red'
+        self.smara1 = tk.StringVar(value=smara1_value)
         self.lbl_smara1 = tk.Label(master=frm_ini, width=1, height=1, bg=self.smara1.get())
         self.lbl_smara1.place(x=180, y=60)
 

@@ -13,8 +13,13 @@
 - **16-bits** default acquisition.
 
 ### GUI
-- Connection with Smaract
+- Connection with Smaract, button OK.
+- Connection with microscope, button OK.
 - Button to open help/tutorial to remember acquisition settings.
+
+
+
+
 
 
 ********** DONE

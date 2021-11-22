@@ -37,6 +37,8 @@ while True:
 # Connect to microscope
 
 quattro = SdbMicroscopeClient()
+SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if connected.
+
 # try:
 #     quattro.connect('localhost') # local connection (Support PC) or offline scripting
 # except:
