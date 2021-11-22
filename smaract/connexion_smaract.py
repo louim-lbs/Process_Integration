@@ -93,7 +93,7 @@ class smaract_class(object):
                 self.check_status([InitSystems_status])
                 self.InitState_status = 1
         else:
-            self.check_status([AvailableSys_state], 'No systems detected: ')
+            self.check_status([AvailableSys_state], ' No systems detected: ')
             logging.info(' Check if MCS-3D is turned on. Check USB connexion.')
             self.InitState_status = 1
 
