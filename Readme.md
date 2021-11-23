@@ -14,8 +14,6 @@
 - **16-bits** default acquisition.
 
 ### GUI
-- Connection with Smaract, button OK.
-- Connection with microscope, button OK.
 - Button to open help/tutorial to remember acquisition settings.
 
 
@@ -24,6 +22,8 @@
 
 
 ********** DONE
+- OK. Connection with Smaract, button OK.
+- OK. Connection with microscope, button OK.
 - OK. **Hold time infinite** to prevent drift effect or position changes due to a non-aligned center of mass. Instability ? → No
 - OK. **N° of channel**: channelIndex (unsigned 32bit), input - Selects the channel of the selected system. The index is zero based.
 - OK. **Convert angles**:
