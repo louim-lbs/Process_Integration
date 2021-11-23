@@ -9,6 +9,7 @@
 
 ### Microscope
 - **Eucentric**. Write operation steps.
+    - Calculer le décallage une fois qu'il a été fait la premmière fois.
 - **Dynamical focus** for low-deep-field STEM acquisition?
 - **16-bits** default acquisition.
 
