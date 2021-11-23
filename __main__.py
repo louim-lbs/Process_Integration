@@ -37,25 +37,26 @@ while True:
 # Connect to microscope
 
 quattro = SdbMicroscopeClient()
-SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if connected.
 
-# try:
-#     quattro.connect('localhost') # local connection (Support PC) or offline scripting
-# except:
-#     try:
-#         quattro.connect() # online connection
-#         imp = 1
-#     except:
-#         pass
+try:
+    quattro.connect('localhost') # local connection (Support PC) or offline scripting
+    SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 0 if connected.
+except:
+    try:
+        quattro.connect() # online connection
+        SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 0 if connected.
+    except:
+        pass
 
 
-
+# Connect to positioner
 
 from smaract import connexion_smaract as sm
 smaract = sm.smaract_class(calibrate=False)
 
 
 
+# Lauch GUI
 
 os.chdir(dir_pi)
 

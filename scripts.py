@@ -14,21 +14,23 @@ def set_eucentric(microscope, positioner) -> int:
             -> 0    
     '''
     method = "Eucentric point model II"
-    magnification_start = 5000 # units
+    hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
     angle_step = 5             # degrees
     angle_range = 100          # units
     precision = 100            # nanometers or fraction of image size ? End condition with magnification ?
     eucentric_error = int
+    settings = microscope.GrabFrameSettings(resolution="1536x1024", dwell_time=1e-6, bit_depth=16)
+    image = []
 
     if method == "Eucentric point model II":
         multiplicator = 1
-        # Take picture 1
+        image.append(microscope.imaging.grab_multiple_frames(settings))
         while eucentric_error == int or (eucentric_error > precision or eucentric_error < image_height//2):
-            # Move relative multiplicator*angle_step
-            # Take picture 2
+            positioner.setpos_abs([0, 0, multiplicator*angle_step])
+            image.append(microscope.imaging.grab_multiple_frames(settings))
             # Match pictures and compute eucentric error
             if match is not OK:
-                # Set magnification -= 500
+                # microscope.beams.electron_beam.horizontal_field_width.value = hfw*2
                 # Take picture 1
                 pass
             # Add value to the curve model
@@ -51,7 +53,7 @@ def set_eucentric(microscope, positioner) -> int:
 
     # Deal magnification adjustements according step and if it find solution or not.         
 
-
+    positioner.setpos_abs([0, 0, 0])
     pos = positioner.getpos()
     print('eucentrixx')
     return 0

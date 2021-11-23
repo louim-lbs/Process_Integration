@@ -447,8 +447,8 @@ if __name__ == "__main__":
 
     # smaract.setpos_abs([0, 0, 0])
     # time.sleep(1)
-    # smaract.setpos_abs([0, 0, 90000000])
+    # smaract.setpos_abs([0, 0, 10000000])
     # time.sleep(1)
-    # smaract.setpos_abs([0, 0, -90000000])
+    # smaract.setpos_abs([0, 0, -10000000])
     # time.sleep(1)
     # smaract.setpos_abs([0, 0, 0])
