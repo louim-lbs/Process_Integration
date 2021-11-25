@@ -39,14 +39,14 @@ while True:
 quattro = SdbMicroscopeClient()
 
 try:
-    quattro.connect('localhost') # local connection (Support PC) or offline scripting
-    SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 0 if connected.
+    quattro.connect() # online connection
+    SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
 except:
     try:
-        quattro.connect() # online connection
-        SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 0 if connected.
+        quattro.connect('localhost') # local connection (Support PC) or offline scripting
+        SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
     except:
-        pass
+        SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if not connected
 
 
 # Connect to positioner
