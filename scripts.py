@@ -13,7 +13,7 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
         - speed_factor: reduce master patch size for speed optimization. Decrease precision and is not recommended for high displacements (int).
 
     Output:
-        - Displacement vector (list[float, float]).
+        - Displacement vector in pixels (list[float, float]).
         - Correlation coefficient between 0 and 1 (float).
 
     Exemple:
@@ -123,9 +123,10 @@ def set_eucentric(microscope, positioner) -> int:
         while eucentric_error == int or (eucentric_error > precision or eucentric_error < image_height//2):
             positioner.setpos_abs([0, 0, multiplicator*angle_step])
             np.append(image, microscope.imaging.grab_multiple_frames(settings))
-            # Try Match pictures and compute eucentric error
-            match_status = match(image[-1], image[-2])
-
+            # Compute eucentric error
+            dx, dy, corr_trust = match(image[-1], image[-2])
+            # Convert pixel to meters or nanometers.
+            eucentric_error = max(dx, dy)
 
 
 
