@@ -1,15 +1,25 @@
 import numpy as np
 import cv2 as cv
 
-def match(image_master, image_template, grid_size = 10, ratio_template_master = 0.5, ratio_master_template_patch = None, speed_factor = 4):
+def match(image_master, image_template, grid_size = 10, ratio_template_master = 0.5, ratio_master_template_patch = 0, speed_factor = 4):
     ''' Match two images
 
     Input:
+        - image_master: image before the displacement (ndarray).
+        - image_template: image after the displacement (nd_array).
+        - grid_size: Computation resolution. Higher is more precise but slower (int).
+        - ratio_template_master: Ratio of image_template used for computation. Between 0 and 1 (float).
+        - ratio_master_template_patch: Ratio for master patch size from template patch. Is computed optimaly by default (float).
+        - speed_factor: reduce master patch size for speed optimization. Decrease precision and is not recommended for high displacements (int).
 
     Output:
+        - Displacement vector (list[float, float]).
+        - Correlation coefficient between 0 and 1 (float).
 
     Exemple:
-
+        res = match(img1, img2)
+        print(res)
+            -> ([20.0, 20.0], 0.9900954802437584)
     '''
     height_master, width_master = image_master.shape
 
@@ -21,7 +31,7 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     master_patch_size = (int(height_master - height_template + template_patch_size[0])//speed_factor,
                          int(width_master  - width_template  + template_patch_size[1])/speed_factor)
     
-    if ratio_master_template_patch != None:
+    if ratio_master_template_patch != 0:
         if ratio_master_template_patch > max(master_patch_size[0], master_patch_size[1]):
             pass
         master_patch_size = (int(template_patch_size[0]*ratio_master_template_patch),
