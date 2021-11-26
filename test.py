@@ -17,16 +17,6 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
 
     height_template, width_template = int(ratio_template_master*height_master), int(ratio_template_master*width_master)
 
-    x_A = (width_master  - width_template)//2
-    y_A = (height_master - height_template)//2
-    x_B = (width_master  + width_template)//2
-    y_B = (height_master + height_template)//2
-    
-    cv.rectangle(image_master,
-                (x_A,y_A),
-                (x_B,y_B),
-                255, 2)
-
     template_patch_size = (height_template//grid_size,
                             width_template//grid_size)
 
@@ -72,26 +62,7 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
 
             displacement_vector = np.append(displacement_vector, [[dx, dy]], axis=0)
 
-            # print('Correlation trust: ', max_val)
             corr_trust = np.append(corr_trust, max_val)
-
-            # top_left = (template_patch_yA,
-            #             template_patch_xA)
-            
-            # # top_left = (max_loc[0] + (width_master  - width_template)//2 + j*template_patch_size[1],
-            # #             max_loc[1] + (height_master - height_template)//2 + i*template_patch_size[0])
-
-            # bottom_right = (top_left[0] + template_patch_size[1],
-            #                 top_left[1] + template_patch_size[0])
-
-            # top_left_master = (master_patch_yA,
-            #                    master_patch_xA)
-
-            # bottom_right_master = (master_patch_yB,
-            #                        master_patch_xB)
-
-            # cv.rectangle(image_master,top_left, bottom_right, 255, 2)
-            # # cv.rectangle(image_master,top_left_master, bottom_right_master, 255, 2)
 
     dx_tot = displacement_vector[:,0]
     dy_tot = displacement_vector[:,1]
@@ -111,15 +82,18 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
 
-    mean_x = np.mean(dx_tot)
-    mean_y = np.mean(dy_tot)
-    stdev_x = np.std(dx_tot)
-    stdev_y = np.std(dy_tot)
+    return [-np.mean(dx_tot), np.mean(dy_tot)], np.mean(corr_trust)
 
-    return [np.mean(dx_tot), np.mean(dy_tot)], np.mean(corr_trust)
+img1 = np.asarray(image.imread('images/2_40.tif'))
+img2 = np.asarray(image.imread('images/5_25.tif'))
 
-img1 = np.asarray(image.imread('images/cell_20.tif'))
-img2 = np.asarray(image.imread('images/cell_19.tif'))
+try:
+    img1 = img1[:,:,1]
+    img2 = img2[:,:,1]
+except:
+    pass
+
+print(img1.shape)
 
 import time
 

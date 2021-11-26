@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
 
-def match(image1, image_master):
+def match(image_master, image_template, grid_size = 10, ratio_template_master = 0.5, ratio_master_template_patch = None, speed_factor = 4):
     ''' Match two images
 
     Input:
@@ -11,73 +11,75 @@ def match(image1, image_master):
     Exemple:
 
     '''
-    image_width, image_height = image1.shape
+    height_master, width_master = image_master.shape
 
+    height_template, width_template = int(ratio_template_master*height_master), int(ratio_template_master*width_master)
+
+    template_patch_size = (height_template//grid_size,
+                            width_template//grid_size)
+
+    master_patch_size = (int(height_master - height_template + template_patch_size[0])//speed_factor,
+                         int(width_master  - width_template  + template_patch_size[1])/speed_factor)
     
+    if ratio_master_template_patch != None:
+        if ratio_master_template_patch > max(master_patch_size[0], master_patch_size[1]):
+            pass
+        master_patch_size = (int(template_patch_size[0]*ratio_master_template_patch),
+                             int(template_patch_size[1]*ratio_master_template_patch))
 
-    pixel_center_w = image_width//2
-    pixel_center_h = image_height//2
+    displacement_vector = np.array([[0,0]])
+    corr_trust = np.array(0)
 
-    slave_size = 0.3
+    for i in range(grid_size):
+        for j in range(grid_size):
+            
+            master_patch_xA = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0]
+            master_patch_yA = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1]
+            master_patch_xB = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0] + master_patch_size[0]
+            master_patch_yB = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1] + master_patch_size[1]
 
-    zone_slave = (  int(pixel_center_h - slave_size*image_height//2),
-                    int(pixel_center_w - slave_size*image_width //2),
-                    int(pixel_center_h + slave_size*image_height//2),
-                    int(pixel_center_w + slave_size*image_width //2))
-    
-    image_slave  = image1[zone_slave[0]:zone_slave[2], zone_slave[1]:zone_slave[3]]
+            master_patch = image_master[int(master_patch_xA):int(master_patch_xB),
+                                        int(master_patch_yA):int(master_patch_yB)]
 
-    corr_scores = cv.matchTemplate(image_master, image_slave, cv.TM_CCOEFF_NORMED)
 
-    delta_h, delta_w = np.unravel_index(corr_scores.argmax(), corr_scores.shape)
+            template_patch_xA = (height_master - height_template)//2 + (i)*template_patch_size[0]
+            template_patch_yA = (width_master  - width_template)//2  + (j)*template_patch_size[1]
+            template_patch_xB = (height_master - height_template)//2 + (i+1)*template_patch_size[0]
+            template_patch_yB = (width_master  - width_template)//2  + (j+1)*template_patch_size[1]
 
-    print('delta_h, delta_w', delta_h, delta_w)
+            template_patch = image_template[int(template_patch_xA):int(template_patch_xB),
+                                            int(template_patch_yA):int(template_patch_yB)]
 
-    # coordonnees du centre du fragment maitre dans image esclave entiere 
-    pixel_center_w_master_in_slave = pixel_center_w - image_width//2  + delta_w + slave_size*image_width//2
-    pixel_center_h_master_in_slave = pixel_center_h - image_height//2 + delta_h + slave_size*image_height//2
-    
-    print('pixel_center_w_master_in_slave, pixel_center_h_master_in_slave', pixel_center_w_master_in_slave, pixel_center_h_master_in_slave)
-    
-    # vecteur de deplacement en pixels :
-    dw = -(pixel_center_w - pixel_center_w_master_in_slave)
-    dh = pixel_center_h - pixel_center_h_master_in_slave
+            corr_scores = cv.matchTemplate(master_patch, template_patch, cv.TM_CCOEFF_NORMED)
 
-    print('Vecteur de déplacement selon l\'axe horizontal : ' + str(dw) + ' pixels')
-    print('Vecteur de déplacement selon l\'axe vertical   : ' + str(dh) + ' pixels')
+            _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
 
-    import matplotlib.pyplot as plt
-    fig=plt.figure()
-    result = corr_scores
-    img=plt.imshow(result,origin='lower')
-    y,x = np.unravel_index(result.argmax(), result.shape)
-    plt.plot(x,y,'ok')
-    bar=plt.colorbar(img)
-    plt.show()
+            dx = (master_patch_size[0] - template_patch_size[0])//2 - max_loc[1]
+            dy = (master_patch_size[1] - template_patch_size[1])//2 - max_loc[0]
 
-    return dw, dh
+            displacement_vector = np.append(displacement_vector, [[dx, dy]], axis=0)
 
-from matplotlib import image
+            corr_trust = np.append(corr_trust, max_val)
 
-img1 = np.asarray(image.imread('images/cell_36.tif'))
-img2 = np.asarray(image.imread('images/cell_37.tif'))
+    dx_tot = displacement_vector[:,0]
+    dy_tot = displacement_vector[:,1]
 
-# results = []
+    mean_x = np.mean(dx_tot)
+    mean_y = np.mean(dy_tot)
+    stdev_x = np.std(dx_tot)
+    stdev_y = np.std(dy_tot)
 
-# print('...')
+    for d in dx_tot:
+        if (d <= mean_x - stdev_x) or (mean_x + stdev_x <= d):
+            dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
+    for d in dy_tot:
+        if (d <= mean_y - stdev_y) or (mean_y + stdev_y <= d):
+            dy_tot = np.delete(dy_tot, np.where(dy_tot==d))
 
-# for i in range(100):
-res = match(img1, img2)
-#     results.append(res)
+    dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
+    dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
 
-# for x in results:
-#     if x != results[0]:
-#         print('Not accurate')
-#         break
-# print('Accurate')
-# print(results[1])
-
-exit()
+    return [np.mean(dx_tot), np.mean(dy_tot)], np.mean(corr_trust)
 
 def set_eucentric(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
