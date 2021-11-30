@@ -11,6 +11,10 @@
 - **Eucentric**. Write operation steps.
     - Attention au sens et aux axes.
     - Calculer le décallage une fois qu'il a été fait la premmière fois.
+    - Le HAADF donne le meilleur contraste
+    - Augmenter le dwell time pour augmenter la précision.
+    - Corriger le décalage de l'axe de tilt grâce à une analyse avec un déplacement horizontal de y
+    - Faire se recouvrir les patchs pour moyenner les erreurs.
 - **Dynamical focus** for low-deep-field STEM acquisition?
 - **16-bits** default acquisition.
 

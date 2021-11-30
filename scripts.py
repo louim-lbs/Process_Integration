@@ -21,6 +21,9 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
         print(res)
             -> ([20.0, 20.0], 0.9900954802437584)
     '''
+    image_master = np.float32(image_master)
+    image_template = np.float32(image_template)
+
     height_master, width_master = image_master.shape
 
     height_template, width_template = int(ratio_template_master*height_master), int(ratio_template_master*width_master)
@@ -80,16 +83,16 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     stdev_y = np.std(dy_tot)
 
     for d in dx_tot:
-        if (d <= mean_x - stdev_x) or (mean_x + stdev_x <= d):
+        if (d < mean_x - stdev_x) or (mean_x + stdev_x < d):
             dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
     for d in dy_tot:
-        if (d <= mean_y - stdev_y) or (mean_y + stdev_y <= d):
+        if (d < mean_y - stdev_y) or (mean_y + stdev_y < d):
             dy_tot = np.delete(dy_tot, np.where(dy_tot==d))
 
     dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
 
-    return [np.mean(dx_tot), np.mean(dy_tot)], np.mean(corr_trust)
+    return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
 def set_eucentric(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
@@ -114,9 +117,10 @@ def set_eucentric(microscope, positioner) -> int:
     resolution="1536x1024"
     image_width = int(resolution[:resolution.find('x')])
     image_height = int(resolution[-resolution.find('x'):])
-    settings = microscope.GrabFrameSettings(resolution=resolution, dwell_time=1e-6, bit_depth=16)
+    settings = GrabFrameSettings(resolution=resolution, dwell_time=1e-6, bit_depth=16)
     image = np.array()
 
+    #set active view
     if method == "Eucentric point model II":
         multiplicator = 1
         np.append(image, microscope.imaging.grab_multiple_frames(settings))
