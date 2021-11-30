@@ -35,14 +35,14 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     template_patch_size = (height_template//grid_size,
                             width_template//grid_size)
 
-    master_patch_size = (int(height_master - height_template + template_patch_size[0])//speed_factor,
-                         int(width_master  - width_template  + template_patch_size[1])/speed_factor)
+    # master_patch_size = (int(height_master - height_template + template_patch_size[0])//speed_factor,
+    #                      int(width_master  - width_template  + template_patch_size[1])/speed_factor)
     
-    if ratio_master_template_patch != 0:
-        if ratio_master_template_patch > max(master_patch_size[0], master_patch_size[1]):
-            pass
-        master_patch_size = (int(template_patch_size[0]*ratio_master_template_patch),
-                             int(template_patch_size[1]*ratio_master_template_patch))
+    # if ratio_master_template_patch != 0:
+    #     if ratio_master_template_patch > max(master_patch_size[0], master_patch_size[1]):
+    #         pass
+    #     master_patch_size = (int(template_patch_size[0]*ratio_master_template_patch),
+    #                          int(template_patch_size[1]*ratio_master_template_patch))
 
     displacement_vector = np.array([[0,0]])
     corr_trust = np.array(0)
@@ -50,13 +50,13 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     for i in range(grid_size):
         for j in range(grid_size):
             
-            master_patch_xA = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0]
-            master_patch_yA = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1]
-            master_patch_xB = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0] + master_patch_size[0]
-            master_patch_yB = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1] + master_patch_size[1]
+            # master_patch_xA = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0]
+            # master_patch_yA = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1]
+            # master_patch_xB = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0] + master_patch_size[0]
+            # master_patch_yB = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1] + master_patch_size[1]
 
-            master_patch = image_master[int(master_patch_xA):int(master_patch_xB),
-                                        int(master_patch_yA):int(master_patch_yB)]
+            # master_patch = image_master[int(master_patch_xA):int(master_patch_xB),
+            #                             int(master_patch_yA):int(master_patch_yB)]
 
 
             template_patch_xA = (height_master - height_template)//2 + (i)*template_patch_size[0]
@@ -85,14 +85,14 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     displacement_vector = np.delete(displacement_vector,0,0)
     dx_tot = displacement_vector[:,0]
     dy_tot = displacement_vector[:,1]
-    
+
     mean_x = np.mean(dx_tot)
     mean_y = np.mean(dy_tot)
     stdev_x = np.std(dx_tot)
     stdev_y = np.std(dy_tot)
-    # plt.plot(dx_tot)
-    # plt.plot(dy_tot)
-    # plt.show()
+    plt.plot(dx_tot)
+    plt.plot(dy_tot)
+    plt.show()
     for d in dx_tot:
         if (d < mean_x - stdev_x) or (mean_x + stdev_x < d):
             dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
@@ -103,23 +103,23 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     mean_y = np.mean(dy_tot)
     stdev_x = np.std(dx_tot)
     stdev_y = np.std(dy_tot)
-    # plt.plot(dx_tot)
-    # plt.plot(dy_tot)
-    # plt.show()
+    plt.plot(dx_tot)
+    plt.plot(dy_tot)
+    plt.show()
     for d in dx_tot:
         if (d < mean_x - stdev_x) or (mean_x + stdev_x < d):
             dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
     for d in dy_tot:
         if (d < mean_y - stdev_y) or (mean_y + stdev_y < d):
             dy_tot = np.delete(dy_tot, np.where(dy_tot==d))
-    # plt.plot(dx_tot)
-    # plt.plot(dy_tot)
-    # plt.show()
+    plt.plot(dx_tot)
+    plt.plot(dy_tot)
+    plt.show()
     dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
-    # plt.plot(dx_tot)
-    # plt.plot(dy_tot)
-    # plt.show()
+    plt.plot(dx_tot)
+    plt.plot(dy_tot)
+    plt.show()
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
@@ -194,8 +194,8 @@ while True:
 
 # exit()
 
-img1 = np.asarray(image.imread('images/img2_0_2.tif'))
-img2 = np.asarray(image.imread('images/img2_1_2.tif'))
+img1 = np.asarray(image.imread('images/2_40.tif'))
+img2 = np.asarray(image.imread('images/5_25.tif'))
 
 try:
     img1 = img1[:,:,1]
@@ -206,25 +206,27 @@ except:
 import time
 
 
-ratio = [0.1*i for i in range(1,10)]
-ratio = 0.9
-grid =  [ 1*i for i in range(1, 10)]
+# ratio = [0.1*i for i in range(1,10)]
+# ratio = 0.9
+# grid =  [ 1*i for i in range(1, 10)]
 
-# for x in ratio:
-for y in grid:
-    try:
-        dx, dy, trust = match(img1, img2, grid_size=y, ratio_template_master=ratio)
-        print(y, 1000000*dx*1.27e-05/512, 1000000*dy*1.27e-05/512, trust)
-        # print(x, y, dx, dy, trust)
-    except:
+# # for x in ratio:
+# for y in grid:
+#     try:
+#         t = time.time()
+#         dx, dy, trust = match(img1, img2, grid_size=y, ratio_template_master=ratio)
+#         print(y, 1000000*dx*1.27e-05/512, 1000000*dy*1.27e-05/512, trust)
+#         print('time = ', int((time.time()-t)*1000), 'ms')
+#         # print(x, y, dx, dy, trust)
+#     except:
+        
+#         pass
 
-        pass
 
-
-# t = time.time()
-# res = match(img1, img2, grid_size=5, ratio_template_master=0.9)
-# print(res)
-# print('time = ', int((time.time()-t)*1000), 'ms')
+t = time.time()
+res = match(img1, img2, grid_size=5, ratio_template_master=0.9)
+print(res)
+print('time = ', int((time.time()-t)*1000), 'ms')
 
 # dx, dy, trust = match(img1, img2, grid_size=5, ratio_template_master=0.9)
 # print(1000000*dx*1.27e-05/512, 1000000*dy*1.27e-05/512, trust)
