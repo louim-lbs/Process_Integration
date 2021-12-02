@@ -1,18 +1,56 @@
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings
 import numpy as np
 import cv2 as cv
+from numpy.core.fromnumeric import mean
+from scipy import interpolate
 
-def correct_eucentric(microscope, positioner, displacement):
+def correct_eucentric(microscope, positioner, displacement, angle):
     '''
     '''
     if displacement == []:
         return 1
-    # Check limits
-    # Try to correct eucentric position (z (prior) and y)
-    # Adjust stage position according y value along the y axis.
-    # Adjust focus
-    # Reset eucentric error
-    return
+    
+    z0_ini, y0_ini = positioner.getpos()
+    pas = 1
+    alpha = [i*pas for i in range(int(angle[0]/pas), int(angle[-1]/pas)+1)]
+    index_0 = alpha.index(0)
+
+    finterpa = interpolate.CubicSpline(angle, displacement[:,1])
+    displacement_y_interpa = finterpa(alpha)
+
+    displacement_y_interpa_prime = [0]*len(displacement_y_interpa)
+
+    ## z0 computation
+    for j in range(1,len(displacement_y_interpa)-1):
+        displacement_y_interpa_prime[j] = (displacement_y_interpa[j+1]-displacement_y_interpa[j-1])/(2*pas*np.pi/180)
+    displacement_y_interpa_prime[0] = displacement_y_interpa_prime[1]   # Edge effect correction
+    displacement_y_interpa_prime[-1] = displacement_y_interpa_prime[-2] # Edge effect correction
+
+    z0_calc = displacement_y_interpa_prime[index_0]
+
+    ## yA computation
+    y0_calc = [0]*len(displacement_y_interpa)
+    for i in range(index_0):
+        y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
+    for i in range(index_0+1, len(displacement_y_interpa)): # derivative is not define for angle=0
+        y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
+    del y0_calc[index_0] # delete not computed 0-angle value from the result list
+
+    z0 = z0_ini + z0_calc                     
+    y0 = y0_ini + mean(y0_calc)
+
+    # Adjust positioner position
+    positioner.setpos_abs([z0, y0, 0])
+
+    # Adjust microscope stage position
+    microscope.specimen.compustage.relative_move(0, y0, 0)
+
+    # Adjust focus because z0 move
+    # microscope.auto_functions.run_auto_focus()
+    # Or
+    microscope.beams.electron_beam.working_distance.value += z0
+
+    return z0, y0
 
 def match(image_master, image_template, grid_size = 10, ratio_template_master = 0.5, ratio_master_template_patch = 0, speed_factor = 4):
     ''' Match two images
@@ -158,7 +196,7 @@ def set_eucentric(microscope, positioner) -> int:
         angle.append(positioner.getpos()[2])
         dx_pix, dy_pix, corr_trust = match(image_euc[1], image_euc[0])
 
-        if corr_trust <= 0.3:
+        if corr_trust <= 0.3: # 0.3 empirical value. Need to be optimized
             '''If match is not good'''
             if angle_step >= 100000:
                 '''Decrease angle step up to 0.1 degree'''
@@ -166,7 +204,7 @@ def set_eucentric(microscope, positioner) -> int:
                 positioner.setpos_rel([0, 0, -multiplicator*angle_step])
             else:
                 '''Zoom out x2'''
-                z0, y0 = correct_eucentric(microscope, positioner, displacement)
+                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
                 positioner.setpos_abs([z0, y0, 0])
                 microscope.beams.electron_beam.horizontal_field_width.value = hfw*2
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings).data
@@ -177,13 +215,13 @@ def set_eucentric(microscope, positioner) -> int:
         dx_si = dx_pix*hfw/image_width
         dy_si = dy_pix*hfw/image_width
         displacement.append([dx_si, dy_si])
-        eucentric_error = sum(displacement[1])
+        eucentric_error = sum(displacement[:,1])
 
         if abs(positioner.getpos()[2]) >= angle_max:
             '''If out of the angle range'''
             if multiplicator == 1:
                 '''Start again with negative angles'''
-                z0, y0 = correct_eucentric(microscope, positioner, displacement)
+                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
                 multiplicator = -1
                 positioner.setpos_abs([z0, y0, 0])
                 displacement = []
@@ -193,7 +231,7 @@ def set_eucentric(microscope, positioner) -> int:
 
             if multiplicator == -1:
                 '''Zoom in x2'''
-                z0, y0 = correct_eucentric(microscope, positioner, displacement)
+                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
                 multiplicator = 1
                 positioner.setpos_abs([z0, y0, 0])
                 microscope.beams.electron_beam.horizontal_field_width.value = hfw//2
