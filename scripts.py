@@ -3,6 +3,10 @@ import numpy as np
 import cv2 as cv
 
 def correct_eucentric(microscope, positioner, displacement):
+    '''
+    '''
+    if displacement == []:
+        return 1
     # Check limits
     # Try to correct eucentric position (z (prior) and y)
     # Adjust stage position according y value along the y axis.
@@ -136,7 +140,8 @@ def set_eucentric(microscope, positioner) -> int:
     image_height = int(resolution[-resolution.find('x'):])
     settings = GrabFrameSettings(resolution=resolution, dwell_time=1e-6, bit_depth=16)
     image_euc = np.zeros((2, image_height, image_width))
-    displacement = []
+    displacement = [[0, 0]]
+    angle = [0]
     z0 = 0
     y0 = 0
 
@@ -150,13 +155,17 @@ def set_eucentric(microscope, positioner) -> int:
     while eucentric_error > precision or positioner.getpos()[2] < angle_max:
         
         image_euc[1] = microscope.imaging.grab_multiple_frames(settings).data
+        angle.append(positioner.getpos()[2])
         dx_pix, dy_pix, corr_trust = match(image_euc[1], image_euc[0])
 
         if corr_trust <= 0.3:
-            if angle_step >= 100000: # 0.1 degrees
+            '''If match is not good'''
+            if angle_step >= 100000:
+                '''Decrease angle step up to 0.1 degree'''
                 angle_step /= 2
                 positioner.setpos_rel([0, 0, -multiplicator*angle_step])
             else:
+                '''Zoom out x2'''
                 z0, y0 = correct_eucentric(microscope, positioner, displacement)
                 positioner.setpos_abs([z0, y0, 0])
                 microscope.beams.electron_beam.horizontal_field_width.value = hfw*2
@@ -170,31 +179,35 @@ def set_eucentric(microscope, positioner) -> int:
         displacement.append([dx_si, dy_si])
         eucentric_error = sum(displacement[1])
 
+        if abs(positioner.getpos()[2]) >= angle_max:
+            '''If out of the angle range'''
+            if multiplicator == 1:
+                '''Start again with negative angles'''
+                z0, y0 = correct_eucentric(microscope, positioner, displacement)
+                multiplicator = -1
+                positioner.setpos_abs([z0, y0, 0])
+                displacement = []
+                image_euc[0] = microscope.imaging.grab_multiple_frames(settings).data
+                angle_step = angle_step0
+                positioner.setpos_abs([z0, y0, multiplicator*angle_step])
 
-        current_pos = positioner.getpos()
-        if abs(current_pos[2]) >= angle_max:
             if multiplicator == -1:
-                
-                break
-            multiplicator = -1
-            positioner.setpos_abs([z0, y0, 0])
-            displacement = []
-            image_euc[0] = microscope.imaging.grab_multiple_frames(settings).data
-            angle_step = angle_step0
-            positioner.setpos_abs([z0, y0, multiplicator*angle_step])
-            
+                '''Zoom in x2'''
+                z0, y0 = correct_eucentric(microscope, positioner, displacement)
+                multiplicator = 1
+                positioner.setpos_abs([z0, y0, 0])
+                microscope.beams.electron_beam.horizontal_field_width.value = hfw//2
+                image_euc[0] = microscope.imaging.grab_multiple_frames(settings).data
+                angle_step = angle_step0
+                positioner.setpos_abs([z0, y0, multiplicator*angle_step])
+            continue
 
         positioner.setpos_rel([0, 0, multiplicator*angle_step])
         image_euc[0] = np.ndarray.copy(image_euc[1])
 
-    # Deal magnification adjustements according step and if it find solution or not.         
-
     positioner.setpos_abs([z0, y0, 0])
     print('Done eucentrixx')
     return 0
-
-
-
 
 def tomo_acquisition(micro_settings:list, smaract_settings:list, drift_correction:bool=False) -> int:
     ''' Acquire set of images according to input parameters.

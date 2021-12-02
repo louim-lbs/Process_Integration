@@ -15,6 +15,7 @@
     - Augmenter le dwell time pour augmenter la précision.
     - Corriger le décalage de l'axe de tilt grâce à une analyse avec un déplacement horizontal de y
     - Faire se recouvrir les patchs pour moyenner les erreurs.
+    - Logging
 - **Dynamical focus** for low-deep-field STEM acquisition?
 - **16-bits** default acquisition.
 
