@@ -9,7 +9,7 @@
 
 ### Microscope
 - **Eucentric**. Write operation steps.
-    - Attention au sens et aux axes.
+    - Attention au sens et aux axes. Match function: x and y from left-up corner of the image.
     - Calculer le décallage une fois qu'il a été fait la premmière fois.
     - Le HAADF donne le meilleur contraste
     - Augmenter le dwell time pour augmenter la précision.

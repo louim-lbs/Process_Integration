@@ -90,9 +90,9 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     mean_y = np.mean(dy_tot)
     stdev_x = np.std(dx_tot)
     stdev_y = np.std(dy_tot)
-    plt.plot(dx_tot)
-    plt.plot(dy_tot)
-    plt.show()
+    # plt.plot(dx_tot)
+    # plt.plot(dy_tot)
+    # plt.show()
     for d in dx_tot:
         if (d < mean_x - stdev_x) or (mean_x + stdev_x < d):
             dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
@@ -103,23 +103,23 @@ def match(image_master, image_template, grid_size = 10, ratio_template_master = 
     mean_y = np.mean(dy_tot)
     stdev_x = np.std(dx_tot)
     stdev_y = np.std(dy_tot)
-    plt.plot(dx_tot)
-    plt.plot(dy_tot)
-    plt.show()
+    # plt.plot(dx_tot)
+    # plt.plot(dy_tot)
+    # plt.show()
     for d in dx_tot:
         if (d < mean_x - stdev_x) or (mean_x + stdev_x < d):
             dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
     for d in dy_tot:
         if (d < mean_y - stdev_y) or (mean_y + stdev_y < d):
             dy_tot = np.delete(dy_tot, np.where(dy_tot==d))
-    plt.plot(dx_tot)
-    plt.plot(dy_tot)
-    plt.show()
+    # plt.plot(dx_tot)
+    # plt.plot(dy_tot)
+    # plt.show()
     dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
-    plt.plot(dx_tot)
-    plt.plot(dy_tot)
-    plt.show()
+    # plt.plot(dx_tot)
+    # plt.plot(dy_tot)
+    # plt.show()
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
