@@ -165,8 +165,8 @@ class smaract_class(object):
                 error = 1
         return error
 
-    def angle_convert(self, angle_py:int) -> int:
-        ''' Convert "normal" angles to Smaract angle plus revolution type.
+    def angle_convert_SI2Smaract(self, angle_py:int) -> int:
+        ''' Convert SI angles to Smaract angle plus revolution type.
 
         Input:
             - angle in microdegrees (int).
@@ -176,9 +176,9 @@ class smaract_class(object):
             - revolution 0 or -1 according positive or negative rotation (int).
 
         Exemple:
-            angle, revolution = angle_convert(90000000)
+            angle, revolution = angle_convertSI2Smaract(90000000)
                 -> 90000000, 0
-            ngle, revolution = angle_convert(-90000000)
+            angle, revolution = angle_convertSI2Smaract(-90000000)
                 -> 270000000, -1
         '''
         revolution = 0
@@ -186,6 +186,29 @@ class smaract_class(object):
             revolution = -1
             angle_py = 360000000 + angle_py
         return angle_py, revolution
+
+    def angle_convert_Smaract2SI(self, angle_smaract:int) -> int:
+        ''' Convert SI angles to Smaract angle plus revolution type.
+
+        Input:
+            - positive angle in microdegrees converted for absolute move (int).
+        
+        Return:
+            - angle in microdegrees (int).
+
+        Exemple:
+            angle = angle_convert_Smaract2SI(90000000)
+                -> 90000000, 0
+            angle = angle_convert_Smaract2SI(270000000)
+                -> -90000000
+        '''
+        if 0 <= angle_smaract <= 90000000:
+            return angle_smaract
+        elif 270000000 <= angle_smaract <= 360000000:
+            return angle_smaract-360000000
+        else:
+            print('problem to convert angles')
+            exit()
     
     def gets_limits(self):
         ''' Retrieve the travel range limits of positioners.
@@ -319,7 +342,7 @@ class smaract_class(object):
                 return 1
         except:
             return 1
-        pos[2], revolution = self.angle_convert(pos[2])
+        pos[2], revolution = self.angle_convert_SI2Smaract(pos[2])
         
         pos = [ctypes.c_uint32(int(pos[0])), ctypes.c_uint32(int(pos[1])), ctypes.c_uint32(int(pos[2]))]
         revolution = ctypes.c_int32(revolution)
