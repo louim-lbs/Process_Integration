@@ -2,3 +2,4 @@ __pycache__/
 /data
 /.vscode
 /last_execution.log
+/__pycache__
