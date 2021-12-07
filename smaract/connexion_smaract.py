@@ -284,11 +284,10 @@ class smaract_class(object):
         y_pos   = ctypes.c_int32()
         t_angle = ctypes.c_uint32()
         t_revol = ctypes.c_int32()
-
         try:
-            z_pos_status   = smaract.smart.SA_GetPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(0), ctypes.byref(z_pos))
-            y_pos_status   = smaract.smart.SA_GetPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(1), ctypes.byref(y_pos))
-            t_angle_status = smaract.smart.SA_GetAngle_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ctypes.byref(t_angle), ctypes.byref(t_revol))
+            z_pos_status   = self.smart.SA_GetPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(0), ctypes.byref(z_pos))
+            y_pos_status   = self.smart.SA_GetPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(1), ctypes.byref(y_pos))
+            t_angle_status = self.smart.SA_GetAngle_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ctypes.byref(t_angle), ctypes.byref(t_revol))
         except:
             logging.info(' Something went wrong when acquiring postition of positioners')
             return [None, None, None]
@@ -320,10 +319,9 @@ class smaract_class(object):
                 return 1
         except:
             return 1
-        
         pos[2], revolution = self.angle_convert(pos[2])
         
-        pos = [ctypes.c_uint32(pos[0]), ctypes.c_uint32(pos[1]), ctypes.c_uint32(pos[2])]
+        pos = [ctypes.c_uint32(int(pos[0])), ctypes.c_uint32(int(pos[1])), ctypes.c_uint32(int(pos[2]))]
         revolution = ctypes.c_int32(revolution)
         
         try:
@@ -365,7 +363,7 @@ class smaract_class(object):
         except:
             return 1
         
-        step = [ctypes.c_uint32(step[0]), ctypes.c_uint32(step[1]), ctypes.c_uint32(step[2])]
+        step = [ctypes.c_uint32(int(step[0])), ctypes.c_uint32(int(step[1])), ctypes.c_uint32(int(step[2]))]
         revolution = ctypes.c_int32(0)
 
         try:
@@ -452,3 +450,5 @@ if __name__ == "__main__":
     # smaract.setpos_abs([0, 0, -10000000])
     # time.sleep(1)
     # smaract.setpos_abs([0, 0, 0])
+
+    print(smaract.getpos())
