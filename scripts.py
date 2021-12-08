@@ -7,9 +7,14 @@ from scipy import interpolate
 def correct_eucentric(microscope, positioner, displacement, angle):
     '''
     '''
-    angle = sorted(angle)
+    angle_sort = sorted(angle)
+    if angle_sort == angle:
+        direction = 1
+    else:
+        direction = -1
+
     print(displacement)
-    print(angle)
+    print(angle_sort)
 
     z0_ini, y0_ini, _ = positioner.getpos()
 
@@ -20,10 +25,10 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     print('z0_ini, y0_ini', z0_ini, y0_ini)
 
     pas = 1000000 # 1° with smaract convention
-    alpha = [i for i in range(int(angle[0]/pas), int(angle[-1]/pas)+1)]
+    alpha = [i for i in range(int(angle_sort[0]/pas), int(angle_sort[-1]/pas)+1)]
     index_0 = alpha.index(0)
 
-    finterpa = interpolate.CubicSpline([i/pas for i in angle[:]], [i[0] for i in displacement[:]])
+    finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], [i[0] for i in displacement]) # i[0] -> displacement in x direction of images (vertical)
     displacement_y_interpa = finterpa(alpha)
 
     displacement_y_interpa_prime = [0]*len(displacement_y_interpa)
@@ -41,20 +46,16 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     y0_calc = [0]*len(displacement_y_interpa_prime)
     for i in range(index_0):
         y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
-    for i in range(index_0+1, len(displacement_y_interpa_prime)): # derivative is not define for angle=0
+    for i in range(index_0+1, len(displacement_y_interpa_prime)): # derivative is not define for angle_sort=0
         y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
-    del y0_calc[index_0] # delete not computed 0-angle value from the result list
-
-    z0 = z0_ini + z0_calc*1000000000
-    y0 = y0_ini + mean(y0_calc)*1000000000
-
-    print('z0, y0', z0, y0)
+    del y0_calc[index_0] # delete not computed 0-angle_sort value from the result list
 
     # Adjust positioner position
-    print(positioner.setpos_abs([z0, y0, 0]))
+    positioner.setpos_rel([z0_calc*1e9, direction*mean(y0_calc)*1e9, 0])
 
     # Adjust microscope stage position
-    microscope.specimen.stage.relative_move(StagePosition(y=mean(y0_calc))) ####################Check this
+    microscope.specimen.stage.relative_move(StagePosition(y=direction*mean(y0_calc))) ####################Check this, sign for contre-positive image check?
+    # microscope.specimen.stage.relative_move(StagePosition(y=y0*1e-9))
 
     # Adjust focus because z0 move
     # microscope.auto_functions.run_auto_focus()
@@ -63,7 +64,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
 
 
     # Check limits
-    return z0, y0
+    return z0_calc, mean(y0_calc) #################### relative move in meters
 
 def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0):
     ''' Match two images
