@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory
@@ -13,9 +14,13 @@ class App(object):
         root.title("Tomo Controller for Quattro and Smaract positioner - version 0.1")
         # root.iconbitmap('PI.ico')
 
-        self.microscope = microscope
-        self.positioner = positioner
-        
+        try:
+            self.microscope = microscope
+            self.positioner = positioner
+        except:
+            self.microscope = 0
+            self.positioner = 0
+
         # Window size
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
@@ -24,16 +29,19 @@ class App(object):
         alignstr = '%dx%d+%d+%d' % (width, height, screenwidth/76.8, screenheight*3/76.8)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
-        # 1536x1094
 
         ### Init
         frm_ini = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//4, height=height//4, bg='#202020')
         frm_ini.place(x=0, y=0)
 
-        if self.microscope.InitState_status == 0:
-            micro1_value = 'green'
-        else:
+        try:
+            if self.microscope.InitState_status == 0:
+                micro1_value = 'green'
+            else:
+                micro1_value = 'red'
+        except:
             micro1_value = 'red'
+
         self.micro1 = tk.StringVar(value=micro1_value)
         self.lbl_micro1 = tk.Label(master=frm_ini, width=1, height=1, bg=self.micro1.get())
         self.lbl_micro1.place(x=180, y=20)
@@ -41,10 +49,14 @@ class App(object):
         self.lbl_micro2 = tk.Label(master=frm_ini, width=20, height=1, bg='#2B2B2B', fg='white', text="Microscope", justify='left')
         self.lbl_micro2.place(x=20, y=20)
 
-        if self.positioner.InitState_status == 0:
-            smara1_value = 'green'
-        else:
+        try:
+            if self.positioner.InitState_status == 0:
+                smara1_value = 'green'
+            else:
+                smara1_value = 'red'
+        except:
             smara1_value = 'red'
+
         self.smara1 = tk.StringVar(value=smara1_value)
         self.lbl_smara1 = tk.Label(master=frm_ini, width=1, height=1, bg=self.smara1.get())
         self.lbl_smara1.place(x=180, y=60)
@@ -164,9 +176,13 @@ class App(object):
         ''' Set the eucentric point
         '''
         self.lbl_eucent.config(bg='orange')
+        self.lbl_eucent.update()
+        
         set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
+        
         if set_eucentric_status == 0:
             self.lbl_eucent.config(bg='green')
+            self.lbl_eucent.update()
             return 0
         return 1
     
@@ -196,6 +212,10 @@ class App(object):
 
     def acquisition(self):
         self.lbl_acquisition.config(bg="orange")
+        self.lbl_acquisition.update()
+        
+        self.lbl_acquisition.config(bg="red")
+        self.lbl_acquisition.update()
         '''
         '''
         # set_tomo_status = scripts.tomo_acquisition(self.microscope.micro_settings, self.positioner.smaract_settings, drift_correction=False)
@@ -206,5 +226,5 @@ class App(object):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = App(root)
+    app = App(root, 0, 0)
     root.mainloop()

@@ -3,18 +3,14 @@
 Use Python 32-bits
 
 @author: Louis-Marie Lebas
-Created on Fri Oct 29 2021
+Updated on Dec 08 2021
 '''
-
-### Imports
 
 import os
 import logging
 
 dir_pi = os.getcwd()
 logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)
-
-
 
 imp = 0
 while True:
@@ -35,9 +31,7 @@ while True:
 ### Connexion
 
 # Connect to microscope
-
 quattro = SdbMicroscopeClient()
-
 try:
     quattro.connect() # online connection
     SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
@@ -50,18 +44,12 @@ except:
 
 
 # Connect to positioner
-
 from smaract import connexion_smaract as sm
 smaract = sm.smaract_class(calibrate=False)
 
-
-
 # Lauch GUI
-
 os.chdir(dir_pi)
-
 from gui import GUI
-
 root = GUI.tk.Tk()
 app = GUI.App(root, quattro, smaract)
 root.mainloop()

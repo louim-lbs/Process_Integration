@@ -5,7 +5,21 @@ from numpy.core.fromnumeric import mean
 from scipy import interpolate
 
 def correct_eucentric(microscope, positioner, displacement, angle):
-    '''
+    ''' Calculate z and y parameters for postioner eucentric correction, correct it, correct microscope view and focus.
+
+    Input:
+        - Microscope control class (class).
+        - Positioner control class (class).
+        - Displacement vector of images in meters (list[float, float]).
+        - Angle list according to images in degrees (list[float]).
+
+    Output:
+        - z relative parameter in meter (float).
+        - y relative parameter in meter (float).
+
+    Exemple:
+        z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
+            -> z0 = 0.000001, y0 = 0.000001
     '''
     angle_sort = sorted(angle)
     if angle_sort == angle:
@@ -13,16 +27,11 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     else:
         direction = -1
 
-    print(displacement)
-    print(angle_sort)
-
     z0_ini, y0_ini, _ = positioner.getpos()
 
     if displacement == [[0,0]]:
 
         return z0_ini, y0_ini
-
-    print('z0_ini, y0_ini', z0_ini, y0_ini)
 
     pas = 1000000 # 1° with smaract convention
     alpha = [i for i in range(int(angle_sort[0]/pas), int(angle_sort[-1]/pas)+1)]
@@ -37,7 +46,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     for j in range(1,len(displacement_y_interpa)-1):
         displacement_y_interpa_prime[j] = (displacement_y_interpa[j+1]-displacement_y_interpa[j-1])/((alpha[j+1]-alpha[j-1])*np.pi/180)
     displacement_y_interpa_prime[0] = displacement_y_interpa_prime[1]   # Edge effect correction
-    displacement_y_interpa_prime[-1] = displacement_y_interpa_prime[-2]   # Edge effect correction
+    displacement_y_interpa_prime[-1] = displacement_y_interpa_prime[-2] # Edge effect correction
     # del displacement_y_interpa_prime[-1] # Edge effect correction
 
     z0_calc = displacement_y_interpa_prime[index_0]
@@ -96,30 +105,11 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     template_patch_size = (height_template//grid_size,
                             width_template//grid_size)
 
-    # master_patch_size = (int(height_master - height_template + template_patch_size[0])//speed_factor,
-    #                      int(width_master  - width_template  + template_patch_size[1])/speed_factor)
-    
-    # if ratio_master_template_patch != 0:
-    #     if ratio_master_template_patch > max(master_patch_size[0], master_patch_size[1]):
-    #         pass
-    #     master_patch_size = (int(template_patch_size[0]*ratio_master_template_patch),
-    #                          int(template_patch_size[1]*ratio_master_template_patch))
-
     displacement_vector = np.array([[0,0]])
     corr_trust = np.array(0)
 
     for i in range(grid_size):
         for j in range(grid_size):
-            
-            # master_patch_xA = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0]
-            # master_patch_yA = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1]
-            # master_patch_xB = (height_master - height_template)//2 - (master_patch_size[0] - template_patch_size[0])//2 + (i)*template_patch_size[0] + master_patch_size[0]
-            # master_patch_yB = (width_master  - width_template)//2  - (master_patch_size[1] - template_patch_size[1])//2 + (j)*template_patch_size[1] + master_patch_size[1]
-
-            # master_patch = image_master[int(master_patch_xA):int(master_patch_xB),
-            #                             int(master_patch_yA):int(master_patch_yB)]
-
-
             template_patch_xA = (height_master - height_template)//2 + (i)*template_patch_size[0]
             template_patch_yA = (width_master  - width_template)//2  + (j)*template_patch_size[1]
             template_patch_xB = (height_master - height_template)//2 + (i+1)*template_patch_size[0]
@@ -128,16 +118,12 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
             template_patch = image_template[int(template_patch_xA):int(template_patch_xB),
                                             int(template_patch_yA):int(template_patch_yB)]
 
-            corr_scores = cv.matchTemplate(image_master, template_patch, cv.TM_CCOEFF_NORMED) # plein de param à modifier après pour que ça marche
-            # corr_scores = cv.matchTemplate(master_patch, template_patch, cv.TM_CCOEFF_NORMED)
+            corr_scores = cv.matchTemplate(image_master, template_patch, cv.TM_CCOEFF_NORMED)
 
             _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
 
             dx = template_patch_xA - max_loc[1]
             dy = template_patch_yA - max_loc[0]
-
-            # dx = (master_patch_size[0] - template_patch_size[0])//2 - max_loc[1]
-            # dy = (master_patch_size[1] - template_patch_size[1])//2 - max_loc[0]
 
             displacement_vector = np.append(displacement_vector, [[dx, dy]], axis=0)
 
@@ -224,20 +210,18 @@ def set_eucentric(microscope, positioner) -> int:
             else:
                 '''Zoom out x2'''
                 z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-                positioner.setpos_abs([z0, y0, 0])
                 microscope.beams.electron_beam.horizontal_field_width.value *= 2
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
                 angle_step = angle_step0
-                positioner.setpos_abs([z0, y0, angle_step])
+                positioner.setpos_rel([0, 0, angle_step])
             continue
-        
+
         dx_si = dx_pix*hfw/image_width
         dy_si = dy_pix*hfw/image_width
 
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
-        # print(dx_pix, dy_pix)
-        # print(dx_si, dy_si)
+
         eucentric_error = sum([i[0] for i in displacement])
 
         if abs(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) >= angle_max:
@@ -246,21 +230,19 @@ def set_eucentric(microscope, positioner) -> int:
                 '''Start again with negative angles'''
                 z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
                 multiplicator = -1
-                positioner.setpos_abs([z0, y0, 0])
                 displacement = [[0,0]]
                 angle = [0]
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
                 angle_step = angle_step0
-                positioner.setpos_abs([z0, y0, multiplicator*angle_step])
+                positioner.setpos_rel([0, 0, multiplicator*angle_step])
             elif multiplicator == -1:
                 '''Zoom in x2'''
                 z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
                 multiplicator = 1
-                positioner.setpos_abs([z0, y0, 0])
                 microscope.beams.electron_beam.horizontal_field_width.value /= 2
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
                 angle_step = angle_step0
-                positioner.setpos_abs([z0, y0, multiplicator*angle_step])
+                positioner.setpos_abs([0, 0, multiplicator*angle_step])
             continue
 
         positioner.setpos_rel([0, 0, multiplicator*angle_step])

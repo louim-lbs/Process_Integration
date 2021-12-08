@@ -13,7 +13,7 @@
     - Deal with smaract errors
     - IF NOT MATCHED INCREASE DWELL TIME.
     - Attention au sens et aux axes. Match function: x and y from left-up corner of the image.
-    - Calculer le décallage une fois qu'il a été fait la premmière fois.
+    - Calculer le décallage une fois qu'il a été fait la première fois.
     - Le HAADF donne le meilleur contraste
     - Augmenter le dwell time pour augmenter la précision.
     - Corriger le décalage de l'axe de tilt grâce à une analyse avec un déplacement horizontal de y
@@ -24,6 +24,7 @@
 
 ### GUI
 - Button to open help/tutorial to remember acquisition settings.
+- Button position with fraction of size, not with element height.
 
 
 
