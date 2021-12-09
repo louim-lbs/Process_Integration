@@ -142,7 +142,7 @@ class smaract_class(object):
                 return k 
         return ''
     
-    def check_status(self, list:vector, error_text:str = 'Something went wrong. ') -> int:
+    def check_status(self, list:vector, error_text:str = 'Error. ') -> int:
         ''' Check if an error occured during smart C++ function execution. If so, the corresponding status message is written in log.
 
         Input:

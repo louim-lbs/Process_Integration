@@ -1,9 +1,33 @@
 import time
+import threading
+import logging
 import tkinter as tk
+import tkinter.scrolledtext as ScrolledText
 from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 import scripts
+
+class TextHandler(logging.Handler):
+    # This class allows you to log to a Tkinter Text or ScrolledText widget
+    # Adapted from Moshe Kaplan: https://gist.github.com/moshekaplan/c425f861de7bbf28ef06
+
+    def __init__(self, text):
+        # run the regular Handler __init__
+        logging.Handler.__init__(self)
+        # Store a reference to the Text it will log to
+        self.text = text
+
+    def emit(self, record):
+        msg = self.format(record)
+        def append():
+            self.text.configure(state='normal')
+            self.text.insert(tk.END, msg + '\n')
+            self.text.configure(state='disabled')
+            # Autoscroll to the bottom
+            self.text.yview(tk.END)
+        # This is necessary because we can't modify the Text from other threads
+        self.text.after(0, append)
 
 class App(object):
     def __init__(self, root, microscope, positioner):
@@ -78,9 +102,12 @@ class App(object):
         self.frm_log = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//4, height=3*height//4+1, bg='#202020')
         self.frm_log.place(x=0, y=height//4)
 
-        self.log = tk.StringVar(value="Hello\nWorld!")
-        self.lbl_log = tk.Label(master=self.frm_log, width=48, height=38, bg='#2B2B2B', fg='white', textvariable=self.log, justify=tk.LEFT, anchor='nw')
+        self.lbl_log = ScrolledText.ScrolledText(master=self.frm_log, width=40, height=36, bg='#2B2B2B', fg='white')
         self.lbl_log.place(x=10, y=10)
+
+        text_handler = TextHandler(self.lbl_log)
+        logger = logging.getLogger()
+        logger.addHandler(text_handler)
 
         ### Image et Eucentrique
         self.frm_img = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//2, height=height, bg='#202020')
@@ -123,16 +150,18 @@ class App(object):
         self.btn_t_up.place(x=242, y=210)
         self.btn_t_down.place(x=242, y=320)
 
-        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="394 325 623" + " nm", justify='left')
-        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="394 345 623" + " nm", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="39.4°", justify='left')
+        positioner_pos = self.positioner.getpos()
+        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[0]) + " nm", justify='left')
+        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[1]) + " nm", justify='left')
+        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[2]) + " u°", justify='left')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
 
-        self.ent_z_step = tk.Entry(master=self.frm_mov, width=15, bg='#2B2B2B', fg='white', text="394 325 623" + " nm", justify='left')
-        self.ent_y_step = tk.Entry(master=self.frm_mov, width=15, bg='#2B2B2B', fg='white', text="394 324 623" + " nm", justify='left')
-        self.ent_t_step = tk.Entry(master=self.frm_mov, width=15, bg='#2B2B2B', fg='white', text="39.4°", justify='left')
+        ent_step_values = tuple(10**i for i in range(10))
+        self.ent_z_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', fg='white', values=ent_step_values, justify='center')
+        self.ent_y_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', fg='white', values=ent_step_values, justify='center')
+        self.ent_t_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', fg='white', values=ent_step_values, justify='center')
         self.ent_z_step.place(x=20, y=280)
         self.ent_y_step.place(x=130, y=280)
         self.ent_t_step.place(x=240, y=280)
@@ -187,27 +216,45 @@ class App(object):
         return 1
     
     def z_up(self):
-        step = self.ent_z_step.get()
+        step = int(self.ent_z_step.get())
+        self.positioner.setpos_rel([step, 0, 0])
+        self.lbl_z_pos.config(text=str(self.positioner.getpos()[0]) + ' nm')
+        self.lbl_z_pos.update()
         return 0
 
     def y_up(self):
-        step = self.ent_z_step.get()
+        step = int(self.ent_z_step.get())
+        self.positioner.setpos_rel([0, step, 0])
+        self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
+        self.lbl_y_pos.update()
         return 0
 
     def t_up(self):
-        step = self.ent_y_step.get()
+        step = int(self.ent_y_step.get())
+        self.positioner.setpos_rel([0, 0, step])
+        self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
+        self.lbl_t_pos.update()
         return 0
     
     def z_down(self):
-        step = self.ent_y_step.get()
+        step = int(self.ent_y_step.get())
+        self.positioner.setpos_rel([-step, 0, 0])
+        self.lbl_z_pos.config(text=str(self.positioner.getpos()[0]) + ' nm')
+        self.lbl_z_pos.update()
         return 0
     
     def y_down(self):
-        step = self.ent_t_step.get()
+        step = int(self.ent_t_step.get())
+        self.positioner.setpos_rel([0, -step, 0])
+        self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
+        self.lbl_y_pos.update()
         return 0
     
     def t_down(self):
-        step = self.ent_t_step.get()
+        step = int(self.ent_t_step.get())
+        self.positioner.setpos_rel([0, 0, step])
+        self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
+        self.lbl_t_pos.update()
         return 0
 
     def acquisition(self):

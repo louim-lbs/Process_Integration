@@ -4,6 +4,9 @@
 
 ********** TO DO
 
+- Improve performances
+- Investigate threading (see above).
+
 ### Smaract
 - **Calibrate and Set software limits** and check it to prevent breaking device cables. SA_FindReferenceMark_S()
 

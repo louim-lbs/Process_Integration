@@ -26,7 +26,7 @@ while True:
             #!pip install opencv-python # type: ignore
             imp = 1
         if imp != 0:
-            logging.info('Something went wrong. Check your Autoscript installation')
+            logging.info('Error. Check your Autoscript installation')
 
 ### Connexion
 
