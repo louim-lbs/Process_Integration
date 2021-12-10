@@ -188,7 +188,7 @@ class smaract_class(object):
         return angle_py, revolution
 
     def angle_convert_Smaract2SI(self, angle_smaract:int) -> int:
-        ''' Convert SI angles to Smaract angle plus revolution type.
+        ''' Convert Smaract angle plus revolution type to SI angles.
 
         Input:
             - positive angle in microdegrees converted for absolute move (int).

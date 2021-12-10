@@ -22,6 +22,7 @@
     - Corriger le décalage de l'axe de tilt grâce à une analyse avec un déplacement horizontal de y
     - Faire se recouvrir les patchs pour moyenner les erreurs.
     - Logging
+    - Check limits of displacement.
 - **Dynamical focus** for low-deep-field STEM acquisition?
 - **16-bits** default acquisition.
 
