@@ -102,7 +102,7 @@ class App(object):
         self.frm_log = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//4, height=3*height//4+1, bg='#202020')
         self.frm_log.place(x=0, y=height//4)
 
-        self.lbl_log = ScrolledText.ScrolledText(master=self.frm_log, width=40, height=36, bg='#2B2B2B', fg='white')
+        self.lbl_log = ScrolledText.ScrolledText(master=self.frm_log, width=48, height=40, bg='#2B2B2B', fg='white')
         self.lbl_log.vbar.config(troughcolor = 'red', bg = 'blue')
         self.lbl_log.place(x=10, y=10)
 
@@ -260,7 +260,7 @@ class App(object):
     
     def t_down(self):
         step = int(self.ent_t_step.get())
-        self.positioner.setpos_rel([0, 0, step])
+        self.positioner.setpos_rel([0, 0, -step])
         self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
         self.lbl_t_pos.update()
         return 0

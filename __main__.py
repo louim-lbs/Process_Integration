@@ -40,6 +40,3 @@ from gui import GUI
 root = GUI.tk.Tk()
 app = GUI.App(root, quattro, smaract)
 root.mainloop()
-
-
-
