@@ -12,21 +12,9 @@ import logging
 dir_pi = os.getcwd()
 logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)
 
-imp = 0
-while True:
-    try:
-        from autoscript_sdb_microscope_client import SdbMicroscopeClient
-        from autoscript_sdb_microscope_client.enumerations import *
-        from autoscript_sdb_microscope_client.structures import *
-        break
-    except:
-        if imp == 0:
-            logging.info('Autoscript import failed... Trying to install pillow and cv2 requirements and trying again')
-            #!pip install pillow # type: ignore
-            #!pip install opencv-python # type: ignore
-            imp = 1
-        if imp != 0:
-            logging.info('Error. Check your Autoscript installation')
+from autoscript_sdb_microscope_client import SdbMicroscopeClient
+from autoscript_sdb_microscope_client.enumerations import *
+from autoscript_sdb_microscope_client.structures import *
 
 ### Connexion
 
@@ -41,7 +29,6 @@ except:
         SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
     except:
         SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if not connected
-
 
 # Connect to positioner
 from smaract import connexion_smaract as sm

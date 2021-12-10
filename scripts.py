@@ -3,6 +3,7 @@ import numpy as np
 import cv2 as cv
 from numpy.core.fromnumeric import mean
 from scipy import interpolate
+import os
 
 def correct_eucentric(microscope, positioner, displacement, angle):
     ''' Calculate z and y parameters for postioner eucentric correction, correct it, correct microscope view and focus.
@@ -187,7 +188,7 @@ def set_eucentric(microscope, positioner) -> int:
 
     multiplicator = 1
     image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
-    # positioner.setpos_abs([z0, y0, angle_step])
+    
     positioner.setpos_rel([0, 0, angle_step])
 
     while abs(eucentric_error) > precision or positioner.angle_convert_Smaract2SI(positioner.getpos()[2]) < angle_max:
@@ -252,7 +253,7 @@ def set_eucentric(microscope, positioner) -> int:
     print('Done eucentrixx')
     return 0
 
-def tomo_acquisition(micro_settings:list, smaract_settings:list, drift_correction:bool=False) -> int:
+def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=2, drift_correction:bool=False) -> int:
     ''' Acquire set of images according to input parameters.
 
     Input:
@@ -264,7 +265,7 @@ def tomo_acquisition(micro_settings:list, smaract_settings:list, drift_correctio
             - dwell time
         - Smaract parameters:
             - tilt increment
-            - tilt to begin from
+            # - tilt to begin from
     
     Return:
         - success or error code (int).
@@ -273,5 +274,18 @@ def tomo_acquisition(micro_settings:list, smaract_settings:list, drift_correctio
         tomo_status = tomo_acquisition(micro_settings, smaract_settings, drift_correction=False)
             -> 0
     '''
-    print('Tomographixx')
+    pos = positioner.getpos()
+    nb_images = pos[2]//tilt_increment + 1
+
+    os.makedirs('./data/tomo/' + images_name, exist_ok=True)
+
+    for i in range(nb_images):
+        ###### Drift correction
+        settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+        images = microscope.imaging.grab_multiple_frames(settings)
+        images[0].save(work_folder + 'SE/'   + str(images_name) + str(i) + '.tif')
+        images[1].save(work_folder + 'BF/'   + str(images_name) + str(i) + '.tif')
+        images[2].save(work_folder + 'HAADF' + str(images_name) + str(i) + '.tif')
+
+    print('Tomographixx is a Succes')
     return 0

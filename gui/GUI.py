@@ -103,6 +103,7 @@ class App(object):
         self.frm_log.place(x=0, y=height//4)
 
         self.lbl_log = ScrolledText.ScrolledText(master=self.frm_log, width=40, height=36, bg='#2B2B2B', fg='white')
+        self.lbl_log.vbar.config(troughcolor = 'red', bg = 'blue')
         self.lbl_log.place(x=10, y=10)
 
         text_handler = TextHandler(self.lbl_log)
@@ -123,11 +124,11 @@ class App(object):
         self.lbl_img.place(x=10, y=height//2-img_height//2)
 
         self.btn_eucentric = tk.Button(master=self.frm_img, width=20, height=1, bg='#373737', fg='white', text="Set Eucentric", justify='left', command=self.eucentric)
-        self.btn_eucentric.place(x=int(width//4-100), y=720)
+        self.btn_eucentric.place(x=int(width//4-100), rely=0.88)
 
         self.eucent = tk.StringVar(value='red')
         self.lbl_eucent = tk.Label(master=self.frm_img, width=1, height=1, bg=self.eucent.get())
-        self.lbl_eucent.place(x=int(width//4-100)+160, y=720)
+        self.lbl_eucent.place(x=int(width//4-100)+160, rely=0.88)
 
         ### Controllers
         self.frm_mov = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//2, height=height//2, bg='#202020')
@@ -159,9 +160,16 @@ class App(object):
         self.lbl_t_pos.place(x=240, y=250)
 
         ent_step_values = tuple(10**i for i in range(10))
-        self.ent_z_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', fg='white', values=ent_step_values, justify='center')
-        self.ent_y_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', fg='white', values=ent_step_values, justify='center')
-        self.ent_t_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', fg='white', values=ent_step_values, justify='center')
+        var1 = tk.IntVar(value=1000)
+        var2 = tk.IntVar(value=1000)
+        var3 = tk.IntVar(value=1000000)
+        self.ent_z_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
+        self.ent_y_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
+        self.ent_t_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
+        self.ent_z_step.config(textvariable=var1)
+        self.ent_y_step.config(textvariable=var2)
+        self.ent_t_step.config(textvariable=var3)
+
         self.ent_z_step.place(x=20, y=280)
         self.ent_y_step.place(x=130, y=280)
         self.ent_t_step.place(x=240, y=280)
