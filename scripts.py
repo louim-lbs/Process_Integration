@@ -186,9 +186,9 @@ def set_eucentric(microscope, positioner) -> int:
     '''
     z0, y0, _ = positioner.getpos()
     hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-    angle_step0 = 5000000
-    angle_step =  5000000             # udegrees
-    angle_max  = 30000000             # udegrees
+    angle_step0 = 1000000
+    angle_step =  1000000             # udegrees
+    angle_max  = 10000000             # udegrees
     precision  =   100             # nanometers or pixels ? End condition with magnification ?
     eucentric_error = 0
     resolution="512x442" # Bigger pixels means less noise and better match
