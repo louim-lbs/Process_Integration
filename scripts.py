@@ -32,20 +32,25 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         direction = -1
 
     z0_ini, y0_ini, _ = positioner.getpos()
+    print('z0_ini, y0_ini =', z0_ini, y0_ini)
 
     if displacement == [[0,0]]:
-
         return z0_ini, y0_ini
 
     pas = 1000000 # 1° with smaract convention
-    # alpha = [i for i in range(int(angle_sort[0]/pas), int(angle_sort[-1]/pas)+1)]
-    alpha = [i/pas for i in angle]
-    if 0 not in alpha:
-        alpha.append(0)
-        alpha = sorted(alpha)
-    index_0 = alpha.index(0)
+    alpha = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/10))]
+
+    try:
+        index_0 = alpha.index(min([abs(i) for i in alpha]))
+    except:
+        index_0 = alpha.index(-min([abs(i) for i in alpha]))
+
+    index_0 = min(range(len(angle)), key=lambda i: abs(angle[i])) # index of the nearest value of 0
+    offset = displacement[index_0][0]
     
-    finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], [i[0] for i in displacement]) # i[0] -> displacement in x direction of images (vertical)
+    ############ offset?
+
+    finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], [i[0]-offset for i in displacement]) # i[0] -> displacement in x direction of images (vertical)
     displacement_y_interpa = finterpa(alpha)
 
     displacement_y_interpa_prime = [0]*len(displacement_y_interpa)
@@ -57,33 +62,34 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     displacement_y_interpa_prime[-1] = displacement_y_interpa_prime[-2] # Edge effect correction
     # del displacement_y_interpa_prime[-1] # Edge effect correction
 
-    plt.plot([i/pas for i in angle[:]], [i[0] for i in displacement[:]])
-    plt.plot(alpha, displacement_y_interpa)
-    plt.show()
-    plt.plot(alpha, displacement_y_interpa_prime)
-    plt.show()
+    # plt.plot([i/pas for i in angle[:]], [i[0]-offset for i in displacement[:]])
+    # plt.plot(alpha, displacement_y_interpa)
+    # plt.show()
+    # plt.plot(alpha, displacement_y_interpa_prime)
+    # plt.show()
 
-    z0_calc = displacement_y_interpa_prime[index_0-1]
+    z0_calc = displacement_y_interpa_prime[index_0]
 
     ## yA computation
     y0_calc = [0]*len(displacement_y_interpa_prime)
-    for i in range(index_0-1):
+    for i in range(index_0):
         y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
-    for i in range(index_0, len(displacement_y_interpa_prime)-1): # derivative is not define for angle_sort=0
+    for i in range(index_0+1, len(displacement_y_interpa_prime)): # derivative is not define for angle_sort=0
         y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
     del y0_calc[index_0] # delete not computed 0-angle_sort value from the result list
 
+    print('z0, y0 =', z0_calc, direction*mean(y0_calc))
     # Adjust positioner position
-    positioner.setpos_rel([z0_calc*1e9, direction*mean(y0_calc)*1e9, 0])
+    positioner.setpos_rel([z0_calc, direction*mean(y0_calc), 0])
 
     # Adjust microscope stage position
-    microscope.specimen.stage.relative_move(StagePosition(y=direction*mean(y0_calc))) ####################Check this, sign for contre-positive image check?
+    microscope.specimen.stage.relative_move(StagePosition(y=1e-9*direction*mean(y0_calc))) ####################Check this, sign for contre-positive image check?
     # microscope.specimen.stage.relative_move(StagePosition(y=y0*1e-9))
 
     # Adjust focus because z0 move
     # microscope.auto_functions.run_auto_focus()
     # Or
-    microscope.beams.electron_beam.working_distance.value += z0_calc
+    microscope.beams.electron_beam.working_distance.value += z0_calc*1e-9
 
 
     # Check limits
@@ -183,8 +189,8 @@ def set_eucentric(microscope, positioner) -> int:
     hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
     angle_step0 = 1000000
     angle_step =  1000000             # udegrees
-    angle_max  = 10000000             # udegrees
-    precision  =   100e-9             # nanometers or pixels ? End condition with magnification ?
+    angle_max  = 30000000             # udegrees
+    precision  =   100             # nanometers or pixels ? End condition with magnification ?
     eucentric_error = 0
     resolution="512x442" # Bigger pixels means less noise and better match
     image_width = int(resolution[:resolution.find('x')])
@@ -192,20 +198,20 @@ def set_eucentric(microscope, positioner) -> int:
     settings = GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
     image_euc = np.zeros((2, image_height, image_width))
     displacement = [[0,0]]
-    angle = [0]
-    z0 = 0
-    y0 = 0
+    angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
+    multiplicator = 1
 
     # HAADF analysis
     microscope.imaging.set_active_view(3)
 
-    multiplicator = 1
+    positioner.setpos_abs([z0, y0, 0])
+    
     image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
     
     positioner.setpos_rel([0, 0, angle_step])
 
     while abs(eucentric_error) > precision or positioner.angle_convert_Smaract2SI(positioner.getpos()[2]) < angle_max:
-        print(eucentric_error, precision, positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), angle_max)
+        print('eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), 'angle_max =', angle_max)
         #### Deal with positioner error
         ####################
         
@@ -233,13 +239,13 @@ def set_eucentric(microscope, positioner) -> int:
                 positioner.setpos_rel([0, 0, angle_step])
             continue
 
-        dx_si = dx_pix*hfw/image_width
-        dy_si = dy_pix*hfw/image_width
+        dx_si = 1e9*dx_pix*hfw/image_width
+        dy_si = 1e9*dy_pix*hfw/image_width
 
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
 
-        eucentric_error = sum([abs(i[0]) for i in displacement])
+        eucentric_error += dx_si
 
         if abs(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) >= angle_max:
             '''If out of the angle range'''
@@ -273,7 +279,8 @@ def set_eucentric(microscope, positioner) -> int:
         positioner.setpos_rel([0, 0, multiplicator*angle_step])
         image_euc[0] = np.ndarray.copy(image_euc[1])
 
-    positioner.setpos_abs([z0, y0, 0])
+    pos = positioner.getpos()
+    positioner.setpos_abs([pos[1], pos[2], 0])
     print('Done eucentrixx')
     return 0
 
