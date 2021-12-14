@@ -30,6 +30,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         direction = 1
     else:
         direction = -1
+        displacement.reverse()
 
     z0_ini, y0_ini, _ = positioner.getpos()
     print('z0_ini, y0_ini =', z0_ini, y0_ini)
@@ -38,19 +39,17 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         return z0_ini, y0_ini
 
     pas = 1000000 # 1° with smaract convention
-    alpha = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/10))]
+    alpha = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/20))]
 
-    try:
-        index_0 = alpha.index(min([abs(i) for i in alpha]))
-    except:
-        index_0 = alpha.index(-min([abs(i) for i in alpha]))
+    offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
+    index_0 = min(range(len(alpha)), key=lambda i: abs(alpha[i])) # index of the nearest value of 0
 
-    index_0 = min(range(len(angle)), key=lambda i: abs(angle[i])) # index of the nearest value of 0
-    offset = displacement[index_0][0]
-    
-    ############ offset?
+    displacement_filt = np.array([i[0]-offset for i in displacement])
+    filt =  cv.GaussianBlur(displacement_filt, (1,3), 0)
+    for i in range(1,len(displacement_filt)-1):
+        displacement_filt[i] = filt[i]
 
-    finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], [i[0]-offset for i in displacement]) # i[0] -> displacement in x direction of images (vertical)
+    finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
     displacement_y_interpa = finterpa(alpha)
 
     displacement_y_interpa_prime = [0]*len(displacement_y_interpa)
@@ -187,8 +186,8 @@ def set_eucentric(microscope, positioner) -> int:
     '''
     z0, y0, _ = positioner.getpos()
     hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-    angle_step0 = 1000000
-    angle_step =  1000000             # udegrees
+    angle_step0 = 5000000
+    angle_step =  5000000             # udegrees
     angle_max  = 30000000             # udegrees
     precision  =   100             # nanometers or pixels ? End condition with magnification ?
     eucentric_error = 0
@@ -234,6 +233,7 @@ def set_eucentric(microscope, positioner) -> int:
                 z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
                 microscope.beams.electron_beam.horizontal_field_width.value *= 2
                 microscope.auto_functions.run_auto_cb()
+                hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
                 angle_step = angle_step0
                 positioner.setpos_rel([0, 0, angle_step])
@@ -242,10 +242,12 @@ def set_eucentric(microscope, positioner) -> int:
         dx_si = 1e9*dx_pix*hfw/image_width
         dy_si = 1e9*dy_pix*hfw/image_width
 
+        print('dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
+
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
 
-        eucentric_error += dx_si
+        eucentric_error += abs(dx_si)
 
         if abs(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) >= angle_max:
             '''If out of the angle range'''
@@ -271,6 +273,7 @@ def set_eucentric(microscope, positioner) -> int:
                 eucentric_error = 0
                 microscope.beams.electron_beam.horizontal_field_width.value /= 2
                 microscope.auto_functions.run_auto_cb()
+                hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
                 angle_step = angle_step0
                 positioner.setpos_rel([0, 0, 1.5*angle_step])

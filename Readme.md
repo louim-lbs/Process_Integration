@@ -23,6 +23,7 @@
     - Faire se recouvrir les patchs pour moyenner les erreurs.
     - Logging
     - Check limits of displacement.
+    - Centering image on particle after correction.
 - **Dynamical focus** for low-deep-field STEM acquisition?
 - **16-bits** default acquisition.
 
