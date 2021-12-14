@@ -63,15 +63,29 @@ plt.plot(alpha, displacement_y_interpa_prime)
 plt.show()
 
 z0_calc = displacement_y_interpa_prime[index_0]
+print(z0_calc)
 ###############################index0 is not the same for alpha, there are much more values than for angle
+
+
+displacement_y_interpa_prime_2 = [0]*len(displacement_y_interpa_prime)
+# print(alpha)
+## z0 computation
+for j in range(1,len(displacement_y_interpa_prime)-1):
+    displacement_y_interpa_prime_2[j] = (displacement_y_interpa_prime[j+1]-displacement_y_interpa_prime[j-1])/((alpha[j+1]-alpha[j-1])*np.pi/180)
+displacement_y_interpa_prime_2[0] = displacement_y_interpa_prime_2[1]   # Edge effect correction
+displacement_y_interpa_prime_2[-1] = displacement_y_interpa_prime_2[-2] # Edge effect correction
+print(displacement_y_interpa_prime_2[index_0])
+plt.plot(alpha, displacement_y_interpa_prime_2)
+plt.show()
+########### Result positive? 
 
 ## yA computation
 y0_calc = [0]*len(displacement_y_interpa_prime)
 for i in range(index_0):
     y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
-for i in range(index_0, len(displacement_y_interpa_prime)): # derivative is not define for angle_sort=0
+for i in range(index_0+1, len(displacement_y_interpa_prime)): # derivative is not define for angle_sort=0
     y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
-# del y0_calc[index_0] # delete not computed 0-angle_sort value from the result list
+del y0_calc[index_0] # delete not computed 0-angle_sort value from the result list
 
 plt.plot(y0_calc)
 plt.show()
