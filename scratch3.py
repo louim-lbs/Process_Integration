@@ -65,7 +65,7 @@ def worker():
     # Skeleton worker function, runs in separate thread (see below)   
     while True:
         # Report time / date at 2-second intervals
-        time.sleep(2)
+        time.sleep(0.2)
         timeStr = time.asctime()
         msg = 'Current time: ' + timeStr
         logging.info(msg) 

@@ -1,10 +1,16 @@
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, StagePosition
 import numpy as np
 import cv2 as cv
-from numpy.core.fromnumeric import mean
+from numpy.core.fromnumeric import mean, std
 from scipy import interpolate
+from scipy.optimize import curve_fit
 import os
 import matplotlib.pyplot as plt
+
+
+def function_displacement(x, z, y):
+    x = [i*np.pi/180 for i in x]
+    return y*(1-np.cos(x)) + z*np.sin(x)
 
 def correct_eucentric(microscope, positioner, displacement, angle):
     ''' Calculate z and y parameters for postioner eucentric correction, correct it, correct microscope view and focus.
@@ -45,44 +51,48 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     index_0 = min(range(len(alpha)), key=lambda i: abs(alpha[i])) # index of the nearest value of 0
 
     displacement_filt = np.array([i[0]-offset for i in displacement])
-    filt =  cv.GaussianBlur(displacement_filt, (1,3), 0)
-    for i in range(1,len(displacement_filt)-1):
-        displacement_filt[i] = filt[i]
+    # filt =  cv.GaussianBlur(displacement_filt, (1,1), 0)
+    # for i in range(1,len(displacement_filt)-1):
+    #     displacement_filt[i] = filt[i]
 
     finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
     displacement_y_interpa = finterpa(alpha)
 
-    displacement_y_interpa_prime = [0]*len(displacement_y_interpa)
+    # displacement_y_interpa_prime = [0]*len(displacement_y_interpa)
 
-    ## z0 computation
-    for j in range(1,len(displacement_y_interpa)-1):
-        displacement_y_interpa_prime[j] = (displacement_y_interpa[j+1]-displacement_y_interpa[j-1])/((alpha[j+1]-alpha[j-1])*np.pi/180)
-    displacement_y_interpa_prime[0] = displacement_y_interpa_prime[1]   # Edge effect correction
-    displacement_y_interpa_prime[-1] = displacement_y_interpa_prime[-2] # Edge effect correction
-    # del displacement_y_interpa_prime[-1] # Edge effect correction
+    # ## z0 computation
+    # for j in range(1,len(displacement_y_interpa)-1):
+    #     displacement_y_interpa_prime[j] = (displacement_y_interpa[j+1]-displacement_y_interpa[j-1])/((alpha[j+1]-alpha[j-1])*np.pi/180)
+    # displacement_y_interpa_prime[0] = displacement_y_interpa_prime[1]   # Edge effect correction
+    # displacement_y_interpa_prime[-1] = displacement_y_interpa_prime[-2] # Edge effect correction
+    # # del displacement_y_interpa_prime[-1] # Edge effect correction
 
-    # plt.plot([i/pas for i in angle[:]], [i[0]-offset for i in displacement[:]])
-    # plt.plot(alpha, displacement_y_interpa)
-    # plt.show()
-    # plt.plot(alpha, displacement_y_interpa_prime)
-    # plt.show()
+    # # plt.plot([i/pas for i in angle[:]], [i[0]-offset for i in displacement[:]])
+    # # plt.plot(alpha, displacement_y_interpa)
+    # # plt.show()
+    # # plt.plot(alpha, displacement_y_interpa_prime)
+    # # plt.show()
 
-    z0_calc = displacement_y_interpa_prime[index_0]
+    # z0_calc = displacement_y_interpa_prime[index_0]
 
-    ## yA computation
-    y0_calc = [0]*len(displacement_y_interpa_prime)
-    for i in range(index_0):
-        y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
-    for i in range(index_0+1, len(displacement_y_interpa_prime)): # derivative is not define for angle_sort=0
-        y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
-    del y0_calc[index_0] # delete not computed 0-angle_sort value from the result list
+    # ## yA computation
+    # y0_calc = [0]*len(displacement_y_interpa_prime)
+    # for i in range(index_0):
+    #     y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
+    # for i in range(index_0+1, len(displacement_y_interpa_prime)): # derivative is not define for angle_sort=0
+    #     y0_calc[i] = (displacement_y_interpa_prime[i] - z0_calc*np.cos(alpha[i]*np.pi/180))/(np.sin(alpha[i]*np.pi/180))
+    # del y0_calc[index_0] # delete not computed 0-angle_sort value from the result list
 
-    print('z0, y0 =', z0_calc, direction*mean(y0_calc))
+    res, cov = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0], bounds=(-1e9, 1e9))
+    z0_calc, y0_calc = res
+    stdevs = np.sqrt(np.diag(cov))
+
+    print('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1])
     # Adjust positioner position
-    positioner.setpos_rel([z0_calc, direction*mean(y0_calc), 0])
+    positioner.setpos_rel([z0_calc, direction*y0_calc, 0])
 
     # Adjust microscope stage position
-    microscope.specimen.stage.relative_move(StagePosition(y=1e-9*direction*mean(y0_calc))) ####################Check this, sign for contre-positive image check?
+    microscope.specimen.stage.relative_move(StagePosition(y=1e-9*direction*y0_calc)) ####################Check this, sign for contre-positive image check?
     # microscope.specimen.stage.relative_move(StagePosition(y=y0*1e-9))
 
     # Adjust focus because z0 move
@@ -92,7 +102,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
 
 
     # Check limits
-    return z0_calc, mean(y0_calc) #################### relative move in meters
+    return z0_calc, y0_calc #################### relative move in meters
 
 def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0):
     ''' Match two images

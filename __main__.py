@@ -8,6 +8,7 @@ Updated on Dec 08 2021
 
 import os
 import logging
+import threading
 
 dir_pi = os.getcwd()
 logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -37,6 +38,21 @@ smaract = sm.smaract_class(calibrate=False)
 # Lauch GUI
 os.chdir(dir_pi)
 from gui import GUI
-root = GUI.tk.Tk()
-app = GUI.App(root, quattro, smaract)
-root.mainloop()
+
+import time
+def test():
+    while True:
+        time.sleep(1)
+        logging.info('Lol') 
+
+def main_start():
+    root = GUI.tk.Tk()
+    GUI.App(root, quattro, smaract)
+
+    thread_log = threading.Thread(target=test, args=[])
+    thread_log.start()
+
+    root.mainloop()
+    thread_log.join()
+
+main_start()

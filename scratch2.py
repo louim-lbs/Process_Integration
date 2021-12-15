@@ -4,11 +4,11 @@ from scipy import interpolate
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2 as cv
-global alpha, displacement_y_interpa
+# global alpha, displacement_y_interpa
 
 displacement = [[0, 0], [9143.29869281161, 102.89189478999087], [14651.146556526252, 102.89189478999087], [18937.328916635015, 102.89189478999087], [21307.958172596405, 102.89189478999087], [22618.642616998135, 102.89189478999087], [22618.642616998135, 102.89189478999087], [21507.410153266235, 102.89189478999087], [19241.367482126672, -267.51892645397623], [14796.437627199066, -637.9297476979434], [8499.453666051624, -1008.3405689419105], [10.872345877378393, -1175.0254385016958], [-12860.903692350477, -1713.8048148565572], [-29236.961052610073, -2279.1686999131384]]
-
 angle = [34999989, 27500011, 22499987, 17499991, 12499994, 7499999, 2500000, -2499999, -7499995, -12499997, -17499992, -22500003, -27500010, -32500005]
+pas = 1000000 # 1° with smaract convention
 
 angle_sort = sorted(angle)
 if angle_sort == angle:
@@ -21,7 +21,7 @@ z0_ini, y0_ini = 0, 0
 # print('z0_ini, y0_ini =', z0_ini, y0_ini)
 
 
-pas = 1000000 # 1° with smaract convention
+
 alpha = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/20))]
 
 offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
@@ -36,12 +36,12 @@ index_0 = min(range(len(alpha)), key=lambda i: abs(alpha[i])) # index of the nea
 # plt.show()
 
 displacement_filt = np.array([i[0]-offset for i in displacement])
-filt =  cv.GaussianBlur(displacement_filt, (1,3), 0)
+filt =  cv.GaussianBlur(displacement_filt, (1,1), 0)
 for i in range(1,len(displacement_filt)-1):
     displacement_filt[i] = filt[i]
 
-plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement])
-plt.plot([i/pas for i in angle_sort], displacement_filt)
+# plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement])
+# plt.plot([i/pas for i in angle_sort], displacement_filt)
 # plt.show()
 
 finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
@@ -160,10 +160,12 @@ def function_displacement(x, z, y):
     x = [i*np.pi/180 for i in x]
     return y*(1-np.cos(x)) + z*np.sin(x)
 
-pars, cov = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[12000,200000], bounds=(-1e9, 1e9))
+pars, cov = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0], bounds=(-1e9, 1e9))
 
 print('zA, yA =', pars)
 
+plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
+# plt.plot([i/pas for i in angle_sort], displacement_filt, 'black')
 plt.plot(alpha, displacement_y_interpa, 'blue')
 plt.plot(alpha, function_displacement(alpha, *pars), 'red')
 plt.show()
