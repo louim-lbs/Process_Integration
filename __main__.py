@@ -39,20 +39,36 @@ smaract = sm.smaract_class(calibrate=False)
 os.chdir(dir_pi)
 from gui import GUI
 
-import time
-def test():
-    while True:
-        time.sleep(1)
-        logging.info('Lol') 
+# import time
+# def test():
+#     while True:
+#         time.sleep(1)
+#         logging.info('Lol') 
 
 def main_start():
     root = GUI.tk.Tk()
     GUI.App(root, quattro, smaract)
 
-    thread_log = threading.Thread(target=test, args=[])
-    thread_log.start()
+    thread_z_up   = threading.Thread(target=GUI.App.z_up)
+    thread_z_down = threading.Thread(target=GUI.App.z_down)
+    thread_y_up   = threading.Thread(target=GUI.App.y_up)
+    thread_y_down = threading.Thread(target=GUI.App.y_down)
+    thread_t_up   = threading.Thread(target=GUI.App.t_up)
+    thread_t_down = threading.Thread(target=GUI.App.t_down)
+
+    thread_z_up.start()
+    thread_z_down.start()
+    thread_y_up.start()
+    thread_y_down.start()
+    thread_t_up.start()
+    thread_t_down.start()
 
     root.mainloop()
-    thread_log.join()
+    thread_z_up.join()
+    thread_z_down.join()
+    thread_y_up.join()
+    thread_y_down.join()
+    thread_t_up.join()
+    thread_t_down.join()
 
 main_start()

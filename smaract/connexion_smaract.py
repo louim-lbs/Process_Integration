@@ -7,11 +7,7 @@ Created on Fri Nov 05 2021
 '''
 
 ###### Imports
-try:
-    import ctypes
-except:
-    logging.info(' Error while importing python module ctypes. Check your installation.')
-
+import ctypes
 import os
 import time
 import matplotlib.pyplot as plt
@@ -142,7 +138,7 @@ class smaract_class(object):
                 return k 
         return ''
     
-    def check_status(self, list:vector, error_text:str = 'Error. ') -> int:
+    def check_status(self, list_error:vector, error_text:str = 'Error. ') -> int:
         ''' Check if an error occured during smart C++ function execution. If so, the corresponding status message is written in log.
 
         Input:
@@ -157,8 +153,9 @@ class smaract_class(object):
             check_status([z_pos_status, y_pos_status, t_angle_status])
                 -> 0
         '''
+        list_error = list(dict.fromkeys(list_error))
         error = 0
-        for status in list:
+        for status in list_error:
             if status != 0:
                 message = self.find_status_message(self.error_codes, status)
                 logging.info(error_text + str(status) + ' ' + str(message))
@@ -202,13 +199,10 @@ class smaract_class(object):
             angle = angle_convert_Smaract2SI(270000000)
                 -> -90000000
         '''
-        if 0 <= angle_smaract <= 90000000:
+        if 0 <= angle_smaract <= 180000000:
             return angle_smaract
-        elif 270000000 <= angle_smaract <= 360000000:
+        elif 180000000 < angle_smaract <= 360000000:
             return angle_smaract-360000000
-        else:
-            print('problem to convert angles')
-            exit()
     
     def gets_limits(self):
         ''' Retrieve the travel range limits of positioners.
@@ -237,7 +231,7 @@ class smaract_class(object):
             y_limits_state = smaract.smart.SA_GetPositionLimit_S(ctypes.c_uint32(0), ctypes.c_uint32(0), y_min, y_max)
             t_limits_state = smaract.smart.SA_GetAngleLimit_S(ctypes.c_uint32(0), ctypes.c_uint32(0), t_min, revol_min, t_max, revol_max)
         except:
-            logging.info(' Something went wrong when checking range limits of positioners')
+            logging.info('Error when checking range limits of positioners')
             return [None, None, None, None, None, None]
         
         if self.check_status([z_limits_state, y_limits_state, t_limits_state], error_text='Impossible to check limits. ') == 1:
@@ -260,10 +254,10 @@ class smaract_class(object):
         '''
         # limits = self.gets_limits()
         if (self.range_limits['z_min'].value <= pos[0] <= self.range_limits['z_max'].value) and (self.range_limits['y_min'].value <= pos[1] <= self.range_limits['y_max'].value) and (self.range_limits['t_min'].value <= pos[2] <= self.range_limits['t_max'].value):
-            logging.info('    Positions in the list are between the travel range limits of positioners.')
+            logging.info('Positions are between the travel range limits of positioners.')
             return True
         else:
-            logging.info('    Positions in the list are out the travel range limits of positioners.')
+            logging.info('Positions are out the travel range limits of positioners.')
             return False
     
     def hold_during_move(self) -> ctypes.c_uint32:
@@ -284,7 +278,7 @@ class smaract_class(object):
         z_status_status = self.smart.SA_GetStatus_S(ctypes.c_uint32(0),ctypes.c_uint32(0), ctypes.byref(z_status))
         y_status_status = self.smart.SA_GetStatus_S(ctypes.c_uint32(0),ctypes.c_uint32(1), ctypes.byref(y_status))
         t_status_status = self.smart.SA_GetStatus_S(ctypes.c_uint32(0),ctypes.c_uint32(2), ctypes.byref(t_status))
-        logging.info('    Moving...')
+        logging.info('Moving...')
         while z_status.value == 4 or y_status.value == 4 or t_status.value == 4:
             z_status_status = self.smart.SA_GetStatus_S(ctypes.c_uint32(0),ctypes.c_uint32(0), ctypes.byref(z_status))
             y_status_status = self.smart.SA_GetStatus_S(ctypes.c_uint32(0),ctypes.c_uint32(1), ctypes.byref(y_status))
@@ -312,13 +306,13 @@ class smaract_class(object):
             y_pos_status   = self.smart.SA_GetPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(1), ctypes.byref(y_pos))
             t_angle_status = self.smart.SA_GetAngle_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ctypes.byref(t_angle), ctypes.byref(t_revol))
         except:
-            logging.info(' Something went wrong when acquiring postition of positioners')
+            logging.info('Error when acquiring postitions')
             return [None, None, None]
 
         if self.check_status([z_pos_status, y_pos_status, t_angle_status]) == 1:
             return [None, None, None]
 
-        logging.info(' Current position:    ' + str([z_pos.value, y_pos.value, t_angle.value]))
+        logging.info('Current position: ' + str([z_pos.value, y_pos.value, t_angle.value]))
 
         if t_revol == -1:
             t_angle *= -1
@@ -352,7 +346,7 @@ class smaract_class(object):
             y_setpos_status = self.smart.SA_GotoPositionAbsolute_S(ctypes.c_uint32(0),ctypes.c_uint32(1),pos[1],ctypes.c_uint32(60000))
             t_setpos_status = self.smart.SA_GotoAngleAbsolute_S(ctypes.c_uint32(0),ctypes.c_uint32(2),pos[2], revolution,ctypes.c_uint32(60000))
         except:
-            logging.info(' Something went wrong when setting absolute position.')
+            logging.info('Error when setting absolute position.')
             return 1
         
         if self.check_status([z_setpos_status, y_setpos_status, t_setpos_status]) == 1:
@@ -363,7 +357,7 @@ class smaract_class(object):
         if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
             return 1
 
-        logging.info('    Position set to:  ' + str([pos[0].value, pos[1].value, pos[2].value]))
+        logging.info('Position set to:  ' + str([pos[0].value, pos[1].value, pos[2].value]))
 
         return 0
     
@@ -394,7 +388,7 @@ class smaract_class(object):
             y_setpos_status = self.smart.SA_GotoPositionRelative_S(ctypes.c_uint32(0),ctypes.c_uint32(1),step[1],ctypes.c_uint32(60000))
             t_setpos_status = self.smart.SA_GotoAngleRelative_S(ctypes.c_uint32(0),ctypes.c_uint32(2),step[2], revolution,ctypes.c_uint32(60000))
         except:
-            logging.info(' Something went wrong when setting relative position.')
+            logging.info('Error when setting relative position.')
             return 1
         
         if self.check_status([z_setpos_status, y_setpos_status, t_setpos_status]) == 1:
@@ -405,7 +399,7 @@ class smaract_class(object):
         if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
             return 1
 
-        logging.info('    Position set to:  ' + str([step[0].value, step[1].value, step[2].value]))
+        logging.info('Position increased of: ' + str([step[0].value, step[1].value, step[2].value]))
         
         return 0
 
