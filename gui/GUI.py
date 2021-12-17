@@ -231,28 +231,28 @@ class App(object):
         return 0
 
     def y_up(self):
-        step = int(self.ent_z_step.get())
+        step = int(self.ent_y_step.get())
         self.positioner.setpos_rel([0, step, 0])
         self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
         self.lbl_y_pos.update()
         return 0
 
     def t_up(self):
-        step = int(self.ent_y_step.get())
+        step = int(self.ent_t_step.get())
         self.positioner.setpos_rel([0, 0, step])
         self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
         self.lbl_t_pos.update()
         return 0
     
     def z_down(self):
-        step = int(self.ent_y_step.get())
+        step = int(self.ent_z_step.get())
         self.positioner.setpos_rel([-step, 0, 0])
         self.lbl_z_pos.config(text=str(self.positioner.getpos()[0]) + ' nm')
         self.lbl_z_pos.update()
         return 0
     
     def y_down(self):
-        step = int(self.ent_t_step.get())
+        step = int(self.ent_y_step.get())
         self.positioner.setpos_rel([0, -step, 0])
         self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
         self.lbl_y_pos.update()

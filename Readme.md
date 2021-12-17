@@ -12,6 +12,8 @@
 
 ### Microscope
 - **Eucentric**. Write operation steps.
+    - Increase angle not zoom?
+    - match filtre passe bas
     - **Pondérer** le match par la confiance.
     - Deal with smaract errors
     - IF NOT MATCHED INCREASE DWELL TIME.

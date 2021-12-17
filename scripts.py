@@ -100,6 +100,10 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     # Or
     microscope.beams.electron_beam.working_distance.value += z0_calc*1e-9
 
+    plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
+    plt.plot(alpha, displacement_y_interpa, 'blue')
+    plt.plot(alpha, function_displacement(alpha, *res), 'red')
+    plt.show()
 
     # Check limits
     return z0_calc, y0_calc #################### relative move in meters
@@ -162,6 +166,8 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     dx_tot = displacement_vector[:,0]
     dy_tot = displacement_vector[:,1]
 
+    # plt.plot(dx_tot)
+
     for k in range(2): # Delete incoherent values
         mean_x = np.mean(dx_tot)
         mean_y = np.mean(dy_tot)
@@ -177,6 +183,9 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
+
+    # plt.plot(dx_tot)
+    # plt.show()
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
@@ -196,15 +205,15 @@ def set_eucentric(microscope, positioner) -> int:
     '''
     z0, y0, _ = positioner.getpos()
     hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-    angle_step0 = 1000000
-    angle_step =  1000000             # udegrees
+    angle_step0 = 2000000
+    angle_step =  2000000             # udegrees
     angle_max  = 10000000             # udegrees
     precision  =   100             # nanometers or pixels ? End condition with magnification ?
     eucentric_error = 0
     resolution="512x442" # Bigger pixels means less noise and better match
     image_width = int(resolution[:resolution.find('x')])
     image_height = int(resolution[-resolution.find('x'):])
-    settings = GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
+    settings = GrabFrameSettings(resolution=resolution, dwell_time=100e-6, bit_depth=16)
     image_euc = np.zeros((2, image_height, image_width))
     displacement = [[0,0]]
     angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
@@ -240,6 +249,10 @@ def set_eucentric(microscope, positioner) -> int:
             else:
                 '''Zoom out x2'''
                 print('Zoom out x2')
+                multiplicator = 1
+                displacement = [[0,0]]
+                angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
+                eucentric_error = 0
                 z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
                 microscope.beams.electron_beam.horizontal_field_width.value *= 2
                 microscope.auto_functions.run_auto_cb()
