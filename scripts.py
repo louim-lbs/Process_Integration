@@ -6,6 +6,9 @@ from scipy import interpolate
 from scipy.optimize import curve_fit
 import os
 import matplotlib.pyplot as plt
+import logging
+import time
+from shutil import copyfile
 
 
 def function_displacement(x, z, y):
@@ -29,6 +32,8 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
             -> z0 = 0.000001, y0 = 0.000001
     '''
+    logging.info('displacement', displacement)
+    logging.info('angle', angle)
     print(displacement)
     print(angle)
     angle_sort = sorted(angle)
@@ -38,7 +43,10 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         direction = -1
         displacement.reverse()
 
+    logging.info('displacement', displacement)
+    print('displacement', displacement)
     z0_ini, y0_ini, _ = positioner.getpos()
+    logging.info('z0_ini, y0_ini =', z0_ini, y0_ini)
     print('z0_ini, y0_ini =', z0_ini, y0_ini)
 
     if displacement == [[0,0]]:
@@ -87,6 +95,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     z0_calc, y0_calc = res
     stdevs = np.sqrt(np.diag(cov))
 
+    logging.info('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1])
     print('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1])
     # Adjust positioner position
     positioner.setpos_rel([z0_calc, direction*y0_calc, 0])
@@ -103,6 +112,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
     plt.plot(alpha, displacement_y_interpa, 'blue')
     plt.plot(alpha, function_displacement(alpha, *res), 'red')
+    plt.savefig('data/tmp/' + str(time.time()) + 'correct_eucentric.png')
     plt.show()
 
     # Check limits
@@ -218,6 +228,16 @@ def set_eucentric(microscope, positioner) -> int:
     displacement = [[0,0]]
     angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
     multiplicator = 1
+    logging.info('z0', z0,
+                'y0', y0,
+                'hfw', hfw,
+                'angle_step0', angle_step0,
+                'angle_step', angle_step,
+                'angle_max', angle_max,
+                'precision', precision,
+                'resolution', resolution,
+                'settings', settings,
+                'angle', angle)
 
     # HAADF analysis
     microscope.imaging.set_active_view(3)
@@ -225,15 +245,18 @@ def set_eucentric(microscope, positioner) -> int:
     positioner.setpos_abs([z0, y0, 0])
     
     image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
-    
+    image_euc[0].save('data/tmp/' + str(time.time()) + 'img' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + '.tif')
+
     positioner.setpos_rel([0, 0, angle_step])
 
     while abs(eucentric_error) > precision or positioner.angle_convert_Smaract2SI(positioner.getpos()[2]) < angle_max:
+        logging.info('eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), 'angle_max =', angle_max)
         print('eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), 'angle_max =', angle_max)
         #### Deal with positioner error
         ####################
         
         image_euc[1] = microscope.imaging.grab_multiple_frames(settings)[2].data
+        image_euc[1].save('data/tmp/' + str(time.time()) + 'img' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + '.tif')
         dx_pix, dy_pix, corr_trust = match(image_euc[1], image_euc[0])
 
         if corr_trust <= 0.3: # 0.3 empirical value. Need to be optimized
@@ -242,12 +265,14 @@ def set_eucentric(microscope, positioner) -> int:
             ############
             '''If match is not good'''
             if angle_step >= 100000:
+                logging.info('Decrease angle step')
                 print('Decrease angle step')
                 '''Decrease angle step up to 0.1 degree'''
                 positioner.setpos_rel([0, 0, -multiplicator*angle_step])
                 angle_step /= 2
             else:
                 '''Zoom out x2'''
+                logging.info('Zoom out x2')
                 print('Zoom out x2')
                 multiplicator = 1
                 displacement = [[0,0]]
@@ -258,6 +283,7 @@ def set_eucentric(microscope, positioner) -> int:
                 microscope.auto_functions.run_auto_cb()
                 hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
+                image_euc[0].save('data/tmp/' + str(time.time()) + 'img' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + '.tif')
                 angle_step = angle_step0
                 positioner.setpos_rel([0, 0, angle_step])
             continue
@@ -265,6 +291,7 @@ def set_eucentric(microscope, positioner) -> int:
         dx_si = 1e9*dx_pix*hfw/image_width
         dy_si = 1e9*dy_pix*hfw/image_width
 
+        logging.info('dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
         print('dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
 
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
@@ -277,6 +304,7 @@ def set_eucentric(microscope, positioner) -> int:
             if multiplicator == 1:
                 '''Start again with negative angles'''
                 z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
+                logging.info('Start again with negative angles')
                 print('Start again with negative angles')
                 multiplicator = -1
                 displacement = [[0,0]]
@@ -284,11 +312,13 @@ def set_eucentric(microscope, positioner) -> int:
                 eucentric_error = 0
                 microscope.auto_functions.run_auto_cb()
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
+                image_euc[0].save('data/tmp/' + str(time.time()) + 'img' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + '.tif')
                 angle_step = angle_step0
                 positioner.setpos_rel([0, 0, -1.5*angle_step])
             elif multiplicator == -1:
                 '''Zoom in x2'''
                 z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
+                logging.info('Zoom in x2')
                 print('Zoom in x2')
                 multiplicator = 1
                 displacement = [[0,0]]
@@ -298,6 +328,7 @@ def set_eucentric(microscope, positioner) -> int:
                 microscope.auto_functions.run_auto_cb()
                 hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
                 image_euc[0] = microscope.imaging.grab_multiple_frames(settings)[2].data
+                image_euc[0].save('data/tmp/' + str(time.time()) + 'img' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + '.tif')
                 angle_step = angle_step0
                 positioner.setpos_rel([0, 0, 1.5*angle_step])
             continue
@@ -307,6 +338,8 @@ def set_eucentric(microscope, positioner) -> int:
 
     pos = positioner.getpos()
     positioner.setpos_abs([pos[1], pos[2], 0])
+    logging.info('Done eucentrixx')
+    copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
     print('Done eucentrixx')
     return 0
 
@@ -334,7 +367,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
     pos = positioner.getpos()
     nb_images = pos[2]//tilt_increment + 1
 
-    os.makedirs('./data/tomo/' + images_name, exist_ok=True)
+    os.makedirs('./data/tomo/' + images_name + str(time.time()), exist_ok=True)
 
     for i in range(nb_images):
         ###### Drift correction
