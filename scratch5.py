@@ -16,17 +16,17 @@ def function_displacement(x, z, y, t):
     return (y*(1-np.cos(x)) + z*np.sin(x))/np.cos(t)
 
 
-displacement = [[0, 0], [9143.29869281161, 102.89189478999087], [14651.146556526252, 102.89189478999087], [18937.328916635015, 102.89189478999087], [21307.958172596405, 102.89189478999087], [22618.642616998135, 102.89189478999087], [22618.642616998135, 102.89189478999087], [21507.410153266235, 102.89189478999087], [19241.367482126672, -267.51892645397623], [14796.437627199066, -637.9297476979434], [8499.453666051624, -1008.3405689419105], [10.872345877378393, -1175.0254385016958], [-12860.903692350477, -1713.8048148565572], [-29236.961052610073, -2279.1686999131384]]
-angle = [34999989, 27500011, 22499987, 17499991, 12499994, 7499999, 2500000, -2499999, -7499995, -12499997, -17499992, -22500003, -27500010, -32500005]
+displacement = [[0, 0], [-194.9137760037293, 0.0], [1833.961437853271, 194.9137760037293], [2888.267771691625, 363.2484007342228], [3162.9190015150616, 363.2484007342228], [2826.2497520540746, 363.2484007342228], [2826.2497520540746, 363.2484007342228], [2241.508424042887, 363.2484007342228], [1656.767096031699, 363.2484007342228], [682.1982160130526, 363.2484007342228], [-173.25668978109275, 363.2484007342228]]
+angle = [-8000068, -7999998, -6000005, -4000011, -1999996, -1, 1999998, 3999979, 5999988, 7999993, 10000018]
 pas = 1 # 1° with smaract convention
 
 angle = [i*1 for i in angle]
 
 ## Calcul de l'angle
 
-disp_x = [i[1] for i in displacement]
-plt.plot(angle, disp_x)
-plt.show()
+# disp_x = [i[1] for i in displacement]
+# plt.plot(angle, disp_x)
+# plt.show()
 
 
 
@@ -47,9 +47,20 @@ pas = 1000000 # 1° with smaract convention
 alpha = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/20))]
 
 displacement_filt = np.array([i[0] for i in displacement])
+print(displacement_filt)
+# x = cv.blur(displacement_filt, (1, 3))
+# displacement_filt = [i[0] for i in x]
+# print(displacement_filt)
+plt.plot([i/pas for i in angle_sort], displacement_filt, 'yellow')
 
-finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
+# finterpa = interpolate.CubicSpline([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
+finterpa = interpolate.PchipInterpolator([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
+
 displacement_y_interpa = finterpa(alpha)
+
+plt.plot([i/pas for i in angle_sort], [i[0] for i in displacement], 'green')
+plt.plot(alpha, displacement_y_interpa, 'blue')
+plt.show()
 
 ##
 offset = displacement_y_interpa[min(range(len(alpha)), key=lambda i: abs(alpha[i]))]
@@ -62,11 +73,11 @@ stdevs = np.sqrt(np.diag(cov))
 
 print('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1], 't0 = ', t_axis*180/np.pi, '+-', stdevs[2])
 
-plt.plot(alpha, displacement_y_interpa, 'blue')
-for i in range(0, 90, 10):
-    plt.plot(alpha, function_displacement(alpha, z0_calc, y0_calc, i))
-    plt.plot(alpha, function_displacement(alpha, z0_calc, y0_calc, -i))
-plt.show()
+# plt.plot(alpha, displacement_y_interpa, 'blue')
+# for i in range(0, 90, 10):
+#     plt.plot(alpha, function_displacement(alpha, z0_calc, y0_calc, i))
+#     plt.plot(alpha, function_displacement(alpha, z0_calc, y0_calc, -i))
+# plt.show()
 
 plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
 plt.plot(alpha, displacement_y_interpa, 'blue')

@@ -273,10 +273,10 @@ class App(object):
         self.lbl_acquisition.update()
         '''
         '''
-        # set_tomo_status = scripts.tomo_acquisition(self.microscope.micro_settings, self.positioner.smaract_settings, drift_correction=False)
-        # if set_tomo_status == 0:
-        #     self.lbl_acquisition.config(bg='green')
-        #     return 0
+        set_tomo_status = scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=2000000, drift_correction=False)
+        if set_tomo_status == 0:
+            self.lbl_acquisition.config(bg='green')
+            return 0
         return 1
 
 if __name__ == "__main__":

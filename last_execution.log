@@ -1,22 +1,1396 @@
 INFO: Initialization...
-INFO: Available Systems IDs: [0]
-INFO: No systems detected: 3 SA_NO_SYSTEMS_FOUND_ERROR
-INFO: Check if MCS-3D is turned on. Check USB connexion.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
+INFO: Available Systems IDs: [3919851221]
+INFO: Initialization... OK
+INFO: System ID:       3919851221
+INFO: Dll version:     17301603
+INFO: Init state:      1 SA_INIT_STATE_SYNC
+INFO: ---------------------------------------
+INFO:Current position: [438777, 109229, 354499998]
 INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1000000]
+INFO:Current position: [438777, 109228, 355499918]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1000000]
+INFO:Current position: [438770, 109226, 356500049]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1000000]
+INFO:Current position: [438777, 109220, 357499866]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1000000]
+INFO:Current position: [438788, 109222, 358500072]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1000000]
+INFO:Current position: [438782, 109223, 359499819]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1000000]
+INFO:Current position: [438769, 109229, 499905]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 100000]
+INFO:Current position: [438776, 109226, 599947]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294867296]
+INFO:Current position: [438775, 109231, 499967]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294867296]
+INFO:Current position: [438778, 109231, 399981]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294867296]
+INFO:Current position: [438778, 109223, 299878]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294867296]
+INFO:Current position: [438783, 109224, 200056]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294867296]
+INFO:Current position: [438781, 109228, 99981]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294867296]
+INFO:Current position: [438775, 109228, 359999887]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 100000]
+INFO:Current position: [438777, 109227, 100034]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438778, 109229, 90058]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438777, 109229, 80091]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438778, 109228, 69941]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438776, 109230, 60043]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438778, 109227, 50056]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438776, 109229, 39876]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438778, 109228, 29916]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438778, 109227, 19907]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438776, 109228, 10093]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294957296]
+INFO:Current position: [438777, 109228, 61]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294967286]
+INFO:Current position: [438777, 109228, 1]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294967295]
+INFO:Current position: [438777, 109228, 359999995]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438777, 109229, 359999990]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438777, 109228, 359999995]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438777, 109229, 359999991]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109228, 359999985]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109228, 359999999]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109229, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294967295]
+INFO:Current position: [438777, 109228, 359999991]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438777, 109229, 359999989]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109228, 359999991]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438777, 109229, 359999996]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109228, 359999999]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109229, 359999985]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109228, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4294967295]
+INFO:Current position: [438777, 109229, 1]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438778, 109228, 1]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1]
+INFO:Current position: [438777, 109229, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438776, 109229, 9999966]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438777, 109226, 359999929]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438784, 109221, 10000114]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438785, 109226, 359999813]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438768, 109232, 349999832]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438780, 109222, 75]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438777, 110157, 8]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438776, 111125, 3]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438785, 111231, 9999987]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438779, 111230, 359999940]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438778, 111225, 10000134]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438769, 111227, 170]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438767, 111228, 350000218]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438777, 111228, 277]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438779, 111235, 10000287]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438783, 111228, 37]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438776, 111225, 10000104]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438771, 111236, 359999950]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438775, 111225, 349999810]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438773, 111229, 359999860]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438790, 111230, 10000102]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438777, 111230, 359999973]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438777, 111826, 4]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438777, 112751, 2]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438777, 113453, 0]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438777, 114467, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438778, 116102, 359999990]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438776, 117239, 2]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438777, 117722, 2]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438778, 118554, 359999990]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438778, 119371, 2]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [438776, 121223, 7]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438779, 121228, 9999930]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438784, 121228, 359999959]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438776, 121229, 350000170]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438782, 121231, 12]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438775, 121228, 10000107]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438779, 121232, 359999847]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438776, 120337, 4]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438778, 119272, 2]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438778, 118243, 359999989]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 117223, 359999990]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 116229, 359999990]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438778, 115660, 8]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 114754, 359999997]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 113425, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 112260, 0]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 111287, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438779, 110225, 0]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 109340, 12]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 108233, 359999987]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438778, 107588, 359999987]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438776, 106489, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438778, 105240, 2]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438776, 104403, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438778, 103278, 0]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 102652, 9]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438776, 101281, 3]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [438777, 100695, 359999997]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438777, 100226, 10000072]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438777, 100227, 6]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438777, 100229, 350000007]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438769, 100231, 359999824]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438773, 100223, 9999879]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438775, 100230, 359999899]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438776, 100225, 9999801]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [438768, 100230, 130]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [438146, 100229, 0]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [436807, 100228, 359999998]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [436286, 100230, 359999992]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [434769, 100229, 359999992]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [433901, 100228, 0]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [433005, 100228, 359999992]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [431771, 100229, 13]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [430815, 100232, 359999998]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [430786, 100226, 9999900]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430778, 100229, 58]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430769, 100226, 349999814]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430773, 100228, 340000184]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430772, 100228, 329999928]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430766, 100233, 320000308]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430781, 100232, 310000083]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430784, 100228, 299999784]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [430769, 100229, 309999877]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [430771, 100228, 319999918]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [1000, 0, 0]
+INFO:Current position: [431358, 100230, 320000025]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [443769, 100224, 329999929]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [443773, 100225, 340000133]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [435768, 100226, 350000125]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [431455, 100230, 359999982]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [429770, 100231, 9999887]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [428773, 100226, 19999824]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [427758, 100234, 30000219]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [424775, 100229, 40000056]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [422780, 100226, 49999900]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [439768, 100228, 60000116]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [439766, 100228, 69999801]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [436772, 100226, 60000054]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [436775, 100229, 50000078]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [436773, 100233, 39999751]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [436780, 100235, 30000238]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [433776, 100227, 19999916]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [432770, 100223, 9999829]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [432777, 100228, 359999965]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [431773, 100228, 349999766]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430776, 100234, 339999851]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430777, 100234, 330000025]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [430779, 100227, 319999975]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [443770, 100227, 309999933]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [444766, 100228, 299999883]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [447795, 100229, 289999870]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [447783, 100229, 299999796]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [445788, 100231, 310000197]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [443763, 100229, 320000244]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [442773, 100229, 330000156]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [433782, 100229, 340000070]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [424773, 100228, 350000047]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [415773, 100230, 38]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [413758, 100224, 9999930]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [423776, 100224, 19999802]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [432766, 100226, 30000020]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [432772, 100222, 39999891]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [436774, 100228, 49999892]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [438763, 100228, 59999938]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440768, 100229, 70000063]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440768, 100229, 60000087]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440779, 100230, 49999945]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440768, 100232, 39999780]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440770, 100227, 30000087]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100228, 19999898]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100230, 9999864]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440778, 100232, 359999949]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440770, 100223, 350000199]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100231, 340000029]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440779, 100228, 329999867]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440769, 100229, 320000160]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440774, 100232, 310000047]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440773, 100231, 299999840]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440767, 100231, 289999986]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440770, 100230, 300000153]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440762, 100224, 309999942]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440776, 100226, 320000069]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440766, 100228, 330000328]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440785, 100229, 339999894]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440776, 100232, 349999996]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440778, 100225, 143]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440769, 100229, 10000170]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440774, 100229, 19999813]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440768, 100229, 30000053]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440771, 100227, 39999896]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440777, 100228, 50000031]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440772, 100226, 59999989]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440768, 100227, 70000009]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440769, 100228, 60000058]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100227, 50000065]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440769, 100228, 40000059]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100232, 29999943]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440768, 100233, 20000008]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440774, 100224, 10000011]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440782, 100229, 359999899]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100228, 349999754]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100233, 340000114]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440767, 100235, 330000124]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100228, 319999862]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100229, 309999824]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440767, 100229, 299999896]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440774, 100227, 290000056]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100229, 280000071]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440767, 100224, 289999708]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440777, 100229, 300000254]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440772, 100227, 310000276]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440766, 100235, 319999741]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100231, 329999863]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440777, 100229, 339999957]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440778, 100235, 330000242]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100230, 319999942]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440778, 100229, 310000123]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440771, 100231, 300000053]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440779, 100229, 309999926]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440774, 100228, 320000027]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440767, 100231, 330000143]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440776, 100229, 339999900]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440778, 100228, 350000182]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100230, 43]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440770, 100224, 10000100]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440781, 100230, 20000168]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440778, 100225, 30000029]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440777, 100228, 39999905]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440767, 100229, 50000222]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440775, 100226, 59999914]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440777, 100224, 69999997]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440764, 100227, 60000072]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440769, 100233, 49999830]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100230, 40000058]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440767, 100232, 30000165]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100226, 19999906]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440779, 100230, 10000052]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440770, 100226, 359999802]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440764, 100230, 350000019]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440768, 100234, 340000142]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440784, 100230, 330000138]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440774, 100230, 320000072]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440764, 100229, 310000043]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100230, 299999761]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100235, 289999929]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440763, 100227, 279999935]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440784, 100227, 289999863]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440771, 100230, 299999893]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100228, 309999937]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440771, 100230, 319999887]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440779, 100229, 329999943]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440777, 100230, 340000046]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440774, 100226, 350000081]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440767, 100232, 359999885]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100231, 9999928]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440772, 100230, 19999807]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440768, 100230, 30000217]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440776, 100228, 39999935]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440769, 100231, 49999861]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440774, 100229, 59999868]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440778, 100228, 50000130]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440771, 100231, 40000092]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440779, 100223, 30000602]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100230, 19999965]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440773, 100230, 9999912]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440769, 100225, 85]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440779, 100227, 349999916]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440765, 100230, 340000114]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440767, 100237, 329999805]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440774, 100229, 319999992]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100231, 310000068]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100235, 299999972]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100227, 289999934]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440766, 100226, 280000197]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440773, 100227, 270000040]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440777, 100232, 259999427]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440772, 100229, 269999935]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440771, 100227, 279999840]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440780, 100228, 289999847]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100227, 299999843]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440768, 100228, 309999930]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440772, 100229, 319999795]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440756, 100226, 330000058]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440781, 100227, 340000045]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440784, 100231, 350000276]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440768, 100224, 36]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440778, 100231, 10000240]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440764, 100224, 20000161]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100228, 30000047]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440780, 100226, 40000225]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440774, 100230, 50000159]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440769, 100229, 59999912]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440760, 100230, 50000011]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440774, 100230, 40000009]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440767, 100228, 29999764]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440769, 100230, 19999767]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440778, 100223, 10000239]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100230, 239]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440767, 100226, 350000080]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440772, 100229, 339999879]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100231, 330000226]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440773, 100228, 319999721]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440774, 100231, 310000134]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440781, 100227, 319999859]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100224, 329999924]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440779, 100226, 340000222]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440779, 100231, 350000156]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440780, 100230, 13]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440760, 100228, 9999944]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440768, 100229, 19999861]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440790, 100232, 29999892]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440764, 100226, 40000048]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100225, 50000125]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440775, 100228, 60000043]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440781, 100227, 50000121]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100225, 39999909]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440758, 100226, 30000139]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440768, 100230, 19999773]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440768, 100226, 9999939]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100234, 359999883]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100232, 350000112]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440782, 100232, 340000072]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440785, 100237, 329999807]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440769, 100227, 320000058]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440763, 100232, 310000090]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440766, 100230, 300000075]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100228, 290000046]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440784, 100230, 279999646]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440771, 100225, 269999876]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440779, 100229, 280000154]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100226, 290000105]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440765, 100228, 299999911]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440776, 100230, 309999888]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440773, 100227, 319999887]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440776, 100235, 330001061]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440769, 100233, 340000021]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440772, 100228, 349999925]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440794, 100228, 254]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440786, 100226, 10000295]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440780, 100223, 20000093]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440774, 100231, 29999898]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 10000000]
+INFO:Current position: [440781, 100223, 39999883]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440771, 100229, 29999953]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440775, 100227, 19999852]
+INFO:Positions are between the travel range limits of positioners.
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4284967296]
+INFO:Current position: [440776, 100230, 10000034]
