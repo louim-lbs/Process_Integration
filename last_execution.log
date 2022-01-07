@@ -1,65 +1,10 @@
 INFO: Initialization...
-INFO: Available Systems IDs: [0]
-INFO: No systems detected: 3 SA_NO_SYSTEMS_FOUND_ERROR
-INFO: Check if MCS-3D is turned on. Check USB connexion.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
+INFO: Available Systems IDs: [3919851221]
+INFO: Initialization... OK
+INFO: System ID:       3919851221
+INFO: Dll version:     17301603
+INFO: Init state:      1 SA_INIT_STATE_SYNC
+INFO: ---------------------------------------
 INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Positions are between the travel range limits of positioners.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
+INFO:Moving...
+INFO:Position set to:  [0, 0, 0]

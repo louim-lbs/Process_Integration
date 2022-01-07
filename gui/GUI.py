@@ -154,7 +154,7 @@ class App(object):
         positioner_pos = self.positioner.getpos()
         self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[0]) + " nm", justify='left')
         self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[1]) + " nm", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[2]) + " u°", justify='left')
+        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner.angle_convert_Smaract2SI(positioner_pos[2])) + " u°", justify='left')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
@@ -273,7 +273,7 @@ class App(object):
         # self.lbl_acquisition.update()
         '''
         '''
-        set_tomo_status = scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=self.ent_tilt_step.get()*1e6, tilt_end=self.ent_end_tilt.get()*1e6, drift_correction=False)
+        set_tomo_status = scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name=self.ent_name.get(), resolution='1546x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=int(self.ent_tilt_step.get())*1e6, tilt_end=int(self.ent_end_tilt.get())*1e6, drift_correction=False)
         if set_tomo_status == 0:
             self.lbl_acquisition.config(bg='green')
             return 0
