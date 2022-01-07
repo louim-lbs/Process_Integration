@@ -179,19 +179,19 @@ class App(object):
         self.frm_sav.place(x=3*width//4, y=height//2)
 
         self.lbl_tilt_step = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Tilt step (°)", justify='left')
-        #lbl_nb_imgs   = tk.Label(master=frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Number of images", justify='left')
+        self.lbl_end_tilt  = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="End tilt (°)", justify='left')
         self.lbl_name      = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Name of project", justify='left')
 
         self.ent_tilt_step = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', text="5", justify='left')
-        #ent_nb_imgs   = tk.Entry(master=frm_sav, width=20, bg='#2B2B2B', fg='white', text="100", justify='left')
+        self.ent_end_tilt  = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', text="100", justify='left')
         self.ent_name      = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', text="Project_test", justify='left')
 
         self.lbl_tilt_step.place(x=20, y=20)
-        #lbl_nb_imgs.place(x=20, y=60)
+        self.lbl_end_tilt.place(x=20, y=60)
         self.lbl_name.place(x=20, y=100)
 
         self.ent_tilt_step.place(x=180, y=20)
-        #ent_nb_imgs.place(x=180, y=60)
+        self.ent_end_tilt.place(x=180, y=60)
         self.ent_name.place(x=180, y=100)
 
         self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Start Acquisition", justify='left', command=self.acquisition)
@@ -269,11 +269,11 @@ class App(object):
         self.lbl_acquisition.config(bg="orange")
         self.lbl_acquisition.update()
         
-        self.lbl_acquisition.config(bg="red")
-        self.lbl_acquisition.update()
+        # self.lbl_acquisition.config(bg="red")
+        # self.lbl_acquisition.update()
         '''
         '''
-        set_tomo_status = scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=2000000, drift_correction=False)
+        set_tomo_status = scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=self.ent_tilt_step.get()*1e6, tilt_end=self.ent_end_tilt.get()*1e6, drift_correction=False)
         if set_tomo_status == 0:
             self.lbl_acquisition.config(bg='green')
             return 0

@@ -323,7 +323,7 @@ def set_eucentric(microscope, positioner) -> int:
     print('Done eucentrixx')
     return 0
 
-def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=2000000, drift_correction:bool=False) -> int:
+def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False) -> int:
     ''' Acquire set of images according to input parameters.
 
     Input:
@@ -345,19 +345,33 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
             -> 0
     '''
     pos = positioner.getpos()
-    nb_images = int(pos[2]//(tilt_increment/1000000) + 1)
+    if pos[2] > 0:
+        direction = -1
+        if tilt_end > 0:
+            tilt_end *= -1
+    else:
+        direction = 1
+        if tilt_end < 0:
+            tilt_end *= -1
+    
+    # nb_images = int(pos[2]//(tilt_increment/1000000) + 1)
+    nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
 
-    os.makedirs('./data/tomo/' + images_name + str(round(time.time())), exist_ok=True)
+    print(tilt_increment, tilt_end)
+    
+    path = work_folder + images_name + str(round(time.time()))
+    os.makedirs(path, exist_ok=True)
 
     for i in range(nb_images):
         print(i, positioner.getpos()[2])
+        logging.info(str(i) + str(positioner.getpos()[2]))
         ###### Drift correction
         settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
         images = microscope.imaging.grab_multiple_frames(settings)
-        # images[0].save(work_folder + 'SE'   + str(images_name) + str(i) + '.tif')
-        # images[1].save(work_folder + 'BF'   + str(images_name) + str(i) + '.tif')
-        images[2].save(work_folder + 'HAADF' + str(images_name) + str(i) + '.tif')
-        positioner.setpos_rel([0, 0, -tilt_increment])
+        # images[0].save(path + '/SE'   + str(images_name) + str(i) + '.tif')
+        # images[1].save(path + '/BF'   + str(images_name) + str(i) + '.tif')
+        images[2].save(path + '/HAADF' + str(images_name) + str(i) + '.tif')
+        positioner.setpos_rel([0, 0, direction*tilt_increment])
 
     print('Tomographixx is a Succes')
     return 0
