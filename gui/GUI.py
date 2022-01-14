@@ -7,6 +7,7 @@ from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 import scripts
+from autoscript_sdb_microscope_client.structures import StagePosition
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -126,6 +127,9 @@ class App(object):
         self.btn_eucentric = tk.Button(master=self.frm_img, width=20, height=1, bg='#373737', fg='white', text="Set Eucentric", justify='left', command=self.eucentric)
         self.btn_eucentric.place(x=int(width//4-100), rely=0.88)
 
+        self.btn_zero_eucentric = tk.Button(master=self.frm_img, width=20, height=1, bg='#373737', fg='white', text="Set to Zero", justify='left', command=self.zero_eucentric)
+        self.btn_zero_eucentric.place(x=int(width//4-100), rely=0.92)
+
         self.eucent = tk.StringVar(value='red')
         self.lbl_eucent = tk.Label(master=self.frm_img, width=1, height=1, bg=self.eucent.get())
         self.lbl_eucent.place(x=int(width//4-100)+160, rely=0.88)
@@ -222,7 +226,18 @@ class App(object):
             self.lbl_eucent.update()
             return 0
         return 1
-    
+
+    def zero_eucentric(self):
+        ''' Reset eucentric point to zero
+        '''
+        zed, ygrec, tangle = self.positioner.getpos()
+        self.positioner.setpos_abs([0, 0, tangle])
+        self.microscope.specimen.stage.relative_move(StagePosition(y=-ygrec))
+        self.microscope.beams.electron_beam.working_distance.value += zed*1e-9
+        self.lbl_eucent.config(bg='red')
+        self.lbl_eucent.update()
+        return 0
+
     def z_up(self):
         step = int(self.ent_z_step.get())
         self.positioner.setpos_rel([step, 0, 0])

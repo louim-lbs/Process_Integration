@@ -28,6 +28,7 @@
     - Centering image on particle after correction.
 - **Dynamical focus** for low-deep-field STEM acquisition?
 - **16-bits** default acquisition.
+- Angles file
 
 ### GUI
 - Button to open help/tutorial to remember acquisition settings.

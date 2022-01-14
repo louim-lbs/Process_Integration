@@ -39,12 +39,6 @@ smaract = sm.smaract_class(calibrate=False)
 os.chdir(dir_pi)
 from gui import GUI
 
-# import time
-# def test():
-#     while True:
-#         time.sleep(1)
-#         logging.info('Lol') 
-
 def main_start():
     root = GUI.tk.Tk()
     GUI.App(root, quattro, smaract)
