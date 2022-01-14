@@ -159,7 +159,7 @@ class smaract_class(object):
             if status != 0:
                 message = self.find_status_message(self.error_codes, status)
                 logging.info(error_text + str(status) + ' ' + str(message))
-                error = 1
+                return 1
         return error
 
     def angle_convert_SI2Smaract(self, angle_py:int) -> int:
@@ -257,10 +257,8 @@ class smaract_class(object):
         '''
         # limits = self.gets_limits()
         if (self.range_limits['z_min'].value <= pos[0] <= self.range_limits['z_max'].value) and (self.range_limits['y_min'].value <= pos[1] <= self.range_limits['y_max'].value) and (self.range_limits['t_min'].value <= pos[2] <= self.range_limits['t_max'].value):
-            logging.info('Positions are between the travel range limits of positioners.')
             return True
         else:
-            logging.info('Positions are out the travel range limits of positioners.')
             return False
     
     def hold_during_move(self) -> ctypes.c_uint32:

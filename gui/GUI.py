@@ -6,6 +6,7 @@ import tkinter.scrolledtext as ScrolledText
 from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
+from numpy import lexsort
 import scripts
 from autoscript_sdb_microscope_client.structures import StagePosition
 
@@ -31,13 +32,15 @@ class TextHandler(logging.Handler):
         self.text.after(0, append)
 
 class App(object):
-    def __init__(self, root, microscope, positioner):
+    def __init__(self, root, microscope, positioner, letsgo):
         ''' Initialize GUI
         
         '''
         # Title
         root.title("Tomo Controller for Quattro and Smaract positioner - version 0.1")
-        # root.iconbitmap('PI.ico')
+        root.iconbitmap('gui/img/PI.ico')
+
+        self.letsgo = True
 
         try:
             self.microscope = microscope
@@ -185,12 +188,15 @@ class App(object):
         self.frm_sav.place(x=3*width//4, y=height//2)
 
         self.lbl_tilt_step = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Tilt step (°)", justify='left')
-        self.lbl_end_tilt  = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="End tilt (°)", justify='left')
+        self.lbl_end_tilt  = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Final tilt (°)", justify='left')
         self.lbl_name      = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Name of project", justify='left')
 
-        self.ent_tilt_step = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', text="5", justify='left')
-        self.ent_end_tilt  = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', text="100", justify='left')
-        self.ent_name      = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', text="Project_test", justify='left')
+        text1 = tk.StringVar(master=self.frm_sav, value='1')
+        text2 = tk.StringVar(master=self.frm_sav, value='70')
+        text3 = tk.StringVar(master=self.frm_sav, value='Acquisition')
+        self.ent_tilt_step = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text1, justify='left')
+        self.ent_end_tilt  = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text2, justify='left')
+        self.ent_name      = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text3, justify='left')
 
         self.lbl_tilt_step.place(x=20, y=20)
         self.lbl_end_tilt.place(x=20, y=60)
@@ -202,6 +208,9 @@ class App(object):
 
         self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Start Acquisition", justify='left', command=self.acquisition)
         self.btn_acquisition.place(x=100, y=200)
+
+        self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Stop", justify='center', command=self.stop)
+        self.btn_acquisition.place(x=100, y=290)
 
         self.acquisition = tk.StringVar(value='red')
         self.lbl_acquisition = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.acquisition.get())
@@ -218,6 +227,7 @@ class App(object):
     def eucentric(self):
         ''' Set the eucentric point
         '''
+        self.letsgo = True
         self.lbl_eucent.config(bg='orange')
         self.lbl_eucent.update()
         
@@ -227,12 +237,18 @@ class App(object):
             self.lbl_eucent.config(bg='green')
             self.lbl_eucent.update()
             return 0
-        return 1
+        elif set_eucentric_status == 1:
+            self.lbl_eucent.config(bg='red')
+            self.lbl_eucent.update()
+            return 1
+        return 0
 
     def zero_eucentric(self):
         ''' Reset eucentric point to zero
         '''
         zed, ygrec, tangle = self.positioner.getpos()
+        if None in (zed, ygrec, tangle):
+            return 1
         self.positioner.setpos_abs([0, 0, tangle])
         self.microscope.specimen.stage.relative_move(StagePosition(y=-ygrec))
         self.microscope.beams.electron_beam.working_distance.value += zed*1e-9
@@ -242,55 +258,70 @@ class App(object):
 
     def z_up(self):
         step = int(self.ent_z_step.get())
-        self.positioner.setpos_rel([step, 0, 0])
+        status = self.positioner.setpos_rel([step, 0, 0])
+        if status != 0:
+            return 1
         self.lbl_z_pos.config(text=str(self.positioner.getpos()[0]) + ' nm')
         self.lbl_z_pos.update()
         return 0
 
     def y_up(self):
         step = int(self.ent_y_step.get())
-        self.positioner.setpos_rel([0, step, 0])
+        status = self.positioner.setpos_rel([0, step, 0])
+        if status != 0:
+            return 1
         self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
         self.lbl_y_pos.update()
         return 0
 
     def t_up(self):
         step = int(self.ent_t_step.get())
-        self.positioner.setpos_rel([0, 0, step])
+        status = self.positioner.setpos_rel([0, 0, step])
+        if status != 0:
+            return 1
         self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
         self.lbl_t_pos.update()
         return 0
     
     def z_down(self):
         step = int(self.ent_z_step.get())
-        self.positioner.setpos_rel([-step, 0, 0])
+        status = self.positioner.setpos_rel([-step, 0, 0])
+        if status != 0:
+            return 1
         self.lbl_z_pos.config(text=str(self.positioner.getpos()[0]) + ' nm')
         self.lbl_z_pos.update()
         return 0
     
     def y_down(self):
         step = int(self.ent_y_step.get())
-        self.positioner.setpos_rel([0, -step, 0])
+        status = self.positioner.setpos_rel([0, -step, 0])
+        if status != 0:
+            return 1
         self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
         self.lbl_y_pos.update()
         return 0
     
     def t_down(self):
         step = int(self.ent_t_step.get())
-        self.positioner.setpos_rel([0, 0, -step])
+        status = self.positioner.setpos_rel([0, 0, -step])
+        if status != 0:
+            return 1
         self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
         self.lbl_t_pos.update()
         return 0
 
     def t_zero(self):
         zed, ygrec, tangle = self.positioner.getpos()
+        if None in (zed, ygrec, tangle):
+            return 1
         self.positioner.setpos_abs([zed, ygrec, 0])
         self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
         self.lbl_t_pos.update()
         return 0
 
     def acquisition(self):
-        self.lbl_acquisition.config(bg="orange")
+        self.letsgo = True
+        self.lbl_acquisition.config(bg="green")
         self.lbl_acquisition.update()
         
         # self.lbl_acquisition.config(bg="red")
@@ -298,10 +329,19 @@ class App(object):
         '''
         '''
         set_tomo_status = scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name=self.ent_name.get(), resolution='1546x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=int(self.ent_tilt_step.get())*1e6, tilt_end=int(self.ent_end_tilt.get())*1e6, drift_correction=False)
-        if set_tomo_status == 0:
-            self.lbl_acquisition.config(bg='green')
-            return 0
+        self.lbl_acquisition.config(bg='red')
+        self.lbl_acquisition.update()
+        if set_tomo_status == 1:
+            return 1
         return 1
+
+    def stop(self):
+        self.letsgo = False
+        self.lbl_eucent.config(bg='red')
+        self.lbl_eucent.update()
+        self.lbl_acquisition.config(bg="red")
+        self.lbl_acquisition.update()
+        return 0
 
 if __name__ == "__main__":
     root = tk.Tk()
