@@ -12,12 +12,10 @@
 
 ### Microscope
 - **Eucentric**. Write operation steps.
-    - Increase angle not zoom?
     - match filtre passe bas
     - **Pondérer** le match par la confiance.
     - Deal with smaract errors
     - IF NOT MATCHED INCREASE DWELL TIME.
-    - Attention aux sens et aux axes. Match function: x and y from left-up corner of the image.
     - Calculer le décallage une fois qu'il a été fait la première fois.
     - Le HAADF donne le meilleur contraste.
     - Augmenter le dwell time pour augmenter la précision.
@@ -27,7 +25,6 @@
     - Check limits of displacement.
     - Centering image on particle after correction.
 - **Dynamical focus** for low-deep-field STEM acquisition?
-- **16-bits** default acquisition.
 - Angles file
 
 ### GUI
@@ -40,6 +37,9 @@
 
 
 ********** DONE
+- OK. **16-bits** default acquisition.
+- OK. Attention aux sens et aux axes. Match function: x and y from left-up corner of the image.
+- OK. Increase angle not zoom?
 - OK. Connection with Smaract, button OK.
 - OK. Connection with microscope, button OK.
 - OK. **Hold time infinite** to prevent drift effect or position changes due to a non-aligned center of mass. Instability ? → No

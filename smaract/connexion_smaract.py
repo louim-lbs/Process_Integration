@@ -199,10 +199,13 @@ class smaract_class(object):
             angle = angle_convert_Smaract2SI(270000000)
                 -> -90000000
         '''
-        if 0 <= angle_smaract <= 180000000:
-            return angle_smaract
-        elif 180000000 < angle_smaract <= 360000000:
-            return angle_smaract-360000000
+        try:
+            if 0 <= angle_smaract <= 180000000:
+                return angle_smaract
+            elif 180000000 < angle_smaract <= 360000000:
+                return angle_smaract-360000000
+        except:
+            return None
     
     def gets_limits(self):
         ''' Retrieve the travel range limits of positioners.

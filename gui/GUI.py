@@ -148,12 +148,14 @@ class App(object):
         self.btn_y_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.y_down)
         self.btn_t_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.t_up)
         self.btn_t_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.t_down)
+        self.btn_t_zero = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="0", justify='left', command=self.t_zero)
         self.btn_z_up.place(x=22, y=210)
         self.btn_z_down.place(x=22, y=320)
         self.btn_y_up.place(x=132, y=210)
         self.btn_y_down.place(x=132, y=320)
         self.btn_t_up.place(x=242, y=210)
         self.btn_t_down.place(x=242, y=320)
+        self.btn_t_zero.place(x=242, y=360)
 
         positioner_pos = self.positioner.getpos()
         self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[0]) + " nm", justify='left')
@@ -276,6 +278,13 @@ class App(object):
     def t_down(self):
         step = int(self.ent_t_step.get())
         self.positioner.setpos_rel([0, 0, -step])
+        self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
+        self.lbl_t_pos.update()
+        return 0
+
+    def t_zero(self):
+        zed, ygrec, tangle = self.positioner.getpos()
+        self.positioner.setpos_abs([zed, ygrec, 0])
         self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
         self.lbl_t_pos.update()
         return 0
