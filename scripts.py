@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import logging
 import time
 from shutil import copyfile
+import copy
 
 def function_displacement(x, z, y):
     x = [i*np.pi/180 for i in x]
@@ -323,7 +324,75 @@ def set_eucentric(microscope, positioner) -> int:
     print('Done eucentrixx')
     return 0
 
-def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False) -> int:
+def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False) -> int:
+    ''' Acquire set of images according to input parameters.
+
+    Input:
+        - Microscope parameters "micro_settings":
+            - work folder
+            - images naming
+            - image resolution
+            - bit depht
+            - dwell time
+        - Smaract parameters:
+            - tilt increment
+            # - tilt to begin from
+    
+    Return:
+        - success or error code (int).
+
+    Exemple:
+        tomo_status = tomo_acquisition(micro_settings, smaract_settings, drift_correction=False)
+            -> 0
+    '''
+    pos = positioner.getpos()
+    if positioner.angle_convert_Smaract2SI(pos[2]) > 0:
+        direction = -1
+        if tilt_end > 0:
+            tilt_end *= -1
+    else:
+        direction = 1
+        if tilt_end < 0:
+            tilt_end *= -1
+    print(dwell_time)
+    # nb_images = int(pos[2]//(tilt_increment/1000000) + 1)
+    nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
+
+    print(tilt_increment, tilt_end)
+    
+    path = work_folder + images_name + '_' + str(round(time.time()))
+    os.makedirs(path, exist_ok=True)
+
+    settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+    
+    # dx_si_nano = 0
+    # dy_si_nano = 0
+
+    for i in range(nb_images):
+        print(i, positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
+        logging.info(str(i) + str(positioner.getpos()[2]))
+        
+        images = microscope.imaging.grab_multiple_frames(settings)
+        # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        positioner.setpos_rel([0, 0, direction*tilt_increment])
+        ###### Drift correction
+        if drift_correction==True and (i%2) != 0:
+            hfw = microscope.beams.electron_beam.horizontal_field_width.value
+            image_width = int(resolution[:resolution.find('x')])
+            dx_pix, dy_pix, corr_trust = match(images[2].data, images_prev[2].data)
+            dx_si_nano = dx_pix*hfw/image_width
+            dy_si_nano = dy_pix*hfw/image_width
+            microscope.specimen.stage.relative_move(StagePosition(x=2*dx_si_nano, y=2*dy_si_nano))
+        if drift_correction==True and (i%2) == 0 and i>0:
+            microscope.specimen.stage.relative_move(StagePosition(x=0*dx_si_nano, y=0*dy_si_nano))
+        images_prev = copy.deepcopy(images)
+
+    print('Tomographixx is a Succes')
+    return 0
+
+def tomo_acquisition2(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False) -> int:
     ''' Acquire set of images according to input parameters.
 
     Input:
@@ -353,25 +422,42 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
         direction = 1
         if tilt_end < 0:
             tilt_end *= -1
-    
+    print(dwell_time)
     # nb_images = int(pos[2]//(tilt_increment/1000000) + 1)
     nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
 
     print(tilt_increment, tilt_end)
     
-    path = work_folder + images_name + str(round(time.time()))
+    path = work_folder + images_name + '_' + str(round(time.time()))
     os.makedirs(path, exist_ok=True)
+
+    settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+    
+    # dx_si_nano = 0
+    # dy_si_nano = 0
 
     for i in range(nb_images):
         print(i, positioner.getpos()[2])
         logging.info(str(i) + str(positioner.getpos()[2]))
+        
         ###### Drift correction
-        settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
-        images = microscope.imaging.grab_multiple_frames(settings)
-        # images[0].save(path + '/SE'   + str(images_name) + str(i) + '.tif')
-        # images[1].save(path + '/BF'   + str(images_name) + str(i) + '.tif')
-        images[2].save(path + '/HAADF' + str(images_name) + str(i) + '.tif')
+        if drift_correction==True and i > 0:
+            images_drift = microscope.imaging.grab_multiple_frames(GrabFrameSettings(resolution=resolution, dwell_time=0.2e-6, bit_depth=bit_depth))
+            hfw = microscope.beams.electron_beam.horizontal_field_width.value
+            image_width = int(resolution[:resolution.find('x')])
+            dx_pix, dy_pix, corr_trust = match(images_drift[2].data, images_prev[2].data)
+            dx_si_nano = dx_pix*hfw/image_width
+            dy_si_nano = dy_pix*hfw/image_width
+            microscope.specimen.stage.relative_move(StagePosition(y=dy_si_nano)) #x=dx_si_nano,
+            print('dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si_nano, dy_si_nano) 
+        
+        images = microscope.imaging.grab_multiple_frames(GrabFrameSettings(resolution=resolution, dwell_time=1e-6, bit_depth=bit_depth))
+        # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
         positioner.setpos_rel([0, 0, direction*tilt_increment])
+        
+        images_prev = copy.deepcopy(images)
 
     print('Tomographixx is a Succes')
     return 0
