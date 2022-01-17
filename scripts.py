@@ -1,4 +1,4 @@
-from autoscript_sdb_microscope_client.structures import GrabFrameSettings, StagePosition
+from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
 import numpy as np
 import cv2 as cv
 from scipy import interpolate
@@ -161,6 +161,7 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
 
     # plt.plot(dx_tot)
+    # plt.plot(dy_tot)
     # plt.show()
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
@@ -304,7 +305,7 @@ def set_eucentric(microscope, positioner) -> int:
                 ### Test increase angle
                 if 2*angle_max <= 55000000:
                     angle_step *= 2
-                    angle_max *= 2
+                    angle_max *= 3
                 else:
                     angle_max = 55000000
                     angle_step = 5000000
@@ -371,26 +372,54 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
     
     # dx_si_nano = 0
     # dy_si_nano = 0
+    anticipation_x = 0
+    anticipation_y = 0
+    correction_x = 0
+    correction_y = 0
 
     for i in range(nb_images):
         print(i, positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
         logging.info(str(i) + str(positioner.getpos()[2]))
         
         images = microscope.imaging.grab_multiple_frames(settings)
-        # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
         positioner.setpos_rel([0, 0, direction*tilt_increment])
         ###### Drift correction
-        if drift_correction==True and (i%2) != 0:
+        # if drift_correction==True and (i%2) != 0:
+        #     hfw = microscope.beams.electron_beam.horizontal_field_width.value
+        #     image_width = int(resolution[:resolution.find('x')])
+        #     dx_pix, dy_pix, corr_trust = match(images[2].data, images_prev[2].data)
+        #     dx_si_nano = dx_pix*hfw/image_width
+        #     dy_si_nano = dy_pix*hfw/image_width
+        #     microscope.specimen.stage.relative_move(StagePosition(x=2*dx_si_nano, y=2*dy_si_nano))
+        # if drift_correction==True and (i%2) == 0 and i>0:
+        #     microscope.specimen.stage.relative_move(StagePosition(x=0*dx_si_nano, y=0*dy_si_nano))
+        if drift_correction==True and i > 0:
             hfw = microscope.beams.electron_beam.horizontal_field_width.value
             image_width = int(resolution[:resolution.find('x')])
-            dx_pix, dy_pix, corr_trust = match(images[2].data, images_prev[2].data)
-            dx_si_nano = dx_pix*hfw/image_width
-            dy_si_nano = dy_pix*hfw/image_width
-            microscope.specimen.stage.relative_move(StagePosition(x=2*dx_si_nano, y=2*dy_si_nano))
-        if drift_correction==True and (i%2) == 0 and i>0:
-            microscope.specimen.stage.relative_move(StagePosition(x=0*dx_si_nano, y=0*dy_si_nano))
+            dy_pix, dx_pix, _ = match(images[2].data, images_prev[2].data)
+            dx_si = dx_pix*hfw/image_width
+            dy_si = dy_pix*hfw/image_width
+            correction_x = - dx_si + correction_x
+            correction_y = - dy_si + correction_y
+            anticipation_x += correction_x
+            anticipation_y += correction_y
+            # print('dx_pix', dx_pix)
+            # print('dx_si_nano', dx_si)
+            # print('correction_x', correction_x)
+            # print('anticipation_x', anticipation_x)
+            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
+            # print('beamshift_x', beamshift_x)
+            microscope.beams.electron_beam.beam_shift.value = Point(x=0,
+                                                                    y=beamshift_y + correction_y + anticipation_y)
+            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
+            # print('beamshift_x_2', beamshift_x)
+            # microscope.specimen.stage.relative_move(StagePosition(y=correction_y + anticipation_y))
+            # microscope.specimen.stage.relative_move(StagePosition(x=correction_x + anticipation_x,
+            #                                                       y=correction_y + anticipation_y))
+
         images_prev = copy.deepcopy(images)
 
     print('Tomographixx is a Succes')

@@ -284,7 +284,8 @@ class App(object):
         status = self.positioner.setpos_rel([0, 0, step])
         if status != 0:
             return 1
-        self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
+        positioner_pos = self.positioner.getpos()
+        self.lbl_t_pos.config(text=str(self.positioner.angle_convert_Smaract2SI(positioner_pos[2])) + ' u°')
         self.lbl_t_pos.update()
         return 0
     
@@ -311,7 +312,8 @@ class App(object):
         status = self.positioner.setpos_rel([0, 0, -step])
         if status != 0:
             return 1
-        self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
+        positioner_pos = self.positioner.getpos()
+        self.lbl_t_pos.config(text=str(self.positioner.angle_convert_Smaract2SI(positioner_pos[2])) + ' u°')
         self.lbl_t_pos.update()
         return 0
 
@@ -320,7 +322,8 @@ class App(object):
         if None in (zed, ygrec, tangle):
             return 1
         self.positioner.setpos_abs([zed, ygrec, 0])
-        self.lbl_t_pos.config(text=str(self.positioner.getpos()[2]) + ' u°')
+        positioner_pos = self.positioner.getpos()
+        self.lbl_t_pos.config(text=str(self.positioner.angle_convert_Smaract2SI(positioner_pos[2])) + ' u°')
         self.lbl_t_pos.update()
         return 0
 
@@ -334,7 +337,17 @@ class App(object):
         # self.lbl_acquisition.config(bg="red")
         # self.lbl_acquisition.update()
         
-        set_tomo_status = self.pool.submit(scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name=self.ent_name.get(), resolution='1546x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=int(self.ent_tilt_step.get())*1e6, tilt_end=int(self.ent_end_tilt.get())*1e6, drift_correction=False))
+        set_tomo_status = self.pool.submit(scripts.tomo_acquisition(self.microscope,
+                                self.positioner,
+                                work_folder='data/tomo/',
+                                images_name=self.ent_name.get(),
+                                resolution='1536x1024',
+                                bit_depth=16,
+                                dwell_time=2e-6,
+                                tilt_increment=int(self.ent_tilt_step.get())*1e6,
+                                tilt_end=int(self.ent_end_tilt.get())*1e6,
+                                drift_correction=True))
+
         self.lbl_acquisition.config(bg='red')
         self.lbl_acquisition.update()
         if set_tomo_status == 1:

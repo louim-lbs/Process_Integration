@@ -1,5 +1,181 @@
 INFO: Initialization...
-INFO: Available Systems IDs: [0]
-INFO: No systems detected: 3 SA_NO_SYSTEMS_FOUND_ERROR
-INFO: Check if MCS-3D is turned on. Check USB connexion.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
+INFO: Available Systems IDs: [3919851221]
+INFO: Initialization... OK
+INFO: System ID:       3919851221
+INFO: Dll version:     17301603
+INFO: Init state:      1 SA_INIT_STATE_SYNC
+INFO: ---------------------------------------
+INFO:Current position: [434881, 125170, 44000003]
+INFO:Current position: [434881, 125171, 44000010]
+INFO:Current position: [434880, 125170, 43999999]
+INFO:Current position: [434880, 125170, 44000003]
+INFO:044000003
+INFO:Current position: [434880, 125170, 44000006]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434872, 125172, 42999968]
+INFO:Current position: [434872, 125170, 42999972]
+INFO:142999972
+INFO:Current position: [434881, 125170, 42999990]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125171, 41999997]
+INFO:Current position: [434881, 125171, 41999995]
+INFO:241999995
+INFO:Current position: [434880, 125170, 42000005]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125171, 40999997]
+INFO:Current position: [434881, 125170, 40999997]
+INFO:340999997
+INFO:Current position: [434881, 125170, 40999997]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125171, 40000000]
+INFO:Current position: [434880, 125171, 40000004]
+INFO:440000004
+INFO:Current position: [434880, 125170, 40000004]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125171, 38999995]
+INFO:Current position: [434881, 125171, 38999998]
+INFO:538999998
+INFO:Current position: [434881, 125170, 39000007]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125171, 37999987]
+INFO:Current position: [434881, 125171, 37999985]
+INFO:637999985
+INFO:Current position: [434881, 125171, 37999992]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125171, 36999993]
+INFO:Current position: [434880, 125171, 36999990]
+INFO:736999990
+INFO:Current position: [434880, 125170, 37000000]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125171, 36000008]
+INFO:Current position: [434881, 125171, 35999997]
+INFO:835999997
+INFO:Current position: [434881, 125171, 36000003]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 34999994]
+INFO:Current position: [434880, 125171, 34999994]
+INFO:934999994
+INFO:Current position: [434880, 125170, 35000005]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 34000003]
+INFO:Current position: [434880, 125170, 33999990]
+INFO:1033999990
+INFO:Current position: [434881, 125171, 33999990]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125170, 32999993]
+INFO:Current position: [434881, 125170, 32999999]
+INFO:1132999999
+INFO:Current position: [434880, 125170, 32999999]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 32000002]
+INFO:Current position: [434880, 125170, 31999995]
+INFO:1231999995
+INFO:Current position: [434881, 125172, 32000004]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 31000010]
+INFO:Current position: [434880, 125170, 31000006]
+INFO:1331000006
+INFO:Current position: [434881, 125171, 31000008]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 30000001]
+INFO:Current position: [434880, 125171, 30000001]
+INFO:1430000001
+INFO:Current position: [434881, 125170, 30000000]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125170, 29000005]
+INFO:Current position: [434880, 125171, 28999994]
+INFO:1528999994
+INFO:Current position: [434882, 125170, 29000007]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125170, 27999989]
+INFO:Current position: [434880, 125170, 28000003]
+INFO:1628000003
+INFO:Current position: [434881, 125170, 27999999]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 26999992]
+INFO:Current position: [434881, 125170, 27000000]
+INFO:1727000000
+INFO:Current position: [434880, 125171, 26999999]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125171, 25999999]
+INFO:Current position: [434881, 125170, 25999999]
+INFO:1825999999
+INFO:Current position: [434880, 125171, 26000015]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434881, 125171, 24999992]
+INFO:Current position: [434881, 125171, 25000013]
+INFO:1925000013
+INFO:Current position: [434880, 125171, 24999996]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 23999995]
+INFO:Current position: [434880, 125170, 24000005]
+INFO:2024000005
+INFO:Current position: [434880, 125171, 24000007]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125171, 23000000]
+INFO:Current position: [434880, 125171, 23000007]
+INFO:2123000007
+INFO:Current position: [434881, 125170, 22999986]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125171, 22000006]
+INFO:Current position: [434881, 125171, 21999997]
+INFO:2221999997
+INFO:Current position: [434881, 125170, 22000002]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125170, 21000008]
+INFO:Current position: [434880, 125171, 20999996]
+INFO:2320999996
+INFO:Current position: [434881, 125171, 20999996]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [434880, 125171, 20000005]
+INFO:Current position: [434881, 125171, 19999993]
+INFO:2419999993
+INFO:Current position: [434881, 125171, 19999994]
+INFO:Moving...
+INFO:Position set to:  [434881, 125171, 0]
+INFO:Current position: [434882, 125173, 121]
+INFO:Current position: [434881, 125170, 16]
+INFO:Moving...
+INFO:Position set to:  [0, 0, 16]
+INFO:Moving...
+INFO:Position increased of: [4294966296, 0, 0]
+INFO:Current position: [-649, 0, 7]
+INFO:Moving...
+INFO:Position increased of: [1000, 0, 0]
+INFO:Current position: [-22, 0, 16]
+INFO:Moving...
+INFO:Position increased of: [0, 4294966296, 0]
+INFO:Current position: [0, -963, 11]
+INFO:Moving...
+INFO:Position increased of: [0, 1000, 0]
+INFO:Current position: [0, -809, 20]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 4293967296]
+INFO:Current position: [2, -2, 358999833]
+INFO:Moving...
+INFO:Position increased of: [0, 0, 1000000]
+INFO:Current position: [7, 2, 121]
