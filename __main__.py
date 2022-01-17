@@ -8,7 +8,9 @@ Updated on Dec 08 2021
 
 import os
 import logging
-import threading
+# import threading
+from concurrent import futures 
+thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
 
 dir_pi = os.getcwd()
 logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -44,9 +46,8 @@ global letsgo
 from gui import GUI
 
 def main_start():
-    letsgo = True
     root = GUI.tk.Tk()
-    GUI.App(root, quattro, smaract, letsgo)
+    GUI.App(root, quattro, smaract, thread_pool_executor)
 
     # thread_z_up   = threading.Thread(target=GUI.App.z_up)
     # thread_z_down = threading.Thread(target=GUI.App.z_down)
@@ -54,7 +55,10 @@ def main_start():
     # thread_y_down = threading.Thread(target=GUI.App.y_down)
     # thread_t_up   = threading.Thread(target=GUI.App.t_up)
     # thread_t_down = threading.Thread(target=GUI.App.t_down)
-    # thread_t_zero = threading.Thread(target=GUI.App.t_zero)
+    # 
+    # thread_stop = threading.Thread(target=GUI.App.stop)
+    # thread_stop = threading.Thread(target=root.btn_stop)
+
 
     # thread_z_up.start()
     # thread_z_down.start()
@@ -62,7 +66,7 @@ def main_start():
     # thread_y_down.start()
     # thread_t_up.start()
     # thread_t_down.start()
-    # thread_t_zero.start()
+    # thread_stop.start()
 
     root.mainloop()
     # thread_z_up.join()
@@ -71,6 +75,6 @@ def main_start():
     # thread_y_down.join()
     # thread_t_up.join()
     # thread_t_down.join()
-    # thread_t_zero.join()
+    # thread_stop.join()
 
 main_start()

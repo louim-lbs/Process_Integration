@@ -1,14 +1,16 @@
 import time
-import threading
+# import threading
 import logging
 import tkinter as tk
 import tkinter.scrolledtext as ScrolledText
 from tkinter.constants import RAISED
-from tkinter.filedialog import askdirectory
+from tkinter.filedialog import askdirectory, test
 from PIL import ImageTk, Image
 from numpy import lexsort
 import scripts
 from autoscript_sdb_microscope_client.structures import StagePosition
+
+
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -32,14 +34,16 @@ class TextHandler(logging.Handler):
         self.text.after(0, append)
 
 class App(object):
-    def __init__(self, root, microscope, positioner, letsgo):
+    def __init__(self, root, microscope, positioner, pool):
         ''' Initialize GUI
         
         '''
+        self.rootix = root
         # Title
         root.title("Tomo Controller for Quattro and Smaract positioner - version 0.1")
         root.iconbitmap('gui/img/PI.ico')
 
+        self.pool = pool
         self.letsgo = True
 
         try:
@@ -209,8 +213,8 @@ class App(object):
         self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Start Acquisition", justify='left', command=self.acquisition)
         self.btn_acquisition.place(x=100, y=200)
 
-        self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Stop", justify='center', command=self.stop)
-        self.btn_acquisition.place(x=100, y=290)
+        self.btn_stop = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Stop", justify='center', command=self.stop)
+        self.btn_stop.place(x=100, y=290)
 
         self.acquisition = tk.StringVar(value='red')
         self.lbl_acquisition = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.acquisition.get())
@@ -231,8 +235,9 @@ class App(object):
         self.lbl_eucent.config(bg='orange')
         self.lbl_eucent.update()
         
-        set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
-        
+        set_eucentric_status = self.pool.submit(scripts.set_eucentric(self.microscope, self.positioner))
+        # ThreadPoolExecutor.submit(scripts.set_eucentric(self.microscope, self.positioner))
+
         if set_eucentric_status == 0:
             self.lbl_eucent.config(bg='green')
             self.lbl_eucent.update()
@@ -323,17 +328,29 @@ class App(object):
         self.letsgo = True
         self.lbl_acquisition.config(bg="green")
         self.lbl_acquisition.update()
-        
+        # print('acqui')
+        # self.pool.submit(self.testlol, self.rootix, self.letsgo)
+
         # self.lbl_acquisition.config(bg="red")
         # self.lbl_acquisition.update()
-        '''
-        '''
-        set_tomo_status = scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name=self.ent_name.get(), resolution='1546x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=int(self.ent_tilt_step.get())*1e6, tilt_end=int(self.ent_end_tilt.get())*1e6, drift_correction=False)
+        
+        set_tomo_status = self.pool.submit(scripts.tomo_acquisition(self.microscope, self.positioner, work_folder='data/tomo/', images_name=self.ent_name.get(), resolution='1546x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=int(self.ent_tilt_step.get())*1e6, tilt_end=int(self.ent_end_tilt.get())*1e6, drift_correction=False))
         self.lbl_acquisition.config(bg='red')
         self.lbl_acquisition.update()
         if set_tomo_status == 1:
             return 1
         return 1
+
+    def testlol(self, win, letsgo):
+        for i in range(5):
+            if letsgo == False:
+                win.after(1000, print(letsgo))
+                return 1
+            win.after(1000, print(letsgo))
+        return 0
+
+    def acquisition2(self):
+        return 0
 
     def stop(self):
         self.letsgo = False

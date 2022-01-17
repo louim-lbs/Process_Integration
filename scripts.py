@@ -182,7 +182,7 @@ def set_eucentric(microscope, positioner) -> int:
     z0, y0, _ = positioner.getpos()
     if z0 == None or y0 == None:
         return 1
-    
+    hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
     angle_step0 = 2000000
     angle_step =  2000000             # udegrees
     angle_max  = 10000000             # udegrees
@@ -209,7 +209,7 @@ def set_eucentric(microscope, positioner) -> int:
 
     positioner.setpos_rel([0, 0, angle_step])
 
-    while abs(eucentric_error) > precision or positioner.angle_convert_Smaract2SI(positioner.getpos()[2]) < angle_max and letsgo == True:
+    while abs(eucentric_error) > precision or positioner.angle_convert_Smaract2SI(positioner.getpos()[2]) < angle_max:
         logging.info('eucentric_error =' + str(round(eucentric_error)) + 'precision =' + str(precision) + 'current angle =' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + 'angle_max =' + str(angle_max))
         print('eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), 'angle_max =', angle_max)
         #### Deal with positioner error
@@ -373,9 +373,6 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
     # dy_si_nano = 0
 
     for i in range(nb_images):
-        if letsgo == False:
-            break
-
         print(i, positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
         logging.info(str(i) + str(positioner.getpos()[2]))
         
@@ -444,9 +441,6 @@ def tomo_acquisition2(microscope, positioner, work_folder='data/tomo/', images_n
     # dy_si_nano = 0
 
     for i in range(nb_images):
-        if letsgo == False:
-            break
-        
         print(i, positioner.getpos()[2])
         logging.info(str(i) + str(positioner.getpos()[2]))
         
