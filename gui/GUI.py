@@ -255,7 +255,7 @@ class App(object):
         if None in (zed, ygrec, tangle):
             return 1
         self.positioner.setpos_abs([0, 0, tangle])
-        self.microscope.specimen.stage.relative_move(StagePosition(y=-ygrec))
+        self.microscope.specimen.stage.relative_move(StagePosition(y=-ygrec*1e-9))
         self.microscope.beams.electron_beam.working_distance.value += zed*1e-9
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
@@ -343,7 +343,7 @@ class App(object):
                                 images_name=self.ent_name.get(),
                                 resolution='1536x1024',
                                 bit_depth=16,
-                                dwell_time=2e-6,
+                                dwell_time=1e-6,
                                 tilt_increment=int(self.ent_tilt_step.get())*1e6,
                                 tilt_end=int(self.ent_end_tilt.get())*1e6,
                                 drift_correction=True))

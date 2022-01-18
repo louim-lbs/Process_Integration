@@ -383,7 +383,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
         
         images = microscope.imaging.grab_multiple_frames(settings)
         # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        images[1].save(path + '/BF_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
         images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
         positioner.setpos_rel([0, 0, direction*tilt_increment])
         ###### Drift correction
@@ -400,7 +400,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
             hfw = microscope.beams.electron_beam.horizontal_field_width.value
             image_width = int(resolution[:resolution.find('x')])
             dy_pix, dx_pix, _ = match(images[2].data, images_prev[2].data)
-            dx_si = dx_pix*hfw/image_width
+            dx_si = - dx_pix*hfw/image_width
             dy_si = dy_pix*hfw/image_width
             correction_x = - dx_si + correction_x
             correction_y = - dy_si + correction_y
@@ -412,7 +412,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
             # print('anticipation_x', anticipation_x)
             beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
             # print('beamshift_x', beamshift_x)
-            microscope.beams.electron_beam.beam_shift.value = Point(x=0,
+            microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
                                                                     y=beamshift_y + correction_y + anticipation_y)
             beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
             # print('beamshift_x_2', beamshift_x)
@@ -425,29 +425,14 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
     print('Tomographixx is a Succes')
     return 0
 
-def tomo_acquisition2(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=10e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False) -> int:
-    ''' Acquire set of images according to input parameters.
-
-    Input:
-        - Microscope parameters "micro_settings":
-            - work folder
-            - images naming
-            - image resolution
-            - bit depht
-            - dwell time
-        - Smaract parameters:
-            - tilt increment
-            # - tilt to begin from
-    
-    Return:
-        - success or error code (int).
-
-    Exemple:
-        tomo_status = tomo_acquisition(micro_settings, smaract_settings, drift_correction=False)
-            -> 0
+def tomo_acquisition2(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False) -> int:
+    ''' 
     '''
     pos = positioner.getpos()
-    if pos[2] > 0:
+    if None in pos:
+        return 1
+
+    if positioner.angle_convert_Smaract2SI(pos[2]) > 0:
         direction = -1
         if tilt_end > 0:
             tilt_end *= -1
@@ -455,41 +440,40 @@ def tomo_acquisition2(microscope, positioner, work_folder='data/tomo/', images_n
         direction = 1
         if tilt_end < 0:
             tilt_end *= -1
-    print(dwell_time)
-    # nb_images = int(pos[2]//(tilt_increment/1000000) + 1)
     nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
-
-    print(tilt_increment, tilt_end)
-    
-    path = work_folder + images_name + '_' + str(round(time.time()))
-    os.makedirs(path, exist_ok=True)
 
     settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
     
-    # dx_si_nano = 0
-    # dy_si_nano = 0
+    anticipation_x = 0
+    anticipation_y = 0
+    correction_x = 0
+    correction_y = 0
+    focus_scores = []
 
-    for i in range(nb_images):
-        print(i, positioner.getpos()[2])
-        logging.info(str(i) + str(positioner.getpos()[2]))
-        
-        ###### Drift correction
-        if drift_correction==True and i > 0:
-            images_drift = microscope.imaging.grab_multiple_frames(GrabFrameSettings(resolution=resolution, dwell_time=0.2e-6, bit_depth=bit_depth))
-            hfw = microscope.beams.electron_beam.horizontal_field_width.value
-            image_width = int(resolution[:resolution.find('x')])
-            dx_pix, dy_pix, corr_trust = match(images_drift[2].data, images_prev[2].data)
-            dx_si_nano = dx_pix*hfw/image_width
-            dy_si_nano = dy_pix*hfw/image_width
-            microscope.specimen.stage.relative_move(StagePosition(y=dy_si_nano)) #x=dx_si_nano,
-            print('dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si_nano, dy_si_nano) 
-        
-        images = microscope.imaging.grab_multiple_frames(GrabFrameSettings(resolution=resolution, dwell_time=1e-6, bit_depth=bit_depth))
-        # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+    for i in range(nb_images):        
+        images = microscope.imaging.grab_multiple_frames(settings)
         positioner.setpos_rel([0, 0, direction*tilt_increment])
         
+        focus_score = cv.Laplacian(images[2].data, cv.CV_16U).var()
+        focus_scores.append(focus_score)
+        plt.plot(focus_scores)
+        plt.show()
+        print(focus_score)
+
+        if drift_correction==True and i > 0:
+            hfw = microscope.beams.electron_beam.horizontal_field_width.value
+            image_width = int(resolution[:resolution.find('x')])
+            dy_pix, dx_pix, _ = match(images[2].data, images_prev[2].data)
+            dx_si = - dx_pix*hfw/image_width
+            dy_si = dy_pix*hfw/image_width
+            correction_x = - dx_si + correction_x
+            correction_y = - dy_si + correction_y
+            anticipation_x += correction_x
+            anticipation_y += correction_y
+            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
+            microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
+                                                                    y=beamshift_y + correction_y + anticipation_y)
+            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
         images_prev = copy.deepcopy(images)
 
     print('Tomographixx is a Succes')
