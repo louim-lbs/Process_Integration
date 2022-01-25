@@ -214,166 +214,6 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
-def set_eucentric(microscope, positioner) -> int:
-    ''' Set eucentric point according to the image centered features.
-
-    Input:
-        - Microscope control class (class).
-        - Positioner control class (class).
-
-    Return:
-        - Success or error code (int).
-
-    Exemple:
-        set_eucentric_status = set_eucentric()
-            -> 0    
-    '''
-    z0, y0, _ = positioner.getpos()
-    if z0 == None or y0 == None:
-        return 1
-    hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-    angle_step0 = 2000000
-    angle_step =  2000000             # udegrees
-    angle_max  = 10000000             # udegrees
-    precision  =   100             # nanometers or pixels ? End condition with magnification ?
-    eucentric_error = 0
-    resolution="512x442" # Bigger pixels means less noise and better match
-    image_width = int(resolution[:resolution.find('x')])
-    image_height = int(resolution[-resolution.find('x'):])
-    settings = GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
-    image_euc = np.zeros((2, image_height, image_width))
-    displacement = [[0,0]]
-    angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-    multiplicator = 1
-    logging.info('z0' + str(z0) + 'y0' + str(y0) + 'hfw' + str(hfw) + 'angle_step0' + str(angle_step0) + 'angle_step' + str(angle_step) + 'angle_max' + str(angle_max) + 'precision' + str(precision) + 'resolution' + str(resolution) + 'settings' + str(settings) + 'angle' + str(angle))
-
-    # HAADF analysis
-    microscope.imaging.set_active_view(3)
-
-    positioner.setpos_abs([z0, y0, 0])
-    
-    img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-    image_euc[0] = img_tmp.data
-    img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
-
-    positioner.setpos_rel([0, 0, angle_step])
-
-    while abs(eucentric_error) > precision or positioner.angle_convert_Smaract2SI(positioner.getpos()[2]) < angle_max:
-        logging.info('eucentric_error =' + str(round(eucentric_error)) + 'precision =' + str(precision) + 'current angle =' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + 'angle_max =' + str(angle_max))
-        print('eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), 'angle_max =', angle_max)
-        #### Deal with positioner error
-        ####################
-        
-        img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-        image_euc[1] = img_tmp.data
-        img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
-        
-        dx_pix, dy_pix, corr_trust = match(image_euc[1], image_euc[0])
-
-        if corr_trust <= 0.3: # 0.3 empirical value. Need to be optimized
-            ############
-            ### Increase dwell time
-            ############
-            '''If match is not good'''
-            if angle_step >= 100000:
-                logging.info('Decrease angle step')
-                print('Decrease angle step')
-                '''Decrease angle step up to 0.1 degree'''
-                positioner.setpos_rel([0, 0, -multiplicator*angle_step])
-                angle_step /= 2
-            else:
-                '''Zoom out x2'''
-                logging.info('Zoom out x2')
-                print('Zoom out x2')
-                multiplicator = 1
-                displacement = [[0,0]]
-                angle_step = angle_step0
-                positioner.setpos_rel([0, 0, angle_step])
-
-                angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-                eucentric_error = 0
-                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-                microscope.beams.electron_beam.horizontal_field_width.value *= 2
-                microscope.auto_functions.run_auto_cb()
-                hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-                img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-                image_euc[0] = img_tmp.data
-                img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
-            continue
-
-        dx_si = 1e9*dx_pix*hfw/image_width
-        dy_si = 1e9*dy_pix*hfw/image_width
-
-        logging.info('dx_pix, dy_pix' + str(dx_pix) + str(dy_pix) + 'dx_si, dy_si' + str(dx_si) + str(dy_si))
-        print('dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
-
-        displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
-        angle.append(positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
-
-        eucentric_error += abs(dx_si)
-
-        if abs(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) >= angle_max:
-            '''If out of the angle range'''
-            if multiplicator == 1:
-                '''Start again with negative angles'''
-                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-                logging.info('Start again with negative angles')
-                print('Start again with negative angles')
-                multiplicator = -1
-                displacement = [[0,0]]
-                # angle_step = angle_step0
-                positioner.setpos_rel([0, 0, -1*angle_step])
-                positioner.setpos_rel([0, 0, -0.5*angle_step])
-                
-                angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-                eucentric_error = 0
-                microscope.auto_functions.run_auto_cb()
-                img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-                image_euc[0] = img_tmp.data
-                img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
-                positioner.setpos_rel([0, 0, -1.5*angle_step])
-            elif multiplicator == -1:
-                '''Zoom in x2'''
-                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-                logging.info('Zoom in x2')
-                print('Zoom in x2')
-                multiplicator = 1
-                displacement = [[0,0]]
-                # angle_step = angle_step0
-                positioner.setpos_rel([0, 0, 1*angle_step])
-                positioner.setpos_rel([0, 0, 0.5*angle_step])
-
-                angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-                eucentric_error = 0
-                microscope.auto_functions.run_auto_cb()
-
-                # microscope.beams.electron_beam.horizontal_field_width.value /= 2
-                hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-                
-                ### Test increase angle
-                if 2*angle_max <= 55000000:
-                    angle_step *= 2
-                    angle_max *= 3
-                else:
-                    angle_max = 55000000
-                    angle_step = 5000000
-
-                img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-                image_euc[0] = img_tmp.data
-                img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
-                positioner.setpos_rel([0, 0, 1.5*angle_step])
-            continue
-
-        positioner.setpos_rel([0, 0, multiplicator*angle_step])
-        image_euc[0] = np.ndarray.copy(image_euc[1])
-
-    pos = positioner.getpos()
-    positioner.setpos_abs([pos[1], pos[2], 0])
-    logging.info('Done eucentrixx')
-    copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
-    print('Done eucentrixx')
-    return 0
-
 def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False) -> int:
     ''' Acquire set of images according to input parameters.
 
@@ -410,8 +250,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
     print(dwell_time)
     nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
 
-    image_width = int(resolution[:resolution.find('x')])
-    image_height = int(resolution[-resolution.find('x'):])
+    print(tilt_increment, tilt_end)
     
     path = work_folder + images_name + '_' + str(round(time.time()))
     os.makedirs(path, exist_ok=True)
@@ -435,6 +274,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
         ###### Drift correction
         if drift_correction==True and i > 0:
             hfw = microscope.beams.electron_beam.horizontal_field_width.value
+            image_width = int(resolution[:resolution.find('x')])
             dy_pix, dx_pix, _ = match(images[2].data, images_prev[2].data)
             dx_si = - dx_pix*hfw/image_width
             dy_si = dy_pix*hfw/image_width

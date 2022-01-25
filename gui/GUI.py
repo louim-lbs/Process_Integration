@@ -346,7 +346,8 @@ class App(object):
                                 dwell_time=1e-6,
                                 tilt_increment=int(self.ent_tilt_step.get())*1e6,
                                 tilt_end=int(self.ent_end_tilt.get())*1e6,
-                                drift_correction=True))
+                                drift_correction=True,
+                                focus_correction=True))
 
         self.lbl_acquisition.config(bg='red')
         self.lbl_acquisition.update()

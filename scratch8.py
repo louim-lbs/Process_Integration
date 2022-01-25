@@ -1,3 +1,4 @@
+import time
 from autoscript_sdb_microscope_client import SdbMicroscopeClient
 from autoscript_sdb_microscope_client.enumerations import *
 from autoscript_sdb_microscope_client.structures import *
@@ -6,6 +7,7 @@ import copy
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 ### Connexion
 
@@ -24,6 +26,54 @@ except:
 # Connect to positioner
 from smaract import connexion_smaract as sm
 smaract = sm.smaract_class(calibrate=False)
+
+import numpy.linalg as linalg
+
+def fft_treh_filt(img, threshold=150):
+    rows, cols = img.shape
+    nrows = cv.getOptimalDFTSize(rows)
+    ncols = cv.getOptimalDFTSize(cols)
+    right = ncols - cols
+    bottom = nrows - rows
+    nimg = cv.copyMakeBorder(img, 0, bottom, 0, right, cv.BORDER_CONSTANT, value=0)
+
+    # Compute FFT
+    image_fft     = np.fft.fftshift(cv.dft(np.float32(nimg), flags=cv.DFT_COMPLEX_OUTPUT))
+    image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
+    
+    # Threshold images
+    image_fft_mag_tresh = cv.threshold(np.uint8(image_fft_mag), threshold, 255, cv.THRESH_BINARY)[1]
+    
+    # Delete isolated pixels
+    image_fft_mag_tresh_comp = cv.bitwise_not(image_fft_mag_tresh)
+
+    kernel1 = np.array([[0, 0, 0,],
+                        [0, 1, 0] ,
+                        [0, 0, 0]], np.uint8)
+    kernel2 = np.array([[1, 1, 1,],
+                        [1, 0, 1] ,
+                        [1, 1, 1]], np.uint8)
+
+    hitormiss1 = cv.morphologyEx(image_fft_mag_tresh,      cv.MORPH_ERODE, kernel1)
+    hitormiss2 = cv.morphologyEx(image_fft_mag_tresh_comp, cv.MORPH_ERODE, kernel2)
+    hitormiss = cv.bitwise_and(hitormiss1, hitormiss2)
+    hitormiss_comp = cv.bitwise_not(hitormiss)
+    image_fft_mag_tresh_filt = cv.bitwise_and(image_fft_mag_tresh, image_fft_mag_tresh, mask=hitormiss_comp)
+    
+    return image_fft_mag_tresh_filt
+
+def find_ellipse(img):
+    contours, _ = cv.findContours(img, mode=cv.RETR_EXTERNAL, method=cv.CHAIN_APPROX_NONE)
+    print(len(contours))
+    cv.drawContours(img, contours, -1, (0,255,0), 3)
+    cv.waitKey()
+    if len(contours) != 0:
+        for cont in contours:
+            if len(cont) < 5:
+                break
+            elps = cv.fitEllipse(cont)
+            return elps
+    return None
 
 def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0):
     ''' Match two images
@@ -107,8 +157,26 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
-def tomo_acquisition2(microscope, positioner, resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False) -> int:
-    ''' 
+def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False) -> int:
+    ''' Acquire set of images according to input parameters.
+
+    Input:
+        - Microscope parameters "micro_settings":
+            - work folder
+            - images naming
+            - image resolution
+            - bit depht
+            - dwell time
+        - Smaract parameters:
+            - tilt increment
+            # - tilt to begin from
+    
+    Return:
+        - success or error code (int).
+
+    Exemple:
+        tomo_status = tomo_acquisition(micro_settings, smaract_settings, drift_correction=False)
+            -> 0
     '''
     pos = positioner.getpos()
     if None in pos:
@@ -122,56 +190,59 @@ def tomo_acquisition2(microscope, positioner, resolution='1536x1024', bit_depth=
         direction = 1
         if tilt_end < 0:
             tilt_end *= -1
+
     nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
 
+    image_width = int(resolution[:resolution.find('x')])
+    image_height = int(resolution[-resolution.find('x'):])
+    
     settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
     
-    focus_scores_laplac = []
-    focus_scores_mean = []
-    focus_scores_mean2 = []
-    focus_scores_mean3 = []
-    focus_scores_mean4 = []
-    focus_scores_mean5 = []
-    focus_scores_mean6 = []
-    focus_scores_mean7 = []
+    anticipation_x = 0
+    anticipation_y = 0
+    correction_x = 0
+    correction_y = 0
 
-    for i in range(10):        
-        images = microscope.imaging.grab_multiple_frames(settings)
-        # positioner.setpos_rel([0, 0, direction*tilt_increment])
+    for i in range(nb_images):
+        print(i, positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
         
-        # focus_score_lap = cv.Laplacian(images[2].data, cv.CV_16U).var()
-        # focus_score_me  = np.mean(images[2].data)
-        focus_score_me2 = np.mean(images[2].data[images[2].data>65536//2.5])
-        focus_score_me6 = np.mean(images[2].data[images[2].data>65536//3])
-        focus_score_me7 = np.mean(images[2].data[images[2].data>65536//3.5])
-        # focus_score_me3 = np.average(images[2].data, weights=np.power(images[2].data, 2))
-        # focus_score_me4 = np.average(images[2].data, weights=np.power(images[2].data, 3))
-        # focus_score_me5 = np.average(images[2].data, weights=np.power(images[2].data, 4))
+        images = microscope.imaging.grab_multiple_frames(settings)
+        
+        positioner.setpos_rel([0, 0, direction*tilt_increment])
+        ###### Drift correction
+        if drift_correction==True and i > 0:
+            hfw = microscope.beams.electron_beam.horizontal_field_width.value
+            dy_pix, dx_pix, _ = match(images[2].data, images_prev[2].data)
+            dx_si = - dx_pix*hfw/image_width
+            dy_si = dy_pix*hfw/image_width
+            correction_x = - dx_si + correction_x
+            correction_y = - dy_si + correction_y
+            anticipation_x += correction_x
+            anticipation_y += correction_y
+            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
+            microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
+                                                                    y=beamshift_y + correction_y + anticipation_y)
+            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
 
-        # focus_scores_laplac.append(focus_score_lap)
-        # focus_scores_mean.append(focus_score_me)
-        focus_scores_mean2.append(focus_score_me2)
-        # focus_scores_mean3.append(focus_score_me3)
-        # focus_scores_mean4.append(focus_score_me4)
-        # focus_scores_mean5.append(focus_score_me5)
-        focus_scores_mean6.append(focus_score_me6)
-        focus_scores_mean7.append(focus_score_me7)
+        if focus_correction == True and i > 0:
+            t = time.time()
 
-        # print(focus_score_lap)
-        # print(focus_score_me)
-        print(focus_score_me2)
-        # print(focus_score_me3)
-    # plt.plot(focus_scores_laplac, 'blue')
-    # plt.plot(focus_scores_mean, 'r+')
-    plt.plot([i/np.max(focus_scores_mean2) for i in focus_scores_mean2], 'r+')
-    plt.plot([i/np.max(focus_scores_mean6) for i in focus_scores_mean6], 'g+')
-    plt.plot([i/np.max(focus_scores_mean7) for i in focus_scores_mean7], 'b+')
-    # plt.plot([i/np.min(focus_scores_mean3) for i in focus_scores_mean3], 'r+')
-    # plt.plot([i/np.min(focus_scores_mean4) for i in focus_scores_mean4], 'g+')
-    # plt.plot([i/np.min(focus_scores_mean5) for i in focus_scores_mean5], 'b+')
-    plt.show()
+            fft = fft_treh_filt(images[2].data,      threshold=150)
+            
+            # plt.imshow(fft[int(3.75*image_height/8):int(4.25*image_height/8),
+            #                 int(3.75*image_width/8):int(4.25*image_width/8)])
+            # plt.show()
 
-    print('Tomographixx is a Succes')
+            elps = find_ellipse(fft[int(3.75*image_height/8):int(4.25*image_height/8),
+                                    int(3.75*image_width/8):int(4.25*image_width/8)])
+
+            print('elps', elps)
+
+            print(time.time()-t, 's')
+
+        images_prev = copy.deepcopy(images)
+
+    print('Tomography is a Succes')
     return 0
 
 ## noise fait que le blur détection est pas exact. blur reult,
@@ -182,11 +253,12 @@ def tomo_acquisition2(microscope, positioner, resolution='1536x1024', bit_depth=
 
 
 if __name__ == "__main__":
-    tomo_acquisition2(quattro,
-                        smaract,
-                        resolution='1536x1024',
-                        bit_depth=16,
-                        dwell_time=10e-6,
-                        tilt_increment=int(2*1e6),
-                        tilt_end=int(70*1e6),
-                        drift_correction=True)
+    tomo_acquisition(quattro,
+                     smaract,
+                     resolution='1536x1024',
+                     bit_depth=16,
+                     dwell_time=1e-6,
+                     tilt_increment=int(2*1e6),
+                     tilt_end=int(70*1e6),
+                     drift_correction=True,
+                     focus_correction=True)
