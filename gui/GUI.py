@@ -196,21 +196,27 @@ class App(object):
         self.lbl_name      = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Name of project", justify='left')
         self.lbl_param     = tk.Label(master=self.frm_sav, width=41, height=1, bg='#2B2B2B', fg='white', text="Other parameters from the microscope", justify='left')
 
-        text1 = tk.StringVar(master=self.frm_sav, value='1')
-        text2 = tk.StringVar(master=self.frm_sav, value='70')
-        text3 = tk.StringVar(master=self.frm_sav, value='Acquisition')
-        self.ent_tilt_step = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text1, justify='left')
-        self.ent_end_tilt  = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text2, justify='left')
-        self.ent_name      = tk.Entry(master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text3, justify='left')
+        text1  = tk.StringVar(master=self.frm_sav, value='1')
+        text2  = tk.StringVar(master=self.frm_sav, value='70')
+        text3  = tk.StringVar(master=self.frm_sav, value='Acquisition')
+        self.check1 = tk.BooleanVar(value=True)
+        self.check2 = tk.BooleanVar(value=True)
+        self.ent_tilt_step = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text1, justify='left')
+        self.ent_end_tilt  = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text2, justify='left')
+        self.ent_name      = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text3, justify='left')
+        self.check_drift   = tk.Checkbutton(master=self.frm_sav, width=17, bg='#2B2B2B', fg='white', activebackground='#2B2B2B', activeforeground='white', selectcolor="#2B2B2B", variable=self.check1, onvalue=True, offvalue=False, text="  Drift correction")
+        self.check_focus   = tk.Checkbutton(master=self.frm_sav, width=14, bg='#2B2B2B', fg='white', activebackground='#2B2B2B', activeforeground='white', selectcolor="#2B2B2B", variable=self.check2, onvalue=True, offvalue=False, text="  Auto focus")
 
         self.lbl_tilt_step.place(x=20, y=20)
         self.lbl_end_tilt.place(x=20, y=60)
         self.lbl_name.place(x=20, y=100)
-        self.lbl_param.place(x=20, y=140)
+        self.lbl_param.place(x=20, y=180)
 
         self.ent_tilt_step.place(x=180, y=20)
         self.ent_end_tilt.place(x=180, y=60)
         self.ent_name.place(x=180, y=100)
+        self.check_drift.place(x=20, y=140)
+        self.check_focus.place(x=180, y=140)
 
         self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Start Acquisition", justify='left', command=self.acquisition)
         self.btn_acquisition.place(x=100, y=240)
@@ -330,6 +336,9 @@ class App(object):
         return 0
 
     def acquisition(self):
+        print(self.check1.get())
+        print(self.check2.get())
+        return
         self.letsgo = True
         self.lbl_acquisition.config(bg="green")
         self.lbl_acquisition.update()
@@ -348,8 +357,8 @@ class App(object):
                                 dwell_time=self.microscope.beams.electron_beam.scanning.dwell_time.value,
                                 tilt_increment=int(self.ent_tilt_step.get())*1e6,
                                 tilt_end=int(self.ent_end_tilt.get())*1e6,
-                                drift_correction=True,
-                                focus_correction=True))
+                                drift_correction=self.check1.get(),
+                                focus_correction=self.check2.get()))
 
         self.lbl_acquisition.config(bg='red')
         self.lbl_acquisition.update()

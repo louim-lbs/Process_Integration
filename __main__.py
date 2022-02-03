@@ -42,7 +42,6 @@ os.chdir(dir_pi)
 
 global letsgo
 
-
 from gui import GUI
 
 def main_start():
