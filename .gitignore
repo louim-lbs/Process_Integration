@@ -2,3 +2,6 @@ __pycache__/
 /.vscode
 /__pycache__
 *.pyc
+*.tif
+!Cell_norm.tif
+*.cpython

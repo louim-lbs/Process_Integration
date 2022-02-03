@@ -194,6 +194,7 @@ class App(object):
         self.lbl_tilt_step = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Tilt step (°)", justify='left')
         self.lbl_end_tilt  = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Final tilt (°)", justify='left')
         self.lbl_name      = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Name of project", justify='left')
+        self.lbl_param     = tk.Label(master=self.frm_sav, width=41, height=1, bg='#2B2B2B', fg='white', text="Other parameters from the microscope", justify='left')
 
         text1 = tk.StringVar(master=self.frm_sav, value='1')
         text2 = tk.StringVar(master=self.frm_sav, value='70')
@@ -205,20 +206,21 @@ class App(object):
         self.lbl_tilt_step.place(x=20, y=20)
         self.lbl_end_tilt.place(x=20, y=60)
         self.lbl_name.place(x=20, y=100)
+        self.lbl_param.place(x=20, y=140)
 
         self.ent_tilt_step.place(x=180, y=20)
         self.ent_end_tilt.place(x=180, y=60)
         self.ent_name.place(x=180, y=100)
 
         self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Start Acquisition", justify='left', command=self.acquisition)
-        self.btn_acquisition.place(x=100, y=200)
+        self.btn_acquisition.place(x=100, y=240)
 
         self.btn_stop = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Stop", justify='center', command=self.stop)
         self.btn_stop.place(x=100, y=290)
 
         self.acquisition = tk.StringVar(value='red')
         self.lbl_acquisition = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.acquisition.get())
-        self.lbl_acquisition.place(x=100+160, y=200)
+        self.lbl_acquisition.place(x=100+160, y=240)
 
 
     def brownse_path(self):
@@ -341,9 +343,9 @@ class App(object):
                                 self.positioner,
                                 work_folder='data/tomo/',
                                 images_name=self.ent_name.get(),
-                                resolution='1536x1024',
+                                resolution=self.microscope.beams.electron_beam.scanning.resolution.value,
                                 bit_depth=16,
-                                dwell_time=1e-6,
+                                dwell_time=self.microscope.beams.electron_beam.scanning.dwell_time.value,
                                 tilt_increment=int(self.ent_tilt_step.get())*1e6,
                                 tilt_end=int(self.ent_end_tilt.get())*1e6,
                                 drift_correction=True,

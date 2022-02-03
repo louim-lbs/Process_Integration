@@ -1,36 +1,38 @@
-from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
-from cv2 import MORPH_ERODE
-import numpy as np
-import cv2 as cv
-from scipy import interpolate
-from scipy.optimize import curve_fit
-import os
-import matplotlib.pyplot as plt
-import logging
+from cProfile import label
 import time
-from shutil import copyfile
+
 import copy
+import cv2 as cv
+from cv2 import ellipse
+import numpy as np
+import matplotlib.pyplot as plt
+plt.style.use('dark_background')
+from PIL import Image
+from tifffile import imread
+
 import numpy.linalg as linalg
+from tkinter.filedialog import askopenfilename
 
 def fft_treh_filt(img, threshold=150):
+    rows, cols = img.shape
+    nrows = cv.getOptimalDFTSize(rows)
+    ncols = cv.getOptimalDFTSize(cols)
+    right = ncols - cols
+    bottom = nrows - rows
+    nimg = cv.copyMakeBorder(img, 0, bottom, 0, right, cv.BORDER_CONSTANT, value=0)
+    # plt.imshow(nimg)
+    # plt.show()
     # Compute FFT
-    # cv.imshow('img', img)
-    image_fft     = np.fft.fftshift(cv.dft(np.float32(img)))#, flags=cv.DFT_COMPLEX_OUTPUT))
-    print(image_fft.shape)
-    cv.imshow('image_fft', image_fft)
-    cv.waitKey()
-    image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,0], image_fft[:,1]))
-    cv.imshow('image_fft_mag', image_fft_mag)
-    cv.waitKey()
-    exit()
-    # Threshold images
-    image_fft_mag_tresh = cv.threshold(np.uint8(image_fft_mag), threshold, 255, cv.THRESH_BINARY)
-    cv.imshow('image_fft_mag_tresh', image_fft_mag_tresh)
-    cv.waitKey()
+    image_fft     = np.fft.fftshift(cv.dft(np.float32(nimg), flags=cv.DFT_COMPLEX_OUTPUT))
+    image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
+    # plt.imshow(image_fft_mag)
+    # plt.show()
+    threshold32 = np.amin(image_fft_mag) + (np.amax(image_fft_mag) - np.amin(image_fft_mag))*threshold/255
+    
+    image_fft_mag_tresh = cv.bitwise_not(np.uint8(cv.threshold(image_fft_mag, threshold32, np.amax(image_fft_mag), cv.THRESH_BINARY)[1]))
+    
     # Delete isolated pixels
     image_fft_mag_tresh_comp = cv.bitwise_not(image_fft_mag_tresh)
-    cv.imshow('image_fft_mag_tresh_comp', image_fft_mag_tresh_comp)
-    cv.waitKey()
 
     kernel1 = np.array([[0, 0, 0,],
                         [0, 1, 0] ,
@@ -48,89 +50,53 @@ def fft_treh_filt(img, threshold=150):
     return image_fft_mag_tresh_filt
 
 def find_ellipse(img):
-    _, contours, _ = cv.findContours(img, mode=cv.RETR_EXTERNAL, method=cv.CHAIN_APPROX_NONE)
+    # plt.imshow(img)
+    img = cv.blur(img, (20,20))
+    treshold = np.amin(img) + (np.amax(img) - np.amin(img))*127/255
+    img = cv.threshold(img, treshold, 255, cv.THRESH_BINARY)[1]
     
+    contours, _ = cv.findContours(img, mode=cv.RETR_LIST, method=cv.CHAIN_APPROX_NONE)
+
     if len(contours) != 0:
-        for cont in contours:
-            if len(cont) < 5:
-                break
-            elps = cv.fitEllipse(cont)
-            return elps
-    return None
+        ind = np.argmax([len(cont) for cont in contours])
+        contours = contours[:ind] + contours[ind+1:]
+        ind = np.argmax([len(cont) for cont in contours])
 
-def function_displacement(x, z, y):
-    x = [i*np.pi/180 for i in x]
-    return y*(1-np.cos(x)) + z*np.sin(x)
+        cont = contours[ind]
+        if len(cont) < 5:
+            print('len contour < 5', len(contours))
+            # plt.imshow(img)
+            # plt.show()
+            pass
 
-def correct_eucentric(microscope, positioner, displacement, angle):
-    ''' Calculate z and y parameters for postioner eucentric correction, correct it, correct microscope view and focus.
+        elps = cv.fitEllipse(cont)
+        # plt.imshow(img, 'gray', alpha=0.6)
+        # plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont])
 
-    Input:
-        - Microscope control class (class).
-        - Positioner control class (class).
-        - Displacement vector of images in meters (list[float, float]).
-        - Angle list according to images in degrees (list[float]).
+        u =     elps[0][0]        # x-position of the center
+        v =     elps[0][1]        # y-position of the center
+        a =     elps[1][0]/2        # radius on the x-axis
+        b =     elps[1][1]/2        # radius on the y-axis
+        t_rot = elps[2]*np.pi/180 # rotation angle
 
-    Output:
-        - z relative parameter in meter (float).
-        - y relative parameter in meter (float).
+        t = np.linspace(0, 2*np.pi, 100)
+        Ell = np.array([a*np.cos(t) , b*np.sin(t)])  
+            #u,v removed to keep the same center location
+        R_rot = np.array([[np.cos(t_rot) , -np.sin(t_rot)],[np.sin(t_rot) , np.cos(t_rot)]])  
+            #2-D rotation matrix
 
-    Exemple:
-        z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-            -> z0 = 0.000001, y0 = 0.000001
-    '''
-    logging.info('displacement' + str(displacement))
-    logging.info('angle' + str(angle))
-    print(displacement)
-    print(angle)
-    angle_sort = sorted(angle)
-    if angle_sort == angle:
-        direction = 1
+        Ell_rot = np.zeros((2,Ell.shape[1]))
+        for i in range(Ell.shape[1]):
+            Ell_rot[:,i] = np.dot(R_rot,Ell[:,i])
+
+        # plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r' )
+        # plt.show()
+        return elps
     else:
-        direction = -1
-        displacement.reverse()
-
-    logging.info('direction' + str(direction))
-    print('direction', direction)
-    z0_ini, y0_ini, _ = positioner.getpos()
-    logging.info('z0_ini, y0_ini =' + str(z0_ini) + str(y0_ini))
-    print('z0_ini, y0_ini =', z0_ini, y0_ini)
-
-    if displacement == [[0,0]]:
-        return z0_ini, y0_ini
-
-    pas = 1000000 # 1° with smaract convention
-    alpha = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/20))]
-
-    offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
-
-    displacement_filt = np.array([i[0]-offset for i in displacement])
-    
-    finterpa = interpolate.PchipInterpolator([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
-    displacement_y_interpa = finterpa(alpha)
-
-    res, cov = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0], bounds=(-1e7, 1e7))
-    z0_calc, y0_calc = res
-    stdevs = np.sqrt(np.diag(cov))
-
-    logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(direction*y0_calc) + '+-' + str(stdevs[1]))
-    print('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1])
-    
-    # Adjust positioner position
-    positioner.setpos_rel([z0_calc, direction*y0_calc, 0])
-
-    # Adjust microscope stage position
-    microscope.specimen.stage.relative_move(StagePosition(y=1e-9*direction*y0_calc)) ####################Check this, sign for contre-positive image check?
-    microscope.beams.electron_beam.working_distance.value += z0_calc*1e-9
-
-    plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
-    plt.plot(alpha, displacement_y_interpa, 'blue')
-    plt.plot(alpha, function_displacement(alpha, *res), 'red')
-    plt.savefig('data/tmp/' + str(time.time()) + 'correct_eucentric.png')
-    plt.show()
-
-    # Check limits
-    return z0_calc, y0_calc #################### relative move in meters
+        print('no contour found')
+        # plt.imshow(img)
+        # plt.show()
+    return ((0, 0), (0, 0), 0)
 
 def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0):
     ''' Match two images
@@ -214,96 +180,152 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
-def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False) -> int:
-    ''' Acquire set of images according to input parameters.
-
-    Input:
-        - Microscope parameters "micro_settings":
-            - work folder
-            - images naming
-            - image resolution
-            - bit depht
-            - dwell time
-        - Smaract parameters:
-            - tilt increment
-            # - tilt to begin from
+def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False) -> int:
     
-    Return:
-        - success or error code (int).
+    # file = open(askopenfilename())
 
-    Exemple:
-        tomo_status = tomo_acquisition(micro_settings, smaract_settings, drift_correction=False)
-            -> 0
-    '''
-    pos = positioner.getpos()
-    if None in pos:
-        return 1
+    stack = imread('images/Stack_HAADF.tif')
 
-    if positioner.angle_convert_Smaract2SI(pos[2]) > 0:
-        direction = -1
-        if tilt_end > 0:
-            tilt_end *= -1
+    if stack.dtype == np.uint8:
+        dtype_number = 255
     else:
-        direction = 1
-        if tilt_end < 0:
-            tilt_end *= -1
-    print(dwell_time)
-    nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
+        dtype_number = 65536
 
-    print(tilt_increment, tilt_end)
-    
-    path = work_folder + images_name + '_' + str(round(time.time()))
-    os.makedirs(path, exist_ok=True)
+    image_width = stack.shape[2]
+    image_height = stack.shape[1]
 
-    settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
-    
-    anticipation_x = 0
-    anticipation_y = 0
-    correction_x = 0
-    correction_y = 0
+    ellipse_array = np.zeros((5, stack.shape[0]))
 
-    for i in range(nb_images):
-        print(i, positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
-        logging.info(str(i) + str(positioner.getpos()[2]))
+    focus_scores_laplac = []
+    focus_scores_mean = []
+    focus_scores_mean2 = []
+    focus_scores_mean3 = []
+    focus_scores_mean4 = []
+    focus_scores_mean5 = []
+    focus_scores_mean6 = []
+    focus_scores_mean7 = []
+
+    # Create radial alpha/transparency layer. 255 in centre, 0 at edge
+    Y = np.linspace(-1, 1, image_width)[None, :]*255
+    X = np.linspace(-1, 1, image_height)[:, None]*255
+    alpha_factor = 1
+    alpha = np.sqrt(alpha_factor*X**2 + alpha_factor*Y**2)
+    alpha = 255 - np.clip(0, 255, alpha)
+
+    # plt.imshow(alpha, 'gray')
+    # plt.show()
+    # exit()
+
+    for i in range(stack.shape[0]):
         
-        images = microscope.imaging.grab_multiple_frames(settings)
-        # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        # images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        positioner.setpos_rel([0, 0, direction*tilt_increment])
-        ###### Drift correction
-        if drift_correction==True and i > 0:
-            hfw = microscope.beams.electron_beam.horizontal_field_width.value
-            image_width = int(resolution[:resolution.find('x')])
-            dy_pix, dx_pix, _ = match(images[2].data, images_prev[2].data)
-            dx_si = - dx_pix*hfw/image_width
-            dy_si = dy_pix*hfw/image_width
-            correction_x = - dx_si + correction_x
-            correction_y = - dy_si + correction_y
-            anticipation_x += correction_x
-            anticipation_y += correction_y
-            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
-            microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
-                                                                    y=beamshift_y + correction_y + anticipation_y)
-            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
-
-        if focus_correction == True and i > 0:
+        if focus_correction == True:
+            # t = time.time()
             
-            fft_1 = fft_treh_filt(images_prev[2].data, threshold=150)
-            fft_2 = fft_treh_filt(images[2].data,      threshold=150)
+            image_for_fft = np.multiply(stack[i], alpha)
+            # image_for_fft = stack[i]
+            image_for_fft = cv.blur(stack[i], ksize=(1,1))
+
+            # plt.imshow(image_for_fft, 'gray')
+            # plt.show()
+
+            fft = fft_treh_filt(image_for_fft, threshold=150)
             
-            cv.imshow('fft_1', fft_1)
-            cv.imshow('fft_2', fft_1)
+            # plt.imshow(cv.blur(fft, ksize=(100,100)))
+            # plt.show()
 
-            elps_1 = find_ellipse(fft_1)
-            elps_2 = find_ellipse(fft_2)
+            # elps = find_ellipse(fft[int(3.5*image_height/8):int(4.5*image_height/8),
+            #                         int(3.5*image_width/8):int(4.5*image_width/8)])
 
-            print(elps_1)
-            print(elps_2)
+            # elps = find_ellipse(cv.blur(fft, ksize=(100,100)))
+            elps = find_ellipse(fft)
 
 
+            if elps != None:
+                print(elps)
+                ellipse_array[0][i] = elps[0][0]
+                ellipse_array[1][i] = elps[0][1]
+                ellipse_array[2][i] = elps[1][0]
+                ellipse_array[3][i] = elps[1][1]
+                ellipse_array[4][i] = elps[2]
+            
+            stack[i] = cv.blur(stack[i], ksize=(1,1))
 
-        images_prev = copy.deepcopy(images)
+            focus_score_lap = cv.Laplacian(stack[i], cv.CV_16U).var()
+            focus_score_me  = np.mean(stack[i])
+            focus_score_me2 = np.mean(stack[i][stack[i]>dtype_number//2.5])
+            focus_score_me6 = np.mean(stack[i][stack[i]>dtype_number//3])
+            focus_score_me7 = np.mean(stack[i][stack[i]>dtype_number//3.5])
+            focus_score_me3 = np.average(stack[i], weights=np.power(stack[i], 2))
+            focus_score_me4 = np.average(stack[i], weights=np.power(stack[i], 3))
+            focus_score_me5 = np.average(stack[i], weights=np.power(stack[i], 4))
+
+            focus_scores_laplac.append(focus_score_lap)
+            focus_scores_mean.append(focus_score_me)
+            focus_scores_mean2.append(focus_score_me2)
+            focus_scores_mean3.append(focus_score_me3)
+            focus_scores_mean4.append(focus_score_me4)
+            focus_scores_mean5.append(focus_score_me5)
+            focus_scores_mean6.append(focus_score_me6)
+            focus_scores_mean7.append(focus_score_me7)
+
+
+            # print(time.time()-t, 's')
+
+        # images_prev = copy.deepcopy(images)
 
     print('Tomography is a Succes')
+    
+    # plt.plot(ellipse_array[0], 'b')
+    # plt.plot(ellipse_array[1], 'b')
+    fig, axs = plt.subplots(2, 2)
+    axs[0, 0].plot(ellipse_array[2], '-ro', label='a')
+    axs[0, 0].plot(ellipse_array[3], '-bv', label='b')
+    axs[0, 0].set_title('a and b ellipse parameters (pix)')
+    axs[0, 0].legend(loc='upper right')
+
+    axs[0, 1].plot(ellipse_array[4], '-bo', label='teta')
+    axs[0, 1].set_title('teta ellipse parameter (°)')
+    axs[0, 1].legend(loc='upper right')
+
+    axs[1, 0].plot(ellipse_array[3]/ellipse_array[2], '-ro') # Analyze of b/a parameter -> astigmatism
+    axs[1, 0].set_title('b/a')
+
+    axs[1, 1].plot([(i-np.min(focus_scores_laplac))/(np.max(focus_scores_laplac)-np.min(focus_scores_laplac)) for i in focus_scores_laplac], '-ws', label='Laplacian var.')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean))/(np.max(focus_scores_mean)-np.min(focus_scores_mean)) for i in focus_scores_mean], '-ro', label='Mean')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean2))/(np.max(focus_scores_mean2)-np.min(focus_scores_mean2)) for i in focus_scores_mean2], '-rv', label='Mean > 1/2.5')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean6))/(np.max(focus_scores_mean6)-np.min(focus_scores_mean6)) for i in focus_scores_mean6], '-gv', label='Mean > 1/3')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean7))/(np.max(focus_scores_mean7)-np.min(focus_scores_mean7)) for i in focus_scores_mean7], '-bv', label='Mean > 1/3.5')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean3))/(np.min(focus_scores_mean3)-np.min(focus_scores_mean3)) for i in focus_scores_mean3], '-r+', label='Average weighted 2')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean4))/(np.min(focus_scores_mean4)-np.min(focus_scores_mean4)) for i in focus_scores_mean4], '-g+', label='Average weighted 3')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean5))/(np.min(focus_scores_mean5)-np.min(focus_scores_mean5)) for i in focus_scores_mean5], '-b+', label='Average weighted 4')
+    axs[1, 1].set_title('Normalized focus score by Laplacian and different means')
+    axs[1, 1].legend(loc='upper left')
+
+    # axs[1, 1].plot([i for i in focus_scores_laplac], '-ws', label='Laplacian var.')
+    # axs[1, 1].plot([i for i in focus_scores_mean], '-ro', label='Mean')
+    # axs[1, 1].plot([i for i in focus_scores_mean2], '-rv', label='Mean > 1/2.5')
+    # axs[1, 1].plot([i for i in focus_scores_mean6], '-gv', label='Mean > 1/3')
+    # axs[1, 1].plot([i for i in focus_scores_mean7], '-bv', label='Mean > 1/3.5')
+    # axs[1, 1].plot([i for i in focus_scores_mean3], '-r+', label='Average weighted 2')
+    # axs[1, 1].plot([i for i in focus_scores_mean4], '-g+', label='Average weighted 3')
+    # axs[1, 1].plot([i for i in focus_scores_mean5], '-b+', label='Average weighted 4')
+    # axs[1, 1].set_title('Focus score by Laplacian and different means')
+    # axs[1, 1].legend(loc='upper left')
+
+    plt.show()
     return 0
+
+## noise fait que le blur détection est pas exact. blur reult,
+## proportionel et pas limite
+## gérer les nan
+## zone de l'image à analyser :les tilts font que les bords supérieurs ou inférieurs seront flous
+## gérer la correction
+
+
+if __name__ == "__main__":
+    tomo_acquisition(bit_depth=16,
+                     dwell_time=1e-6,
+                     tilt_increment=int(2*1e6),
+                     tilt_end=int(70*1e6),
+                     drift_correction=True,
+                     focus_correction=True)
