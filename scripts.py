@@ -81,8 +81,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     '''
     logging.info('displacement' + str(displacement))
     logging.info('angle' + str(angle))
-    print(displacement)
-    print(angle)
+    
     angle_sort = sorted(angle)
     if angle_sort == angle:
         direction = 1
@@ -91,30 +90,35 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         displacement.reverse()
 
     logging.info('direction' + str(direction))
-    print('direction', direction)
+    
     z0_ini, y0_ini, _ = positioner.getpos()
     logging.info('z0_ini, y0_ini =' + str(z0_ini) + str(y0_ini))
-    print('z0_ini, y0_ini =', z0_ini, y0_ini)
 
     if displacement == [[0,0]]:
         return z0_ini, y0_ini
 
-    pas = 1000000 # 1° with smaract convention
-    alpha = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/20))]
+    pas    = 1000000 # 1° with smaract convention
+    alpha  = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/20))]
 
     offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
 
     displacement_filt = np.array([i[0]-offset for i in displacement])
     
-    finterpa = interpolate.PchipInterpolator([i/pas for i in angle_sort], displacement_filt) # i[0] -> displacement in x direction of images (vertical)
+    finterpa               = interpolate.PchipInterpolator([i/pas for i in angle_sort], displacement_filt)
     displacement_y_interpa = finterpa(alpha)
 
-    res, cov = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0], bounds=(-1e7, 1e7))
+    res, cov         = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0], bounds=(-1e7, 1e7))
     z0_calc, y0_calc = res
-    stdevs = np.sqrt(np.diag(cov))
+    stdevs           = np.sqrt(np.diag(cov))
 
     logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(direction*y0_calc) + '+-' + str(stdevs[1]))
     print('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1])
+    
+    plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
+    plt.plot(alpha, displacement_y_interpa, 'blue')
+    plt.plot(alpha, function_displacement(alpha, *res), 'red')
+    plt.savefig('data/tmp/' + str(time.time()) + 'correct_eucentric.png')
+    plt.show()
     
     # Adjust positioner position
     positioner.setpos_rel([z0_calc, direction*y0_calc, 0])
@@ -122,12 +126,6 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     # Adjust microscope stage position
     microscope.specimen.stage.relative_move(StagePosition(y=1e-9*direction*y0_calc)) ####################Check this, sign for contre-positive image check?
     microscope.beams.electron_beam.working_distance.value += z0_calc*1e-9
-
-    plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
-    plt.plot(alpha, displacement_y_interpa, 'blue')
-    plt.plot(alpha, function_displacement(alpha, *res), 'red')
-    plt.savefig('data/tmp/' + str(time.time()) + 'correct_eucentric.png')
-    plt.show()
 
     # Check limits
     return z0_calc, y0_calc #################### relative move in meters
@@ -152,7 +150,7 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
         print(res)
             -> ([20.0, 20.0], 0.9900954802437584)
     '''
-    image_master = np.float32(image_master)
+    image_master   = np.float32(image_master)
     image_template = np.float32(image_template)
 
     height_master, width_master = image_master.shape
@@ -167,34 +165,31 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     for i in range(grid_size):
         for j in range(grid_size):
-            template_patch_xA = (height_master - height_template)//2 + (i)*template_patch_size[0]
-            template_patch_yA = (width_master  - width_template)//2  + (j)*template_patch_size[1]
-            template_patch_xB = (height_master - height_template)//2 + (i+1)*template_patch_size[0]
-            template_patch_yB = (width_master  - width_template)//2  + (j+1)*template_patch_size[1]
+            template_patch_xA      = (height_master - height_template)//2 + (i)*template_patch_size[0]
+            template_patch_yA      = (width_master  - width_template)//2  + (j)*template_patch_size[1]
+            template_patch_xB      = (height_master - height_template)//2 + (i+1)*template_patch_size[0]
+            template_patch_yB      = (width_master  - width_template)//2  + (j+1)*template_patch_size[1]
 
-            template_patch = image_template[int(template_patch_xA):int(template_patch_xB),
-                                            int(template_patch_yA):int(template_patch_yB)]
+            template_patch         = image_template[int(template_patch_xA):int(template_patch_xB),
+                                                    int(template_patch_yA):int(template_patch_yB)]
 
-            corr_scores = cv.matchTemplate(image_master, template_patch, cv.TM_CCOEFF_NORMED)
+            corr_scores            = cv.matchTemplate(image_master, template_patch, cv.TM_CCOEFF_NORMED)
 
             _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
 
-            dx = template_patch_xA - max_loc[1]
-            dy = template_patch_yA - max_loc[0]
+            dx                     = template_patch_xA - max_loc[1]
+            dy                     = template_patch_yA - max_loc[0]
 
-            displacement_vector = np.append(displacement_vector, [[dx, dy]], axis=0)
-
-            corr_trust = np.append(corr_trust, max_val)
+            displacement_vector    = np.append(displacement_vector, [[dx, dy]], axis=0)
+            corr_trust             = np.append(corr_trust, max_val)
 
     displacement_vector = np.delete(displacement_vector,0,0)
-    dx_tot = displacement_vector[:,0]
-    dy_tot = displacement_vector[:,1]
-
-    # plt.plot(dx_tot)
+    dx_tot              = displacement_vector[:,0]
+    dy_tot              = displacement_vector[:,1]
 
     for k in range(2): # Delete incoherent values
-        mean_x = np.mean(dx_tot)
-        mean_y = np.mean(dy_tot)
+        mean_x  = np.mean(dx_tot)
+        mean_y  = np.mean(dy_tot)
         stdev_x = np.std(dx_tot)
         stdev_y = np.std(dy_tot)
 
@@ -207,10 +202,6 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
-
-    # plt.plot(dx_tot)
-    # plt.plot(dy_tot)
-    # plt.show()
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
@@ -231,20 +222,20 @@ def set_eucentric(microscope, positioner) -> int:
     z0, y0, _ = positioner.getpos()
     if z0 == None or y0 == None:
         return 1
-    hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-    angle_step0 = 2000000
-    angle_step =  2000000             # udegrees
-    angle_max  = 10000000             # udegrees
-    precision  =   100             # nanometers or pixels ? End condition with magnification ?
+    hfw             = microscope.beams.electron_beam.horizontal_field_width.value # meters
+    angle_step0     =  2000000
+    angle_step      =  2000000  # udegrees
+    angle_max       = 10000000  # udegrees
+    precision       = 5         # pixels
     eucentric_error = 0
-    resolution="512x442" # Bigger pixels means less noise and better match
-    image_width = int(resolution[:resolution.find('x')])
-    image_height = int(resolution[-resolution.find('x'):])
-    settings = GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
-    image_euc = np.zeros((2, image_height, image_width))
-    displacement = [[0,0]]
-    angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-    multiplicator = 1
+    resolution      = "512x442" # Bigger pixels means less noise and better match
+    image_width     = int(resolution[:resolution.find('x')])
+    image_height    = int(resolution[-resolution.find('x'):])
+    settings        = GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
+    image_euc       = np.zeros((2, image_height, image_width))
+    displacement    = [[0,0]]
+    angle           = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
+    direction   = 1
     logging.info('z0' + str(z0) + 'y0' + str(y0) + 'hfw' + str(hfw) + 'angle_step0' + str(angle_step0) + 'angle_step' + str(angle_step) + 'angle_max' + str(angle_max) + 'precision' + str(precision) + 'resolution' + str(resolution) + 'settings' + str(settings) + 'angle' + str(angle))
 
     # HAADF analysis
@@ -252,7 +243,7 @@ def set_eucentric(microscope, positioner) -> int:
 
     positioner.setpos_abs([z0, y0, 0])
     
-    img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
+    img_tmp      = microscope.imaging.grab_multiple_frames(settings)[2]
     image_euc[0] = img_tmp.data
     img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
 
@@ -260,118 +251,78 @@ def set_eucentric(microscope, positioner) -> int:
 
     while abs(eucentric_error) > precision or positioner.angle_convert_Smaract2SI(positioner.getpos()[2]) < angle_max:
         logging.info('eucentric_error =' + str(round(eucentric_error)) + 'precision =' + str(precision) + 'current angle =' + str(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) + 'angle_max =' + str(angle_max))
-        print('eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), 'angle_max =', angle_max)
-        #### Deal with positioner error
-        ####################
+        print(       'eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.angle_convert_Smaract2SI(positioner.getpos()[2]), 'angle_max =', angle_max)
         
-        img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
+        img_tmp      = microscope.imaging.grab_multiple_frames(settings)[2]
         image_euc[1] = img_tmp.data
         img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
         
         dx_pix, dy_pix, corr_trust = match(image_euc[1], image_euc[0])
 
-        if corr_trust <= 0.3: # 0.3 empirical value. Need to be optimized
-            ############
-            ### Increase dwell time
-            ############
+        if corr_trust <= 0.3: # 0.3 empirical value
             '''If match is not good'''
+            #### Correct eucentric and go to other direction
             if angle_step >= 100000:
                 logging.info('Decrease angle step')
-                print('Decrease angle step')
+                print(       'Decrease angle step')
                 '''Decrease angle step up to 0.1 degree'''
-                positioner.setpos_rel([0, 0, -multiplicator*angle_step])
+                positioner.setpos_rel([0, 0, -2*direction*angle_step])
+                positioner.setpos_rel([0, 0, +1*direction*angle_step]) # Two moves to prevent direction-change approximations
                 angle_step /= 2
             else:
-                '''Zoom out x2'''
-                logging.info('Zoom out x2')
-                print('Zoom out x2')
-                multiplicator = 1
-                displacement = [[0,0]]
-                angle_step = angle_step0
-                positioner.setpos_rel([0, 0, angle_step])
-
-                angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-                eucentric_error = 0
-                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-                microscope.beams.electron_beam.horizontal_field_width.value *= 2
-                microscope.auto_functions.run_auto_cb()
-                hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-                img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-                image_euc[0] = img_tmp.data
-                img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
+                logging.info('Error doing eucentric. Tips: check your acquisition parameters (mainly dwell time) or angle range.')
+                return 1
             continue
 
         dx_si = 1e9*dx_pix*hfw/image_width
         dy_si = 1e9*dy_pix*hfw/image_width
 
         logging.info('dx_pix, dy_pix' + str(dx_pix) + str(dy_pix) + 'dx_si, dy_si' + str(dx_si) + str(dy_si))
-        print('dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
+        print(       'dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
 
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
 
-        eucentric_error += abs(dx_si)
+        eucentric_error += abs(dx_pix)
 
-        if abs(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) >= angle_max:
+        if abs(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])) >= angle_max - 10000: # 0.010000 degree of freedom
             '''If out of the angle range'''
-            if multiplicator == 1:
-                '''Start again with negative angles'''
-                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-                logging.info('Start again with negative angles')
-                print('Start again with negative angles')
-                multiplicator = -1
-                displacement = [[0,0]]
-                # angle_step = angle_step0
-                positioner.setpos_rel([0, 0, -1*angle_step])
-                positioner.setpos_rel([0, 0, -0.5*angle_step])
-                
-                angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-                eucentric_error = 0
-                microscope.auto_functions.run_auto_cb()
-                img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-                image_euc[0] = img_tmp.data
-                img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
-                positioner.setpos_rel([0, 0, -1.5*angle_step])
-            elif multiplicator == -1:
-                '''Zoom in x2'''
-                z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
-                logging.info('Zoom in x2')
-                print('Zoom in x2')
-                multiplicator = 1
-                displacement = [[0,0]]
-                # angle_step = angle_step0
-                positioner.setpos_rel([0, 0, 1*angle_step])
-                positioner.setpos_rel([0, 0, 0.5*angle_step])
-
-                angle = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-                eucentric_error = 0
-                microscope.auto_functions.run_auto_cb()
-
-                # microscope.beams.electron_beam.horizontal_field_width.value /= 2
-                hfw = microscope.beams.electron_beam.horizontal_field_width.value # meters
-                
-                ### Test increase angle
-                if 2*angle_max <= 55000000:
-                    angle_step *= 2
-                    angle_max *= 3
-                else:
-                    angle_max = 55000000
-                    angle_step = 5000000
-
-                img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
-                image_euc[0] = img_tmp.data
-                img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
-                positioner.setpos_rel([0, 0, 1.5*angle_step])
+            z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
+            logging.info('Start again with negative angles')
+            print(       'Start again with negative angles')
+            
+            displacement  = [[0,0]]
+            positioner.setpos_rel([0, 0, direction*angle_step])
+            zed, ygrec, _ = positioner.getpos()
+            positioner.setpos_abs([zed, ygrec, direction*angle_max])
+            
+            direction      *= -1
+            angle           = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
+            eucentric_error = 0
+            microscope.auto_functions.run_auto_cb()
+            
+            ### Test increase angle
+            if 2*angle_max <= 50000000:
+                angle_step *= 2
+                angle_max  *= 2
+            else:
+                angle_max   = 50000000
+                angle_step  =  5000000
+            
+            img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
+            image_euc[0] = img_tmp.data
+            img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/1000000)) + '.tif')
+            positioner.setpos_rel([0, 0, direction*angle_step])
             continue
 
-        positioner.setpos_rel([0, 0, multiplicator*angle_step])
+        positioner.setpos_rel([0, 0, direction*angle_step])
         image_euc[0] = np.ndarray.copy(image_euc[1])
 
     pos = positioner.getpos()
     positioner.setpos_abs([pos[1], pos[2], 0])
     logging.info('Done eucentrixx')
+    print(       'Done eucentrixx')
     copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
-    print('Done eucentrixx')
     return 0
 
 def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False) -> int:
@@ -386,7 +337,6 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
             - dwell time
         - Smaract parameters:
             - tilt increment
-            # - tilt to begin from
     
     Return:
         - success or error code (int).
@@ -410,39 +360,43 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
     print(dwell_time)
     nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
 
-    image_width = int(resolution[:resolution.find('x')])
+    image_width  = int(resolution[:resolution.find('x')])
     image_height = int(resolution[-resolution.find('x'):])
     
     path = work_folder + images_name + '_' + str(round(time.time()))
     os.makedirs(path, exist_ok=True)
 
     settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+    microscope.beams.electron_beam.angular_correction.tilt_correction.turn_on()
     
     anticipation_x = 0
     anticipation_y = 0
-    correction_x = 0
-    correction_y = 0
+    correction_x   = 0
+    correction_y   = 0
 
     for i in range(nb_images):
-        print(i, positioner.angle_convert_Smaract2SI(positioner.getpos()[2]))
+        tangle = positioner.angle_convert_Smaract2SI(positioner.getpos()[2])
+        microscope.beams.electron_beam.angular_correction.specimen_pretilt.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
+
+        print(i, tangle)
         logging.info(str(i) + str(positioner.getpos()[2]))
         
         images = microscope.imaging.grab_multiple_frames(settings)
-        # images[0].save(path + '/SE_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        # images[1].save(path + '/BF_'   + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
-        # images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(positioner.angle_convert_Smaract2SI(positioner.getpos()[2])/100000)) + '.tif')
+        images[0].save(path + '/SE_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+        images[1].save(path + '/BF_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
         positioner.setpos_rel([0, 0, direction*tilt_increment])
-        ###### Drift correction
-        if drift_correction==True and i > 0:
+                
+        if drift_correction == True and i > 0:
             hfw = microscope.beams.electron_beam.horizontal_field_width.value
-            dy_pix, dx_pix, _ = match(images[2].data, images_prev[2].data)
-            dx_si = - dx_pix*hfw/image_width
-            dy_si = dy_pix*hfw/image_width
-            correction_x = - dx_si + correction_x
-            correction_y = - dy_si + correction_y
-            anticipation_x += correction_x
-            anticipation_y += correction_y
-            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
+            dy_pix, dx_pix, _        =   match(images[2].data, images_prev[2].data)
+            dx_si                    = - dx_pix * hfw / image_width
+            dy_si                    =   dy_pix * hfw / image_width
+            correction_x             = - dx_si + correction_x
+            correction_y             = - dy_si + correction_y
+            anticipation_x          +=   correction_x
+            anticipation_y          +=   correction_y
+            beamshift_x, beamshift_y =   microscope.beams.electron_beam.beam_shift.value
             microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
                                                                     y=beamshift_y + correction_y + anticipation_y)
             beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
@@ -464,6 +418,76 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
 
 
         images_prev = copy.deepcopy(images)
+
+    print('Tomography is a Succes')
+    return 0
+
+def record(microscope, positioner, work_folder='data/record/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, drift_correction:bool=False, focus_correction:bool=False) -> int:
+    ''' 
+    '''
+    pos = positioner.getpos()
+    if None in pos:
+        return 1
+
+    image_width  = int(resolution[:resolution.find('x')])
+    image_height = int(resolution[-resolution.find('x'):])
+    
+    path = work_folder + images_name + '_' + str(round(time.time()))
+    os.makedirs(path, exist_ok=True)
+
+    settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+    microscope.beams.electron_beam.angular_correction.tilt_correction.turn_on()
+    
+    anticipation_x = 0
+    anticipation_y = 0
+    correction_x   = 0
+    correction_y   = 0
+    i              = 0
+    
+    while True:
+        tangle = positioner.angle_convert_Smaract2SI(positioner.getpos()[2])
+        microscope.beams.electron_beam.angular_correction.specimen_pretilt.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
+
+        print(i, tangle)
+        logging.info(str(i) + str(positioner.getpos()[2]))
+        
+        images = microscope.imaging.grab_multiple_frames(settings)
+        images[0].save(path + '/SE_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+        images[1].save(path + '/BF_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+                
+        if drift_correction == True and i > 0:
+            hfw = microscope.beams.electron_beam.horizontal_field_width.value
+            dy_pix, dx_pix, _        =   match(images[2].data, images_prev[2].data)
+            dx_si                    = - dx_pix * hfw / image_width
+            dy_si                    =   dy_pix * hfw / image_width
+            correction_x             = - dx_si + correction_x
+            correction_y             = - dy_si + correction_y
+            anticipation_x          +=   correction_x
+            anticipation_y          +=   correction_y
+            beamshift_x, beamshift_y =   microscope.beams.electron_beam.beam_shift.value
+            microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
+                                                                    y=beamshift_y + correction_y + anticipation_y)
+            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
+
+        if focus_correction == True and i > 0:
+            
+            fft_1 = fft_treh_filt(images_prev[2].data, threshold=150)
+            fft_2 = fft_treh_filt(images[2].data,      threshold=150)
+            
+            cv.imshow('fft_1', fft_1)
+            cv.imshow('fft_2', fft_1)
+
+            elps_1 = find_ellipse(fft_1)
+            elps_2 = find_ellipse(fft_2)
+
+            print(elps_1)
+            print(elps_2)
+
+
+
+        images_prev = copy.deepcopy(images)
+        i += 1
 
     print('Tomography is a Succes')
     return 0

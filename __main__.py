@@ -10,7 +10,7 @@ import os
 import logging
 # import threading
 from concurrent import futures 
-thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
+thread_pool_executor = futures.ThreadPoolExecutor(max_workers=2)
 
 dir_pi = os.getcwd()
 logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)

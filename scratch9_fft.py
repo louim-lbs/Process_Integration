@@ -1,17 +1,11 @@
-from cProfile import label
 import time
-
 import copy
 import cv2 as cv
-from cv2 import ellipse
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('dark_background')
 from PIL import Image
 from tifffile import imread
-
-import numpy.linalg as linalg
-from tkinter.filedialog import askopenfilename
 
 def fft_treh_filt(img, threshold=150):
     rows, cols = img.shape
@@ -25,6 +19,8 @@ def fft_treh_filt(img, threshold=150):
     # Compute FFT
     image_fft     = np.fft.fftshift(cv.dft(np.float32(nimg), flags=cv.DFT_COMPLEX_OUTPUT))
     image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
+    # plt.imshow(cv.phase(image_fft[:,:,0], image_fft[:,:,1]), 'gray')
+    # plt.show()
     # plt.imshow(image_fft_mag)
     # plt.show()
     threshold32 = np.amin(image_fft_mag) + (np.amax(image_fft_mag) - np.amin(image_fft_mag))*threshold/255
@@ -51,12 +47,10 @@ def fft_treh_filt(img, threshold=150):
 
 def find_ellipse(img):
     # plt.imshow(img)
-    img = cv.blur(img, (20,20))
-    treshold = np.amin(img) + (np.amax(img) - np.amin(img))*127/255
-    img = cv.threshold(img, treshold, 255, cv.THRESH_BINARY)[1]
-    
+    # img = cv.blur(img, (20,20))
+    treshold = np.amin(img) + (np.amax(img) - np.amin(img))*10/255
+    img = cv.threshold(img, treshold, 255, cv.THRESH_TOZERO)[1]
     contours, _ = cv.findContours(img, mode=cv.RETR_LIST, method=cv.CHAIN_APPROX_NONE)
-
     if len(contours) != 0:
         ind = np.argmax([len(cont) for cont in contours])
         contours = contours[:ind] + contours[ind+1:]
@@ -184,8 +178,8 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     
     # file = open(askopenfilename())
 
-    stack = imread('images/Stack_HAADF.tif')
-
+    stack = imread('images/BF_Acquisition_1642521675_corr.tif')
+    
     if stack.dtype == np.uint8:
         dtype_number = 255
     else:
@@ -196,17 +190,8 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
 
     ellipse_array = np.zeros((5, stack.shape[0]))
 
-    focus_scores_laplac = []
-    focus_scores_mean = []
-    focus_scores_mean2 = []
-    focus_scores_mean3 = []
-    focus_scores_mean4 = []
-    focus_scores_mean5 = []
-    focus_scores_mean6 = []
-    focus_scores_mean7 = []
-
     # Create radial alpha/transparency layer. 255 in centre, 0 at edge
-    Y = np.linspace(-1, 1, image_width)[None, :]*255
+    Y = np.linspace(-1, 1, image_height)[None, :]*255
     X = np.linspace(-1, 1, image_height)[:, None]*255
     alpha_factor = 1
     alpha = np.sqrt(alpha_factor*X**2 + alpha_factor*Y**2)
@@ -219,20 +204,27 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     for i in range(stack.shape[0]):
         
         if focus_correction == True:
+            # img  = cv.resize(stack[i], None, fx=0.25, fy=0.25, interpolation=cv.INTER_CUBIC)
+            img_crop = stack[i][:,(image_width-image_height)//2:-(image_width-image_height)//2]
             # t = time.time()
+            # image_for_fft = cv.threshold(stack[i], 80, 255, cv.THRESH_TOZERO)[1]
+            # image_for_fft = np.multiply(image_for_fft, alpha)
             
-            image_for_fft = np.multiply(stack[i], alpha)
+            image_for_fft = np.multiply(img_crop, alpha)
             # image_for_fft = stack[i]
-            image_for_fft = cv.blur(stack[i], ksize=(1,1))
-
+            # image_for_fft = cv.blur(stack[i], ksize=(1,1))
+            
+            # image_for_fft = cv.resize(image_for_fft, None, fx=0.25, fy=0.25)
+            
             # plt.imshow(image_for_fft, 'gray')
             # plt.show()
+            # exit()
 
-            fft = fft_treh_filt(image_for_fft, threshold=150)
+            fft = fft_treh_filt(image_for_fft, threshold=200) #185
             
             # plt.imshow(cv.blur(fft, ksize=(100,100)))
             # plt.show()
-
+            
             # elps = find_ellipse(fft[int(3.5*image_height/8):int(4.5*image_height/8),
             #                         int(3.5*image_width/8):int(4.5*image_width/8)])
 
@@ -242,31 +234,44 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
 
             if elps != None:
                 print(elps)
-                ellipse_array[0][i] = elps[0][0]
-                ellipse_array[1][i] = elps[0][1]
-                ellipse_array[2][i] = elps[1][0]
-                ellipse_array[3][i] = elps[1][1]
-                ellipse_array[4][i] = elps[2]
+                ellipse_array[0][i] = (elps[0][0] + ellipse_array[0][i-1])/2
+                ellipse_array[1][i] = (elps[0][1] + ellipse_array[1][i-1])/2
+                ellipse_array[2][i] = (elps[1][0] + ellipse_array[2][i-1])/2
+                ellipse_array[3][i] = (elps[1][1] + ellipse_array[3][i-1])/2
+                ellipse_array[4][i] = (elps[2]    + ellipse_array[4][i-1])/2
             
-            stack[i] = cv.blur(stack[i], ksize=(1,1))
+            # img = cv.blur(img, ksize=(1,1))
+            # plt.imshow(img)
+            # plt.show()
+            img = img_crop
+            
+            focus_score_lap = cv.Laplacian(img, cv.CV_16U).var()
+            focus_score_me  = np.mean(img)
+            focus_score_me2 = np.mean(img[img>dtype_number//2.5])
+            focus_score_me6 = np.mean(img[img>dtype_number//3])
+            focus_score_me7 = np.mean(img[img>dtype_number//3.5])
+            focus_score_me3 = np.average(img, weights=np.power(img, 2))
+            focus_score_me4 = np.average(img, weights=np.power(img, 3))
+            focus_score_me5 = np.average(img, weights=np.power(img, 4))
 
-            focus_score_lap = cv.Laplacian(stack[i], cv.CV_16U).var()
-            focus_score_me  = np.mean(stack[i])
-            focus_score_me2 = np.mean(stack[i][stack[i]>dtype_number//2.5])
-            focus_score_me6 = np.mean(stack[i][stack[i]>dtype_number//3])
-            focus_score_me7 = np.mean(stack[i][stack[i]>dtype_number//3.5])
-            focus_score_me3 = np.average(stack[i], weights=np.power(stack[i], 2))
-            focus_score_me4 = np.average(stack[i], weights=np.power(stack[i], 3))
-            focus_score_me5 = np.average(stack[i], weights=np.power(stack[i], 4))
-
-            focus_scores_laplac.append(focus_score_lap)
-            focus_scores_mean.append(focus_score_me)
-            focus_scores_mean2.append(focus_score_me2)
-            focus_scores_mean3.append(focus_score_me3)
-            focus_scores_mean4.append(focus_score_me4)
-            focus_scores_mean5.append(focus_score_me5)
-            focus_scores_mean6.append(focus_score_me6)
-            focus_scores_mean7.append(focus_score_me7)
+            if i == 0:
+                focus_scores_laplac = [focus_score_lap]
+                focus_scores_mean   = [focus_score_me]
+                focus_scores_mean2  = [focus_score_me2]
+                focus_scores_mean3  = [focus_score_me6]
+                focus_scores_mean4  = [focus_score_me7]
+                focus_scores_mean5  = [focus_score_me3]
+                focus_scores_mean6  = [focus_score_me4]
+                focus_scores_mean7  = [focus_score_me5]
+    
+            focus_scores_laplac.append((focus_score_lap + focus_scores_laplac[-1])/2)
+            focus_scores_mean.append((  focus_score_me  + focus_scores_mean[-1])/2)
+            focus_scores_mean2.append(( focus_score_me2 + focus_scores_mean2[-1])/2)
+            focus_scores_mean3.append(( focus_score_me3 + focus_scores_mean3[-1])/2)
+            focus_scores_mean4.append(( focus_score_me4 + focus_scores_mean4[-1])/2)
+            focus_scores_mean5.append(( focus_score_me5 + focus_scores_mean5[-1])/2)
+            focus_scores_mean6.append(( focus_score_me6 + focus_scores_mean6[-1])/2)
+            focus_scores_mean7.append(( focus_score_me7 + focus_scores_mean7[-1])/2)
 
 
             # print(time.time()-t, 's')
@@ -287,17 +292,17 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     axs[0, 1].set_title('teta ellipse parameter (°)')
     axs[0, 1].legend(loc='upper right')
 
-    axs[1, 0].plot(ellipse_array[3]/ellipse_array[2], '-ro') # Analyze of b/a parameter -> astigmatism
-    axs[1, 0].set_title('b/a')
+    axs[1, 0].plot((ellipse_array[3]/ellipse_array[2] - 1)*100, '-ro') # Analyze of b/a parameter -> astigmatism
+    axs[1, 0].set_title('b/a (D%)')
 
     axs[1, 1].plot([(i-np.min(focus_scores_laplac))/(np.max(focus_scores_laplac)-np.min(focus_scores_laplac)) for i in focus_scores_laplac], '-ws', label='Laplacian var.')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean))/(np.max(focus_scores_mean)-np.min(focus_scores_mean)) for i in focus_scores_mean], '-ro', label='Mean')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean2))/(np.max(focus_scores_mean2)-np.min(focus_scores_mean2)) for i in focus_scores_mean2], '-rv', label='Mean > 1/2.5')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean6))/(np.max(focus_scores_mean6)-np.min(focus_scores_mean6)) for i in focus_scores_mean6], '-gv', label='Mean > 1/3')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean7))/(np.max(focus_scores_mean7)-np.min(focus_scores_mean7)) for i in focus_scores_mean7], '-bv', label='Mean > 1/3.5')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean3))/(np.min(focus_scores_mean3)-np.min(focus_scores_mean3)) for i in focus_scores_mean3], '-r+', label='Average weighted 2')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean4))/(np.min(focus_scores_mean4)-np.min(focus_scores_mean4)) for i in focus_scores_mean4], '-g+', label='Average weighted 3')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean5))/(np.min(focus_scores_mean5)-np.min(focus_scores_mean5)) for i in focus_scores_mean5], '-b+', label='Average weighted 4')
+    axs[1, 1].plot([(i-np.min(focus_scores_mean))  /(np.max(focus_scores_mean) - np.min(focus_scores_mean))   for i in focus_scores_mean],   '-ro', label='Mean',               alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean2)) /(np.max(focus_scores_mean2)- np.min(focus_scores_mean2))  for i in focus_scores_mean2],  '-rv', label='Mean > 1/2.5',       alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean6)) /(np.max(focus_scores_mean6)- np.min(focus_scores_mean6))  for i in focus_scores_mean6],  '-gv', label='Mean > 1/3',         alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean7)) /(np.max(focus_scores_mean7)- np.min(focus_scores_mean7))  for i in focus_scores_mean7],  '-bv', label='Mean > 1/3.5',       alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean3)) /(np.min(focus_scores_mean3)- np.min(focus_scores_mean3))  for i in focus_scores_mean3],  '-r+', label='Average weighted 2', alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean4)) /(np.min(focus_scores_mean4)- np.min(focus_scores_mean4))  for i in focus_scores_mean4],  '-g+', label='Average weighted 3', alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean5)) /(np.min(focus_scores_mean5)- np.min(focus_scores_mean5))  for i in focus_scores_mean5],  '-b+', label='Average weighted 4', alpha=0.15)
     axs[1, 1].set_title('Normalized focus score by Laplacian and different means')
     axs[1, 1].legend(loc='upper left')
 

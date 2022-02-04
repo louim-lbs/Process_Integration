@@ -1,3 +1,4 @@
+import re
 import time
 # import threading
 import logging
@@ -194,7 +195,7 @@ class App(object):
         self.lbl_tilt_step = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Tilt step (°)", justify='left')
         self.lbl_end_tilt  = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Final tilt (°)", justify='left')
         self.lbl_name      = tk.Label(master=self.frm_sav, width=20, height=1, bg='#2B2B2B', fg='white', text="Name of project", justify='left')
-        self.lbl_param     = tk.Label(master=self.frm_sav, width=41, height=1, bg='#2B2B2B', fg='white', text="Other parameters from the microscope", justify='left')
+        self.lbl_param     = tk.Label(master=self.frm_sav, width=40, height=1, bg='#2B2B2B', fg='white', text="Other parameters from the microscope", justify='left')
 
         text1  = tk.StringVar(master=self.frm_sav, value='1')
         text2  = tk.StringVar(master=self.frm_sav, value='70')
@@ -220,17 +221,24 @@ class App(object):
 
         self.btn_acquisition = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Start Acquisition", justify='left', command=self.acquisition)
         self.btn_acquisition.place(x=100, y=240)
+        
+        self.btn_record = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Record", justify='left', command=self.record)
+        self.btn_record.place(x=100, y=290)
 
         self.btn_stop = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Stop", justify='center', command=self.stop)
-        self.btn_stop.place(x=100, y=290)
+        self.btn_stop.place(x=100, y=340)
 
-        self.acquisition = tk.StringVar(value='red')
-        self.lbl_acquisition = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.acquisition.get())
+        self.acquisition_col = tk.StringVar(value='red')
+        self.lbl_acquisition = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.acquisition_col.get())
         self.lbl_acquisition.place(x=100+160, y=240)
+        
+        self.record_col = tk.StringVar(value='orange')
+        self.lbl_record = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.record_col.get())
+        self.lbl_record.place(x=100+160, y=290)
 
 
     def brownse_path(self):
-        ''' Select the work path        
+        ''' Select the work path       
         '''
         file_path = askdirectory()
         self.lbl_folder2.config(text="..."+file_path[-20:])
@@ -243,17 +251,18 @@ class App(object):
         self.lbl_eucent.config(bg='orange')
         self.lbl_eucent.update()
         
-        set_eucentric_status = self.pool.submit(scripts.set_eucentric(self.microscope, self.positioner))
-        # ThreadPoolExecutor.submit(scripts.set_eucentric(self.microscope, self.positioner))
-
+        try:
+            set_eucentric_status = self.pool.submit(scripts.set_eucentric(self.microscope, self.positioner))
+            # ThreadPoolExecutor.submit(scripts.set_eucentric(self.microscope, self.positioner))
+        except:
+            pass
+        
         if set_eucentric_status == 0:
             self.lbl_eucent.config(bg='green')
             self.lbl_eucent.update()
-            return 0
-        elif set_eucentric_status == 1:
+        else:
             self.lbl_eucent.config(bg='red')
             self.lbl_eucent.update()
-            return 1
         return 0
 
     def zero_eucentric(self):
@@ -336,35 +345,58 @@ class App(object):
         return 0
 
     def acquisition(self):
-        print(self.check1.get())
-        print(self.check2.get())
-        return
         self.letsgo = True
         self.lbl_acquisition.config(bg="green")
         self.lbl_acquisition.update()
         # print('acqui')
         # self.pool.submit(self.testlol, self.rootix, self.letsgo)
-
-        # self.lbl_acquisition.config(bg="red")
-        # self.lbl_acquisition.update()
         
-        set_tomo_status = self.pool.submit(scripts.tomo_acquisition(self.microscope,
-                                self.positioner,
-                                work_folder='data/tomo/',
-                                images_name=self.ent_name.get(),
-                                resolution=self.microscope.beams.electron_beam.scanning.resolution.value,
-                                bit_depth=16,
-                                dwell_time=self.microscope.beams.electron_beam.scanning.dwell_time.value,
-                                tilt_increment=int(self.ent_tilt_step.get())*1e6,
-                                tilt_end=int(self.ent_end_tilt.get())*1e6,
-                                drift_correction=self.check1.get(),
-                                focus_correction=self.check2.get()))
+        try:
+            self.pool.submit(scripts.tomo_acquisition(self.microscope,
+                                                      self.positioner,
+                                                      work_folder      = 'data/tomo/',
+                                                      images_name      = self.ent_name.get(),
+                                                      resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                                                      bit_depth        = 16,
+                                                      dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                                      tilt_increment   = int(self.ent_tilt_step.get())*1e6,
+                                                      tilt_end         = int(self.ent_end_tilt.get())*1e6,
+                                                      drift_correction = self.check1.get(),
+                                                      focus_correction = self.check2.get()))
+        except Exception as e:
+            logging.info(str(e))
+            pass
 
         self.lbl_acquisition.config(bg='red')
         self.lbl_acquisition.update()
-        if set_tomo_status == 1:
-            return 1
-        return 1
+        return 0
+    
+    def record(self):
+        ''' Record a tiff movie
+        '''
+        self.letsgo = True
+        self.lbl_record.config(bg='green')
+        self.lbl_record.update()
+        
+        try:
+            self.pool.submit(scripts.record(self.microscope,
+                                            self.positioner,
+                                            work_folder      = 'data/record/',
+                                            images_name      = self.ent_name.get(),
+                                            resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                                            bit_depth        = 16,
+                                            dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                            tilt_increment   = int(self.ent_tilt_step.get())*1e6,
+                                            tilt_end         = int(self.ent_end_tilt.get())*1e6,
+                                            drift_correction = self.check1.get(),
+                                            focus_correction = self.check2.get()))
+        except Exception as e:
+            logging.info(str(e))
+            pass
+        
+        self.lbl_record.config(bg='orange')
+        self.lbl_record.update()
+        return 0
 
     def testlol(self, win, letsgo):
         for i in range(5):
@@ -374,15 +406,14 @@ class App(object):
             win.after(1000, print(letsgo))
         return 0
 
-    def acquisition2(self):
-        return 0
-
     def stop(self):
         self.letsgo = False
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
         self.lbl_acquisition.config(bg="red")
         self.lbl_acquisition.update()
+        self.lbl_record.config(bg='orange')
+        self.lbl_record.update()
         return 0
 
 if __name__ == "__main__":
