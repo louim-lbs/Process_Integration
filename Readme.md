@@ -26,6 +26,7 @@
     - Centering image on particle after correction.
 - **Dynamical focus** for low-deep-field STEM acquisition?
 - Angles file
+- Biner les images du match pour les rendre résistantes au bruit.
 
 ### GUI
 - Button to open help/tutorial to remember acquisition settings.

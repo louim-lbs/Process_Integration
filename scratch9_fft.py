@@ -178,7 +178,8 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     
     # file = open(askopenfilename())
 
-    stack = imread('images/BF_Acquisition_1642521675_corr.tif')
+    stack = imread('D:\SharedData\LM LEBAS\Quattro 2022-02-08\Stack_44_stigY.tif')
+    # stack = imread('images\Cell_norm.tif')
     
     if stack.dtype == np.uint8:
         dtype_number = 255
@@ -234,11 +235,11 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
 
             if elps != None:
                 print(elps)
-                ellipse_array[0][i] = (elps[0][0] + ellipse_array[0][i-1])/2
-                ellipse_array[1][i] = (elps[0][1] + ellipse_array[1][i-1])/2
-                ellipse_array[2][i] = (elps[1][0] + ellipse_array[2][i-1])/2
-                ellipse_array[3][i] = (elps[1][1] + ellipse_array[3][i-1])/2
-                ellipse_array[4][i] = (elps[2]    + ellipse_array[4][i-1])/2
+                ellipse_array[0][i] = (elps[0][0])# + ellipse_array[0][i-1])/2
+                ellipse_array[1][i] = (elps[0][1])# + ellipse_array[1][i-1])/2
+                ellipse_array[2][i] = (elps[1][0])# + ellipse_array[2][i-1])/2
+                ellipse_array[3][i] = (elps[1][1])# + ellipse_array[3][i-1])/2
+                ellipse_array[4][i] = (elps[2])#    + ellipse_array[4][i-1])/2
             
             # img = cv.blur(img, ksize=(1,1))
             # plt.imshow(img)
@@ -253,25 +254,38 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
             focus_score_me3 = np.average(img, weights=np.power(img, 2))
             focus_score_me4 = np.average(img, weights=np.power(img, 3))
             focus_score_me5 = np.average(img, weights=np.power(img, 4))
+            focus_score_std = np.std(img)
+            focus_score_std2 = np.std(img[img>dtype_number//2])
+            corr = np.mean(img[img<dtype_number//2])
+            corr_std = np.std(img[img<dtype_number//2])
+            img2 = img - np.full(img.shape, corr + corr_std)
+            focus_score_std3 = np.std(img2[img2>0])
+
 
             if i == 0:
                 focus_scores_laplac = [focus_score_lap]
                 focus_scores_mean   = [focus_score_me]
                 focus_scores_mean2  = [focus_score_me2]
-                focus_scores_mean3  = [focus_score_me6]
-                focus_scores_mean4  = [focus_score_me7]
-                focus_scores_mean5  = [focus_score_me3]
-                focus_scores_mean6  = [focus_score_me4]
-                focus_scores_mean7  = [focus_score_me5]
+                focus_scores_mean6  = [focus_score_me6]
+                focus_scores_mean7  = [focus_score_me7]
+                focus_scores_mean3  = [focus_score_me3]
+                focus_scores_mean4  = [focus_score_me4]
+                focus_scores_mean5  = [focus_score_me5]
+                focus_scores_std    = [focus_score_std]
+                focus_scores_std2   = [focus_score_std2]
+                focus_scores_std3   = [focus_score_std3]
     
-            focus_scores_laplac.append((focus_score_lap + focus_scores_laplac[-1])/2)
-            focus_scores_mean.append((  focus_score_me  + focus_scores_mean[-1])/2)
-            focus_scores_mean2.append(( focus_score_me2 + focus_scores_mean2[-1])/2)
-            focus_scores_mean3.append(( focus_score_me3 + focus_scores_mean3[-1])/2)
-            focus_scores_mean4.append(( focus_score_me4 + focus_scores_mean4[-1])/2)
-            focus_scores_mean5.append(( focus_score_me5 + focus_scores_mean5[-1])/2)
-            focus_scores_mean6.append(( focus_score_me6 + focus_scores_mean6[-1])/2)
-            focus_scores_mean7.append(( focus_score_me7 + focus_scores_mean7[-1])/2)
+            focus_scores_laplac.append((focus_score_lap))# + focus_scores_laplac[-1])/2)
+            focus_scores_mean.append((  focus_score_me))#  + focus_scores_mean[-1])/2)
+            focus_scores_mean2.append(( focus_score_me2))# + focus_scores_mean2[-1])/2)
+            focus_scores_mean3.append(( focus_score_me3))# + focus_scores_mean3[-1])/2)
+            focus_scores_mean4.append(( focus_score_me4))# + focus_scores_mean4[-1])/2)
+            focus_scores_mean5.append(( focus_score_me5))# + focus_scores_mean5[-1])/2)
+            focus_scores_mean6.append(( focus_score_me6))# + focus_scores_mean6[-1])/2)
+            focus_scores_mean7.append(( focus_score_me7))# + focus_scores_mean7[-1])/2)
+            focus_scores_std.append((   focus_score_std))# + focus_scores_std[-1])/2)
+            focus_scores_std2.append((  focus_score_std2))# + focus_scores_std2[-1])/2)
+            focus_scores_std3.append((  focus_score_std3))# + focus_scores_std3[-1])/2)
 
 
             # print(time.time()-t, 's')
@@ -296,13 +310,16 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     axs[1, 0].set_title('b/a (D%)')
 
     axs[1, 1].plot([(i-np.min(focus_scores_laplac))/(np.max(focus_scores_laplac)-np.min(focus_scores_laplac)) for i in focus_scores_laplac], '-ws', label='Laplacian var.')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean))  /(np.max(focus_scores_mean) - np.min(focus_scores_mean))   for i in focus_scores_mean],   '-ro', label='Mean',               alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean2)) /(np.max(focus_scores_mean2)- np.min(focus_scores_mean2))  for i in focus_scores_mean2],  '-rv', label='Mean > 1/2.5',       alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean6)) /(np.max(focus_scores_mean6)- np.min(focus_scores_mean6))  for i in focus_scores_mean6],  '-gv', label='Mean > 1/3',         alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean7)) /(np.max(focus_scores_mean7)- np.min(focus_scores_mean7))  for i in focus_scores_mean7],  '-bv', label='Mean > 1/3.5',       alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean3)) /(np.min(focus_scores_mean3)- np.min(focus_scores_mean3))  for i in focus_scores_mean3],  '-r+', label='Average weighted 2', alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean4)) /(np.min(focus_scores_mean4)- np.min(focus_scores_mean4))  for i in focus_scores_mean4],  '-g+', label='Average weighted 3', alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean5)) /(np.min(focus_scores_mean5)- np.min(focus_scores_mean5))  for i in focus_scores_mean5],  '-b+', label='Average weighted 4', alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean))  /(np.max(focus_scores_mean) - np.min(focus_scores_mean))   for i in focus_scores_mean],   '-ro', label='Mean')#,               alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean2)) /(np.max(focus_scores_mean2)- np.min(focus_scores_mean2))  for i in focus_scores_mean2],  '-rv', label='Mean > 1/2.5')#,       alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean6)) /(np.max(focus_scores_mean6)- np.min(focus_scores_mean6))  for i in focus_scores_mean6],  '-gv', label='Mean > 1/3')#,         alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean7)) /(np.max(focus_scores_mean7)- np.min(focus_scores_mean7))  for i in focus_scores_mean7],  '-bv', label='Mean > 1/3.5')#,       alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean3)) /(np.max(focus_scores_mean3)- np.min(focus_scores_mean3))  for i in focus_scores_mean3],  '-r+', label='AW 2')#, alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean4)) /(np.max(focus_scores_mean4)- np.min(focus_scores_mean4))  for i in focus_scores_mean4],  '-g+', label='AW 3')#, alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean5)) /(np.max(focus_scores_mean5)- np.min(focus_scores_mean5))  for i in focus_scores_mean5],  '-b+', label='AW 4')#, alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_std))   /(np.max(focus_scores_std)  - np.min(focus_scores_std))    for i in focus_scores_std],    '-o', color='orange', label='Std Dev')#, alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_std2))   /(np.max(focus_scores_std2)  - np.min(focus_scores_std2))    for i in focus_scores_std2],    '-v', color='orange', label='Std Dev > 1/2')#, alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_std3))   /(np.max(focus_scores_std3)  - np.min(focus_scores_std3))    for i in focus_scores_std3],    '-s', color='orange', label='Std Dev > NM', mfc = 'r')#, alpha=0.15)
     axs[1, 1].set_title('Normalized focus score by Laplacian and different means')
     axs[1, 1].legend(loc='upper left')
 
@@ -314,6 +331,7 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     # axs[1, 1].plot([i for i in focus_scores_mean3], '-r+', label='Average weighted 2')
     # axs[1, 1].plot([i for i in focus_scores_mean4], '-g+', label='Average weighted 3')
     # axs[1, 1].plot([i for i in focus_scores_mean5], '-b+', label='Average weighted 4')
+    # axs[1, 1].plot([i for i in focus_scores_std],   '-o', color='orange', label='Std Dev')
     # axs[1, 1].set_title('Focus score by Laplacian and different means')
     # axs[1, 1].legend(loc='upper left')
 

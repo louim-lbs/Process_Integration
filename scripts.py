@@ -1,5 +1,4 @@
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
-from cv2 import MORPH_ERODE
 import numpy as np
 import cv2 as cv
 from scipy import interpolate
@@ -10,27 +9,29 @@ import logging
 import time
 from shutil import copyfile
 import copy
-import numpy.linalg as linalg
 
 def fft_treh_filt(img, threshold=150):
+    rows, cols = img.shape
+    nrows = cv.getOptimalDFTSize(rows)
+    ncols = cv.getOptimalDFTSize(cols)
+    right = ncols - cols
+    bottom = nrows - rows
+    nimg = cv.copyMakeBorder(img, 0, bottom, 0, right, cv.BORDER_CONSTANT, value=0)
+    # plt.imshow(nimg)
+    # plt.show()
     # Compute FFT
-    # cv.imshow('img', img)
-    image_fft     = np.fft.fftshift(cv.dft(np.float32(img)))#, flags=cv.DFT_COMPLEX_OUTPUT))
-    print(image_fft.shape)
-    cv.imshow('image_fft', image_fft)
-    cv.waitKey()
-    image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,0], image_fft[:,1]))
-    cv.imshow('image_fft_mag', image_fft_mag)
-    cv.waitKey()
-    exit()
-    # Threshold images
-    image_fft_mag_tresh = cv.threshold(np.uint8(image_fft_mag), threshold, 255, cv.THRESH_BINARY)
-    cv.imshow('image_fft_mag_tresh', image_fft_mag_tresh)
-    cv.waitKey()
+    image_fft     = np.fft.fftshift(cv.dft(np.float32(nimg), flags=cv.DFT_COMPLEX_OUTPUT))
+    image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
+    # plt.imshow(cv.phase(image_fft[:,:,0], image_fft[:,:,1]), 'gray')
+    # plt.show()
+    # plt.imshow(image_fft_mag)
+    # plt.show()
+    threshold32 = np.amin(image_fft_mag) + (np.amax(image_fft_mag) - np.amin(image_fft_mag))*threshold/255
+    
+    image_fft_mag_tresh = cv.bitwise_not(np.uint8(cv.threshold(image_fft_mag, threshold32, np.amax(image_fft_mag), cv.THRESH_BINARY)[1]))
+    
     # Delete isolated pixels
     image_fft_mag_tresh_comp = cv.bitwise_not(image_fft_mag_tresh)
-    cv.imshow('image_fft_mag_tresh_comp', image_fft_mag_tresh_comp)
-    cv.waitKey()
 
     kernel1 = np.array([[0, 0, 0,],
                         [0, 1, 0] ,
@@ -48,15 +49,51 @@ def fft_treh_filt(img, threshold=150):
     return image_fft_mag_tresh_filt
 
 def find_ellipse(img):
-    _, contours, _ = cv.findContours(img, mode=cv.RETR_EXTERNAL, method=cv.CHAIN_APPROX_NONE)
-    
+    # plt.imshow(img)
+    # img = cv.blur(img, (20,20))
+    treshold = np.amin(img) + (np.amax(img) - np.amin(img))*10/255
+    img = cv.threshold(img, treshold, 255, cv.THRESH_TOZERO)[1]
+    contours, _ = cv.findContours(img, mode=cv.RETR_LIST, method=cv.CHAIN_APPROX_NONE)
     if len(contours) != 0:
-        for cont in contours:
-            if len(cont) < 5:
-                break
-            elps = cv.fitEllipse(cont)
-            return elps
-    return None
+        ind = np.argmax([len(cont) for cont in contours])
+        contours = contours[:ind] + contours[ind+1:]
+        ind = np.argmax([len(cont) for cont in contours])
+
+        cont = contours[ind]
+        if len(cont) < 5:
+            print('len contour < 5', len(contours))
+            # plt.imshow(img)
+            # plt.show()
+            pass
+
+        elps = cv.fitEllipse(cont)
+        # plt.imshow(img, 'gray', alpha=0.6)
+        # plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont])
+
+        u =     elps[0][0]        # x-position of the center
+        v =     elps[0][1]        # y-position of the center
+        a =     elps[1][0]/2        # radius on the x-axis
+        b =     elps[1][1]/2        # radius on the y-axis
+        t_rot = elps[2]*np.pi/180 # rotation angle
+
+        t = np.linspace(0, 2*np.pi, 100)
+        Ell = np.array([a*np.cos(t) , b*np.sin(t)])  
+            #u,v removed to keep the same center location
+        R_rot = np.array([[np.cos(t_rot) , -np.sin(t_rot)],[np.sin(t_rot) , np.cos(t_rot)]])  
+            #2-D rotation matrix
+
+        Ell_rot = np.zeros((2,Ell.shape[1]))
+        for i in range(Ell.shape[1]):
+            Ell_rot[:,i] = np.dot(R_rot,Ell[:,i])
+
+        # plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r' )
+        # plt.show()
+        return elps
+    else:
+        print('no contour found')
+        # plt.imshow(img)
+        # plt.show()
+    return ((0, 0), (0, 0), 0)
 
 def function_displacement(x, z, y):
     x = [i*np.pi/180 for i in x]
@@ -130,7 +167,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     # Check limits
     return z0_calc, y0_calc #################### relative move in meters
 
-def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0):
+def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0, resize_factor = 1):
     ''' Match two images
 
     Input:
@@ -150,6 +187,9 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
         print(res)
             -> ([20.0, 20.0], 0.9900954802437584)
     '''
+    image_master   = cv.resize(image_master,   (0, 0), fx=resize_factor, fy=resize_factor)
+    image_template = cv.resize(image_template, (0, 0), fx=resize_factor, fy=resize_factor)
+
     image_master   = np.float32(image_master)
     image_template = np.float32(image_template)
 
@@ -177,8 +217,8 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
             _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
 
-            dx                     = template_patch_xA - max_loc[1]
-            dy                     = template_patch_yA - max_loc[0]
+            dx                     = (template_patch_xA - max_loc[1])*resize_factor
+            dy                     = (template_patch_yA - max_loc[0])*resize_factor
 
             displacement_vector    = np.append(displacement_vector, [[dx, dy]], axis=0)
             corr_trust             = np.append(corr_trust, max_val)
@@ -186,6 +226,9 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     displacement_vector = np.delete(displacement_vector,0,0)
     dx_tot              = displacement_vector[:,0]
     dy_tot              = displacement_vector[:,1]
+
+    # plt.plot(dx_tot)
+    # plt.plot(dy_tot)
 
     for k in range(2): # Delete incoherent values
         mean_x  = np.mean(dx_tot)
@@ -202,6 +245,10 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
     dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
+
+    # plt.plot(dx_tot)
+    # plt.plot(dy_tot)
+    # plt.show()
 
     return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
 
@@ -389,7 +436,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
                 
         if drift_correction == True and i > 0:
             hfw = microscope.beams.electron_beam.horizontal_field_width.value
-            dy_pix, dx_pix, _        =   match(images[2].data, images_prev[2].data)
+            dy_pix, dx_pix, _        =   match(images[2].data, images_prev[2].data, resize_factor=0.5)
             dx_si                    = - dx_pix * hfw / image_width
             dy_si                    =   dy_pix * hfw / image_width
             correction_x             = - dx_si + correction_x
@@ -443,7 +490,7 @@ def record(microscope, positioner, work_folder='data/record/', images_name='imag
     correction_x   = 0
     correction_y   = 0
     i              = 0
-    
+
     while True:
         tangle = positioner.angle_convert_Smaract2SI(positioner.getpos()[2])
         microscope.beams.electron_beam.angular_correction.specimen_pretilt.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
@@ -452,13 +499,14 @@ def record(microscope, positioner, work_folder='data/record/', images_name='imag
         logging.info(str(i) + str(positioner.getpos()[2]))
         
         images = microscope.imaging.grab_multiple_frames(settings)
-        images[0].save(path + '/SE_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+        # images[0].save(path + '/SE_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
         images[1].save(path + '/BF_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
         images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
                 
         if drift_correction == True and i > 0:
             hfw = microscope.beams.electron_beam.horizontal_field_width.value
-            dy_pix, dx_pix, _        =   match(images[2].data, images_prev[2].data)
+            dy_pix, dx_pix, _        =   match(images[2].data, images_prev[2].data, resize_factor=0.5)
+            print('dy_pix', 'dx_pix', dy_pix, dx_pix)
             dx_si                    = - dx_pix * hfw / image_width
             dy_si                    =   dy_pix * hfw / image_width
             correction_x             = - dx_si + correction_x
@@ -475,8 +523,9 @@ def record(microscope, positioner, work_folder='data/record/', images_name='imag
             fft_1 = fft_treh_filt(images_prev[2].data, threshold=150)
             fft_2 = fft_treh_filt(images[2].data,      threshold=150)
             
-            cv.imshow('fft_1', fft_1)
-            cv.imshow('fft_2', fft_1)
+            plt.imshow(fft_1)
+            plt.imshow(fft_2)
+            plt.show()
 
             elps_1 = find_ellipse(fft_1)
             elps_2 = find_ellipse(fft_2)
