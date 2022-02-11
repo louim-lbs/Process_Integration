@@ -1,20 +1,15 @@
 import time
-import copy
 import cv2 as cv
-from cv2 import threshold
-from matplotlib import image
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('dark_background')
-from PIL import Image
 from tifffile import imread
-from scipy import signal
-from scract10 import PSD2
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
+from joblib import Parallel, delayed
 
 
 
-def fft_treh_filt(img, threshold=150):
+def fft(img):
     # plt.imshow(img)
     # plt.show()
     rows, cols = img.shape
@@ -27,109 +22,31 @@ def fft_treh_filt(img, threshold=150):
     # Compute FFT
     image_fft     = np.fft.fftshift(cv.dft(np.float32(img), flags=cv.DFT_COMPLEX_OUTPUT))
     image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
-    # plt.imshow(cv.phase(image_fft[:,:,0], image_fft[:,:,1]), 'gray')
-    # plt.show()
-    # plt.imshow(image_fft_mag, 'gray')
-    # plt.show()
-    
-    # Substract FFT background
-    # treshold_calc = np.amin(img) + (np.amax(img) - np.amin(img))*100/255
-    # image_fft_mag = image_fft_mag - np.full(shape=image_fft_mag.shape, fill_value=treshold_calc)
-    # image_fft_mag[image_fft_mag<0] = 0
-          
-    
-    # threshold32 = np.amin(image_fft_mag) + (np.amax(image_fft_mag) - np.amin(image_fft_mag))*threshold/255
-    
-    # image_fft_mag_tresh = cv.bitwise_not(np.uint8(cv.threshold(image_fft_mag, threshold32, np.amax(image_fft_mag), cv.THRESH_BINARY)[1]))
-    # # plt.imshow(image_fft_mag_tresh, 'gray')
-    # # plt.show()
-    # # Delete isolated pixels
-    # image_fft_mag_tresh_comp = cv.bitwise_not(image_fft_mag_tresh)
+    return image_fft_mag
 
-    # kernel1 = np.array([[0, 0, 0,],
-    #                     [0, 1, 0] ,
-    #                     [0, 0, 0]], np.uint8)
-    # kernel2 = np.array([[1, 1, 1,],
-    #                     [1, 0, 1] ,
-    #                     [1, 1, 1]], np.uint8)
-
-    # hitormiss1 = cv.morphologyEx(image_fft_mag_tresh,      cv.MORPH_ERODE, kernel1)
-    # hitormiss2 = cv.morphologyEx(image_fft_mag_tresh_comp, cv.MORPH_ERODE, kernel2)
-    # hitormiss = cv.bitwise_and(hitormiss1, hitormiss2)
-    # hitormiss_comp = cv.bitwise_not(hitormiss)
-    # image_fft_mag_tresh_filt = cv.bitwise_and(image_fft_mag_tresh, image_fft_mag_tresh, mask=hitormiss_comp)
-    
-    return image_fft_mag#_tresh#_filt
-
-def find_ellipse(img, treshold):
+def find_ellipse(img):
     
     plt.imshow(img, 'gray')
     # plt.show()
-    
-    # # rectKernel = cv.getStructuringElement(cv.MORPH_RECT, (6, 6))
-    # # sqKernel   = cv.getStructuringElement(cv.MORPH_RECT, (30, 30))
-    
-    # Kernel1 = cv.getStructuringElement(cv.MORPH_RECT, (5, 5)) #20/#10
-    # Kernel2 = cv.getStructuringElement(cv.MORPH_RECT, (7, 7)) #14
-    # Kernel3 = cv.getStructuringElement(cv.MORPH_RECT, (2, 2))
 
-    # img = cv.morphologyEx(img, cv.MORPH_DILATE, cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
+    
+    img = cv.morphologyEx(img, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_RECT, (5, 5))) # 5
     # plt.imshow(img, 'gray')
     # plt.show()
     
-    # for i in range(1): #6
+    img = cv.morphologyEx(img, cv.MORPH_DILATE, cv.getStructuringElement(cv.MORPH_RECT, (3, 3))) # 3
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    img = cv.medianBlur(img, 63) #63
+    # plt.imshow(img, 'gray')
+    # plt.show()
         
-    #     img = cv.morphologyEx(img, cv.MORPH_OPEN,   cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
-    #     # plt.imshow(img, 'gray')
-    #     # plt.show()
-        
-    #     img = cv.morphologyEx(img, cv.MORPH_ERODE,   cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
-    #     plt.imshow(img, 'gray')
-    #     plt.show()
-    
-    
-    # img = cv.morphologyEx(img, cv.MORPH_OPEN,   cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
-    # plt.imshow(img, 'gray')
-    # plt.show()
-    
-    img = cv.morphologyEx(img, cv.MORPH_CLOSE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
-    # plt.imshow(img, 'gray')
-    # plt.show()
-    img = cv.medianBlur(img, 63)#, sigmaX=100, sigmaY=100)
-    # plt.imshow(img, 'gray')
-    # plt.show()
-    # img = cv.morphologyEx(img, cv.MORPH_CLOSE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
-    # plt.imshow(img, 'gray')
-    # plt.show()
-    
-    # img = cv.morphologyEx(img, cv.MORPH_ERODE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
-    # plt.imshow(img, 'gray')
-    # plt.show()
-    
-    # img = cv.morphologyEx(img, cv.MORPH_DILATE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
-    # plt.imshow(img, 'gray')
-    # plt.show()
-    
-    # # for i in range(5):
-    # #     Kernel1 = cv.getStructuringElement(cv.MORPH_RECT, (i+1, i+1)) #20/#10
-    # #     Kernel2 = cv.getStructuringElement(cv.MORPH_RECT, (i+2, i+2)) #14
-    # #     img = cv.morphologyEx(img, cv.MORPH_OPEN,   Kernel1, borderType=cv.BORDER_REPLICATE)
-    # #     img = cv.morphologyEx(img, cv.MORPH_DILATE, Kernel2)
-    # #     plt.imshow(img, 'gray')
-    # #     plt.show()
-    
-    # # img = cv.morphologyEx(img, cv.MORPH_OPEN, Kernel1, borderType=cv.BORDER_REPLICATE)
-    # # plt.imshow(img, 'gray')
-    # # plt.show()  
-    # # img = cv.morphologyEx(img, cv.MORPH_DILATE, Kernel2)
-    # # plt.imshow(img, 'gray')
-    # # plt.show()
-        
-    img = cv.medianBlur(img, 63)#, sigmaX=100, sigmaY=100)
+    img = cv.medianBlur(img, 63) #63
     # plt.imshow(img, 'gray')
     # plt.show()
 
-    treshold_calc = np.amin(img) + (np.amax(img) - np.amin(img))*treshold/255
+    treshold_calc = np.amin(img) + (np.amax(img) - np.amin(img))*130/255
     img = cv.threshold(img, treshold_calc, 255, cv.THRESH_TOZERO)[1]
     # plt.imshow(img, 'gray')
     # plt.show()
@@ -267,15 +184,15 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     
     # file = open(askopenfilename())
 
-    stack = imread('E:\LM LEBAS\Quattro 2022-02-08\Stack_90_focus_0.25-20_0.5-40-0-60.tif')
-    # stack = imread('images\\Stack_64_stigY-1.tif')
+    stack = imread('E:\LM LEBAS\Quattro 2022-02-08\Stack_44_stigY.tif')
+    # stack = imread('images\\Stack_HAADF.tif')
     
     if stack.dtype == np.uint8:
         dtype_number = 255
     else:
         dtype_number = 65536
 
-    image_width = stack.shape[2]
+    image_width  = stack.shape[2]
     image_height = stack.shape[1]
 
     ellipse_array = np.zeros((5, stack.shape[0]))
@@ -292,17 +209,14 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
         if focus_correction == True:
             # img  = cv.resize(stack[i], None, fx=0.25, fy=0.25, interpolation=cv.INTER_CUBIC)
             img_crop = stack[i][:,(image_width-image_height)//2:(image_width+image_height)//2]
+            img_crop_alpha = np.uint16(np.multiply(img_crop, alpha))
             
-            img_crop = np.uint16(np.multiply(img_crop, alpha))
+            img_fft = fft(img_crop_alpha)
             
-            
-            threshold = 130 #128
-            
-            # fft = fft_treh_filt(image_for_fft, threshold) #185
-            fft = fft_treh_filt(img_crop, threshold) #185
-            
-            vec_image = np.reshape(fft, (-1,1))
-            labels = KMeans(n_clusters=2).fit_predict(vec_image)
+            # img_fft = cv.resize(img_fft, dsize=None, fx=0.5, fy=0.5)
+            t = time.time()
+            vec_image = np.reshape(img_fft, (-1,1))
+            labels = MiniBatchKMeans(n_clusters=2).fit_predict(vec_image)
 
             # removing background by clustering pixels and sorting means (lowest mean 
             # corresponds to darkest object, here it's a chromosome)
@@ -311,15 +225,15 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
             index_array = np.argsort(means)[0:1]
             mask = np.array([label in index_array for label in labels])
         
-            binary_image = np.reshape(mask, fft.shape)
+            binary_image = np.reshape(mask, img_fft.shape)
+            print(time.time() - t)
             
-            fft = np.uint8(binary_image)
+            img_fft = np.uint8(binary_image)
             
-            elps = find_ellipse(fft, threshold)
+            elps = find_ellipse(img_fft)
 
 
             if elps != None:
-                print(elps)
                 ellipse_array[0][i] = (elps[0][0])# + ellipse_array[0][i-1])/2
                 ellipse_array[1][i] = (elps[0][1])# + ellipse_array[1][i-1])/2
                 ellipse_array[2][i] = (elps[1][0])# + ellipse_array[2][i-1])/2
@@ -372,7 +286,8 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
             focus_scores_std2.append((  focus_score_std2))# + focus_scores_std2[-1])/2)
             focus_scores_std3.append((  focus_score_std3))# + focus_scores_std3[-1])/2)
 
-
+            if elps != None:
+                print(i, elps, focus_score_std3)
             # print(time.time()-t, 's')
 
         # images_prev = copy.deepcopy(images)
