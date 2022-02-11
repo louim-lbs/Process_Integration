@@ -1,59 +1,146 @@
 import time
 import copy
 import cv2 as cv
+from cv2 import threshold
+from matplotlib import image
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('dark_background')
 from PIL import Image
 from tifffile import imread
+from scipy import signal
+from scract10 import PSD2
+from sklearn.cluster import KMeans
+
+
 
 def fft_treh_filt(img, threshold=150):
+    # plt.imshow(img)
+    # plt.show()
     rows, cols = img.shape
     nrows = cv.getOptimalDFTSize(rows)
     ncols = cv.getOptimalDFTSize(cols)
     right = ncols - cols
     bottom = nrows - rows
-    nimg = cv.copyMakeBorder(img, 0, bottom, 0, right, cv.BORDER_CONSTANT, value=0)
-    # plt.imshow(nimg)
-    # plt.show()
+    img = cv.copyMakeBorder(img, 0, bottom, 0, right, cv.BORDER_CONSTANT, value=0)
+    
     # Compute FFT
-    image_fft     = np.fft.fftshift(cv.dft(np.float32(nimg), flags=cv.DFT_COMPLEX_OUTPUT))
+    image_fft     = np.fft.fftshift(cv.dft(np.float32(img), flags=cv.DFT_COMPLEX_OUTPUT))
     image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
     # plt.imshow(cv.phase(image_fft[:,:,0], image_fft[:,:,1]), 'gray')
     # plt.show()
-    # plt.imshow(image_fft_mag)
+    # plt.imshow(image_fft_mag, 'gray')
     # plt.show()
-    threshold32 = np.amin(image_fft_mag) + (np.amax(image_fft_mag) - np.amin(image_fft_mag))*threshold/255
     
-    image_fft_mag_tresh = cv.bitwise_not(np.uint8(cv.threshold(image_fft_mag, threshold32, np.amax(image_fft_mag), cv.THRESH_BINARY)[1]))
+    # Substract FFT background
+    # treshold_calc = np.amin(img) + (np.amax(img) - np.amin(img))*100/255
+    # image_fft_mag = image_fft_mag - np.full(shape=image_fft_mag.shape, fill_value=treshold_calc)
+    # image_fft_mag[image_fft_mag<0] = 0
+          
     
-    # Delete isolated pixels
-    image_fft_mag_tresh_comp = cv.bitwise_not(image_fft_mag_tresh)
-
-    kernel1 = np.array([[0, 0, 0,],
-                        [0, 1, 0] ,
-                        [0, 0, 0]], np.uint8)
-    kernel2 = np.array([[1, 1, 1,],
-                        [1, 0, 1] ,
-                        [1, 1, 1]], np.uint8)
-
-    hitormiss1 = cv.morphologyEx(image_fft_mag_tresh,      cv.MORPH_ERODE, kernel1)
-    hitormiss2 = cv.morphologyEx(image_fft_mag_tresh_comp, cv.MORPH_ERODE, kernel2)
-    hitormiss = cv.bitwise_and(hitormiss1, hitormiss2)
-    hitormiss_comp = cv.bitwise_not(hitormiss)
-    image_fft_mag_tresh_filt = cv.bitwise_and(image_fft_mag_tresh, image_fft_mag_tresh, mask=hitormiss_comp)
+    # threshold32 = np.amin(image_fft_mag) + (np.amax(image_fft_mag) - np.amin(image_fft_mag))*threshold/255
     
-    return image_fft_mag_tresh_filt
+    # image_fft_mag_tresh = cv.bitwise_not(np.uint8(cv.threshold(image_fft_mag, threshold32, np.amax(image_fft_mag), cv.THRESH_BINARY)[1]))
+    # # plt.imshow(image_fft_mag_tresh, 'gray')
+    # # plt.show()
+    # # Delete isolated pixels
+    # image_fft_mag_tresh_comp = cv.bitwise_not(image_fft_mag_tresh)
 
-def find_ellipse(img):
-    # plt.imshow(img)
-    # img = cv.blur(img, (20,20))
-    treshold = np.amin(img) + (np.amax(img) - np.amin(img))*10/255
-    img = cv.threshold(img, treshold, 255, cv.THRESH_TOZERO)[1]
+    # kernel1 = np.array([[0, 0, 0,],
+    #                     [0, 1, 0] ,
+    #                     [0, 0, 0]], np.uint8)
+    # kernel2 = np.array([[1, 1, 1,],
+    #                     [1, 0, 1] ,
+    #                     [1, 1, 1]], np.uint8)
+
+    # hitormiss1 = cv.morphologyEx(image_fft_mag_tresh,      cv.MORPH_ERODE, kernel1)
+    # hitormiss2 = cv.morphologyEx(image_fft_mag_tresh_comp, cv.MORPH_ERODE, kernel2)
+    # hitormiss = cv.bitwise_and(hitormiss1, hitormiss2)
+    # hitormiss_comp = cv.bitwise_not(hitormiss)
+    # image_fft_mag_tresh_filt = cv.bitwise_and(image_fft_mag_tresh, image_fft_mag_tresh, mask=hitormiss_comp)
+    
+    return image_fft_mag#_tresh#_filt
+
+def find_ellipse(img, treshold):
+    
+    plt.imshow(img, 'gray')
+    # plt.show()
+    
+    # # rectKernel = cv.getStructuringElement(cv.MORPH_RECT, (6, 6))
+    # # sqKernel   = cv.getStructuringElement(cv.MORPH_RECT, (30, 30))
+    
+    # Kernel1 = cv.getStructuringElement(cv.MORPH_RECT, (5, 5)) #20/#10
+    # Kernel2 = cv.getStructuringElement(cv.MORPH_RECT, (7, 7)) #14
+    # Kernel3 = cv.getStructuringElement(cv.MORPH_RECT, (2, 2))
+
+    # img = cv.morphologyEx(img, cv.MORPH_DILATE, cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    # for i in range(1): #6
+        
+    #     img = cv.morphologyEx(img, cv.MORPH_OPEN,   cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
+    #     # plt.imshow(img, 'gray')
+    #     # plt.show()
+        
+    #     img = cv.morphologyEx(img, cv.MORPH_ERODE,   cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
+    #     plt.imshow(img, 'gray')
+    #     plt.show()
+    
+    
+    # img = cv.morphologyEx(img, cv.MORPH_OPEN,   cv.getStructuringElement(cv.MORPH_RECT, (2, 2)))
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    img = cv.morphologyEx(img, cv.MORPH_CLOSE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    img = cv.medianBlur(img, 63)#, sigmaX=100, sigmaY=100)
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    # img = cv.morphologyEx(img, cv.MORPH_CLOSE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    # img = cv.morphologyEx(img, cv.MORPH_ERODE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    # img = cv.morphologyEx(img, cv.MORPH_DILATE,   cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    # # for i in range(5):
+    # #     Kernel1 = cv.getStructuringElement(cv.MORPH_RECT, (i+1, i+1)) #20/#10
+    # #     Kernel2 = cv.getStructuringElement(cv.MORPH_RECT, (i+2, i+2)) #14
+    # #     img = cv.morphologyEx(img, cv.MORPH_OPEN,   Kernel1, borderType=cv.BORDER_REPLICATE)
+    # #     img = cv.morphologyEx(img, cv.MORPH_DILATE, Kernel2)
+    # #     plt.imshow(img, 'gray')
+    # #     plt.show()
+    
+    # # img = cv.morphologyEx(img, cv.MORPH_OPEN, Kernel1, borderType=cv.BORDER_REPLICATE)
+    # # plt.imshow(img, 'gray')
+    # # plt.show()  
+    # # img = cv.morphologyEx(img, cv.MORPH_DILATE, Kernel2)
+    # # plt.imshow(img, 'gray')
+    # # plt.show()
+        
+    img = cv.medianBlur(img, 63)#, sigmaX=100, sigmaY=100)
+    # plt.imshow(img, 'gray')
+    # plt.show()
+
+    treshold_calc = np.amin(img) + (np.amax(img) - np.amin(img))*treshold/255
+    img = cv.threshold(img, treshold_calc, 255, cv.THRESH_TOZERO)[1]
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
     contours, _ = cv.findContours(img, mode=cv.RETR_LIST, method=cv.CHAIN_APPROX_NONE)
     if len(contours) != 0:
         ind = np.argmax([len(cont) for cont in contours])
         contours = contours[:ind] + contours[ind+1:]
+        if len(contours) == 0:
+            print('no contour found')
+            return ((0, 0), (0, 0), 0)
         ind = np.argmax([len(cont) for cont in contours])
 
         cont = contours[ind]
@@ -64,8 +151,8 @@ def find_ellipse(img):
             pass
 
         elps = cv.fitEllipse(cont)
-        # plt.imshow(img, 'gray', alpha=0.6)
-        # plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont])
+        # plt.imshow(img, 'gray', alpha=0.1)
+        plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont])
 
         u =     elps[0][0]        # x-position of the center
         v =     elps[0][1]        # y-position of the center
@@ -83,12 +170,14 @@ def find_ellipse(img):
         for i in range(Ell.shape[1]):
             Ell_rot[:,i] = np.dot(R_rot,Ell[:,i])
 
-        # plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r' )
+        plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r' )
+        plt.savefig('images/ellipse/' + str(time.time()) + '.tif')
+        plt.clf()
         # plt.show()
         return elps
     else:
         print('no contour found')
-        # plt.imshow(img)
+        # plt.imshow(img, 'gray')
         # plt.show()
     return ((0, 0), (0, 0), 0)
 
@@ -178,8 +267,8 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     
     # file = open(askopenfilename())
 
-    stack = imread('D:\SharedData\LM LEBAS\Quattro 2022-02-08\Stack_44_stigY.tif')
-    # stack = imread('images\Cell_norm.tif')
+    stack = imread('E:\LM LEBAS\Quattro 2022-02-08\Stack_90_focus_0.25-20_0.5-40-0-60.tif')
+    # stack = imread('images\\Stack_64_stigY-1.tif')
     
     if stack.dtype == np.uint8:
         dtype_number = 255
@@ -192,45 +281,41 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     ellipse_array = np.zeros((5, stack.shape[0]))
 
     # Create radial alpha/transparency layer. 255 in centre, 0 at edge
-    Y = np.linspace(-1, 1, image_height)[None, :]*255
-    X = np.linspace(-1, 1, image_height)[:, None]*255
+    Y = np.linspace(-1, 1, image_height)[None, :]*dtype_number
+    X = np.linspace(-1, 1, image_height)[:, None]*dtype_number
     alpha_factor = 1
     alpha = np.sqrt(alpha_factor*X**2 + alpha_factor*Y**2)
-    alpha = 255 - np.clip(0, 255, alpha)
-
-    # plt.imshow(alpha, 'gray')
-    # plt.show()
-    # exit()
+    alpha = (dtype_number - np.clip(0, dtype_number, alpha))/dtype_number
 
     for i in range(stack.shape[0]):
         
         if focus_correction == True:
             # img  = cv.resize(stack[i], None, fx=0.25, fy=0.25, interpolation=cv.INTER_CUBIC)
-            img_crop = stack[i][:,(image_width-image_height)//2:-(image_width-image_height)//2]
-            # t = time.time()
-            # image_for_fft = cv.threshold(stack[i], 80, 255, cv.THRESH_TOZERO)[1]
-            # image_for_fft = np.multiply(image_for_fft, alpha)
+            img_crop = stack[i][:,(image_width-image_height)//2:(image_width+image_height)//2]
             
-            image_for_fft = np.multiply(img_crop, alpha)
-            # image_for_fft = stack[i]
-            # image_for_fft = cv.blur(stack[i], ksize=(1,1))
+            img_crop = np.uint16(np.multiply(img_crop, alpha))
             
-            # image_for_fft = cv.resize(image_for_fft, None, fx=0.25, fy=0.25)
             
-            # plt.imshow(image_for_fft, 'gray')
-            # plt.show()
-            # exit()
+            threshold = 130 #128
+            
+            # fft = fft_treh_filt(image_for_fft, threshold) #185
+            fft = fft_treh_filt(img_crop, threshold) #185
+            
+            vec_image = np.reshape(fft, (-1,1))
+            labels = KMeans(n_clusters=2).fit_predict(vec_image)
 
-            fft = fft_treh_filt(image_for_fft, threshold=200) #185
-            
-            # plt.imshow(cv.blur(fft, ksize=(100,100)))
-            # plt.show()
-            
-            # elps = find_ellipse(fft[int(3.5*image_height/8):int(4.5*image_height/8),
-            #                         int(3.5*image_width/8):int(4.5*image_width/8)])
+            # removing background by clustering pixels and sorting means (lowest mean 
+            # corresponds to darkest object, here it's a chromosome)
 
-            # elps = find_ellipse(cv.blur(fft, ksize=(100,100)))
-            elps = find_ellipse(fft)
+            means = [np.mean(vec_image[labels == label]) for label in np.unique(labels)]
+            index_array = np.argsort(means)[0:1]
+            mask = np.array([label in index_array for label in labels])
+        
+            binary_image = np.reshape(mask, fft.shape)
+            
+            fft = np.uint8(binary_image)
+            
+            elps = find_ellipse(fft, threshold)
 
 
             if elps != None:
@@ -310,15 +395,15 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     axs[1, 0].set_title('b/a (D%)')
 
     axs[1, 1].plot([(i-np.min(focus_scores_laplac))/(np.max(focus_scores_laplac)-np.min(focus_scores_laplac)) for i in focus_scores_laplac], '-ws', label='Laplacian var.')
-    axs[1, 1].plot([(i-np.min(focus_scores_mean))  /(np.max(focus_scores_mean) - np.min(focus_scores_mean))   for i in focus_scores_mean],   '-ro', label='Mean')#,               alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean2)) /(np.max(focus_scores_mean2)- np.min(focus_scores_mean2))  for i in focus_scores_mean2],  '-rv', label='Mean > 1/2.5')#,       alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean6)) /(np.max(focus_scores_mean6)- np.min(focus_scores_mean6))  for i in focus_scores_mean6],  '-gv', label='Mean > 1/3')#,         alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean7)) /(np.max(focus_scores_mean7)- np.min(focus_scores_mean7))  for i in focus_scores_mean7],  '-bv', label='Mean > 1/3.5')#,       alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean3)) /(np.max(focus_scores_mean3)- np.min(focus_scores_mean3))  for i in focus_scores_mean3],  '-r+', label='AW 2')#, alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean4)) /(np.max(focus_scores_mean4)- np.min(focus_scores_mean4))  for i in focus_scores_mean4],  '-g+', label='AW 3')#, alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_mean5)) /(np.max(focus_scores_mean5)- np.min(focus_scores_mean5))  for i in focus_scores_mean5],  '-b+', label='AW 4')#, alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_std))   /(np.max(focus_scores_std)  - np.min(focus_scores_std))    for i in focus_scores_std],    '-o', color='orange', label='Std Dev')#, alpha=0.15)
-    axs[1, 1].plot([(i-np.min(focus_scores_std2))   /(np.max(focus_scores_std2)  - np.min(focus_scores_std2))    for i in focus_scores_std2],    '-v', color='orange', label='Std Dev > 1/2')#, alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean))  /(np.max(focus_scores_mean) - np.min(focus_scores_mean))   for i in focus_scores_mean],   '-ro', label='Mean',               alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean2)) /(np.max(focus_scores_mean2)- np.min(focus_scores_mean2))  for i in focus_scores_mean2],  '-rv', label='Mean > 1/2.5',       alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean6)) /(np.max(focus_scores_mean6)- np.min(focus_scores_mean6))  for i in focus_scores_mean6],  '-gv', label='Mean > 1/3',         alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean7)) /(np.max(focus_scores_mean7)- np.min(focus_scores_mean7))  for i in focus_scores_mean7],  '-bv', label='Mean > 1/3.5',       alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean3)) /(np.max(focus_scores_mean3)- np.min(focus_scores_mean3))  for i in focus_scores_mean3],  '-r+', label='AW 2', alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean4)) /(np.max(focus_scores_mean4)- np.min(focus_scores_mean4))  for i in focus_scores_mean4],  '-g+', label='AW 3', alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_mean5)) /(np.max(focus_scores_mean5)- np.min(focus_scores_mean5))  for i in focus_scores_mean5],  '-b+', label='AW 4', alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_std))   /(np.max(focus_scores_std)  - np.min(focus_scores_std))    for i in focus_scores_std],    '-o', color='orange', label='Std Dev', alpha=0.15)
+    axs[1, 1].plot([(i-np.min(focus_scores_std2))   /(np.max(focus_scores_std2)  - np.min(focus_scores_std2))    for i in focus_scores_std2],    '-v', color='orange', label='Std Dev > 1/2', alpha=0.15)
     axs[1, 1].plot([(i-np.min(focus_scores_std3))   /(np.max(focus_scores_std3)  - np.min(focus_scores_std3))    for i in focus_scores_std3],    '-s', color='orange', label='Std Dev > NM', mfc = 'r')#, alpha=0.15)
     axs[1, 1].set_title('Normalized focus score by Laplacian and different means')
     axs[1, 1].legend(loc='upper left')
