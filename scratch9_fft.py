@@ -6,8 +6,7 @@ plt.style.use('dark_background')
 from tifffile import imread
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from joblib import Parallel, delayed
-
-
+import faiss
 
 def fft(img):
     # plt.imshow(img)
@@ -216,10 +215,12 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
             # img_fft = cv.resize(img_fft, dsize=None, fx=0.5, fy=0.5)
             t = time.time()
             vec_image = np.reshape(img_fft, (-1,1))
-            labels = MiniBatchKMeans(n_clusters=2).fit_predict(vec_image)
-
-            # removing background by clustering pixels and sorting means (lowest mean 
-            # corresponds to darkest object, here it's a chromosome)
+            # labels = KMeans(n_clusters=2).fit_predict(vec_image) #MiniBatch
+            labels = faiss.Kmeans(d=vec_image.shape[1], k=2)
+            labels.train(vec_image)
+            _, labels = labels.index.search(vec_image, 1)
+            # binary_image = np.reshape(labels, img_fft.shape)
+            # print(time.time() - t)
 
             means = [np.mean(vec_image[labels == label]) for label in np.unique(labels)]
             index_array = np.argsort(means)[0:1]
@@ -227,6 +228,9 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
         
             binary_image = np.reshape(mask, img_fft.shape)
             print(time.time() - t)
+            # plt.imshow(binary_image, 'gray')
+            # plt.show()
+            # exit()
             
             img_fft = np.uint8(binary_image)
             
@@ -234,11 +238,11 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
 
 
             if elps != None:
-                ellipse_array[0][i] = (elps[0][0])# + ellipse_array[0][i-1])/2
-                ellipse_array[1][i] = (elps[0][1])# + ellipse_array[1][i-1])/2
-                ellipse_array[2][i] = (elps[1][0])# + ellipse_array[2][i-1])/2
-                ellipse_array[3][i] = (elps[1][1])# + ellipse_array[3][i-1])/2
-                ellipse_array[4][i] = (elps[2])#    + ellipse_array[4][i-1])/2
+                ellipse_array[0][i] = (elps[0][0])# *2/3 + 1/3*ellipse_array[0][i-1])/2
+                ellipse_array[1][i] = (elps[0][1])# *2/3 + 1/3*ellipse_array[1][i-1])/2
+                ellipse_array[2][i] = (elps[1][0])# *2/3 + 1/3*ellipse_array[2][i-1])/2
+                ellipse_array[3][i] = (elps[1][1])# *2/3 + 1/3*ellipse_array[3][i-1])/2
+                ellipse_array[4][i] = (elps[2])#    *2/3 + 1/3*ellipse_array[4][i-1])/2
             
             # img = cv.blur(img, ksize=(1,1))
             # plt.imshow(img)

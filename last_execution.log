@@ -1,61 +1,7 @@
 INFO: Initialization...
-INFO: Available Systems IDs: [3919851221]
-INFO: Initialization... OK
-INFO: System ID:       3919851221
-INFO: Dll version:     17301603
-INFO: Init state:      1 SA_INIT_STATE_SYNC
-INFO: ---------------------------------------
-INFO:Current position: [175568, 87846, 9]
-INFO:Current position: [175568, 87845, 359999996]
-INFO:Current position: [175568, 87846, 1]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 1]
-INFO:Current position: [0, -1, 359999994]
-INFO:Current position: [-1, -1, 359999994]
-INFO:Current position: [-1, 0, 9]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 9]
-INFO:Current position: [-1, 0, 9]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 9]
-INFO:Current position: [0, 0, 359999996]
-INFO:Current position: [-1, 0, 9]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 9]
-INFO:Current position: [-1, -1, 359999996]
-INFO:Current position: [0, 0, 13]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 13]
-INFO:Current position: [-1, -1, 20]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 20]
-INFO:Current position: [0, 0, 25]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 25]
-INFO:Current position: [0, -1, 25]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 25]
-INFO:Current position: [0, 0, 32]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 32]
-INFO:Current position: [0, 0, 28]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 28]
-INFO:Current position: [0, -1, 25]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 25]
-INFO:Current position: [0, 0, 12]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 12]
-INFO:Current position: [-1, -2, 21]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 21]
-INFO:Current position: [0, -1, 15]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 15]
-INFO:Current position: [-1, -1, 16]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 16]
-INFO:Current position: [0, 1, 15]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 15]
+INFO: Available Systems IDs: [0]
+INFO: No systems detected: 3 SA_NO_SYSTEMS_FOUND_ERROR
+INFO: Check if MCS-3D is turned on. Check USB connexion.
+INFO:Error when acquiring postitions
+INFO:Error. 2 SA_NOT_INITIALIZED_ERROR
+INFO:Error when acquiring postitions

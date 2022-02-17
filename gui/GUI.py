@@ -252,8 +252,7 @@ class App(object):
         self.lbl_eucent.update()
         
         try:
-            set_eucentric_status = self.pool.submit(scripts.set_eucentric(self.microscope, self.positioner))
-            # ThreadPoolExecutor.submit(scripts.set_eucentric(self.microscope, self.positioner))
+            set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
         except:
             pass
         
@@ -352,17 +351,17 @@ class App(object):
         # self.pool.submit(self.testlol, self.rootix, self.letsgo)
         
         try:
-            self.pool.submit(scripts.tomo_acquisition(self.microscope,
-                                                      self.positioner,
-                                                      work_folder      = 'data/tomo/',
-                                                      images_name      = self.ent_name.get(),
-                                                      resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
-                                                      bit_depth        = 16,
-                                                      dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
-                                                      tilt_increment   = int(self.ent_tilt_step.get())*1e6,
-                                                      tilt_end         = int(self.ent_end_tilt.get())*1e6,
-                                                      drift_correction = self.check1.get(),
-                                                      focus_correction = self.check2.get()))
+            scripts.tomo_acquisition(self.microscope,
+                                    self.positioner,
+                                    work_folder      = 'data/tomo/',
+                                    images_name      = self.ent_name.get(),
+                                    resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                                    bit_depth        = 16,
+                                    dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                    tilt_increment   = int(self.ent_tilt_step.get())*1e6,
+                                    tilt_end         = int(self.ent_end_tilt.get())*1e6,
+                                    drift_correction = self.check1.get(),
+                                    focus_correction = self.check2.get())
         except Exception as e:
             logging.info(str(e))
             pass
@@ -379,15 +378,15 @@ class App(object):
         self.lbl_record.update()
         
         try:
-            self.pool.submit(scripts.record(self.microscope,
-                                            self.positioner,
-                                            work_folder      = 'data/record/',
-                                            images_name      = self.ent_name.get(),
-                                            resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
-                                            bit_depth        = 16,
-                                            dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
-                                            drift_correction = self.check1.get(),
-                                            focus_correction = self.check2.get()))
+            scripts.record(self.microscope,
+                        self.positioner,
+                        work_folder      = 'data/record/',
+                        images_name      = self.ent_name.get(),
+                        resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                        bit_depth        = 16,
+                        dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                        drift_correction = self.check1.get(),
+                        focus_correction = self.check2.get())
         except Exception as e:
             logging.info(str(e))
             pass
