@@ -28,7 +28,6 @@ def find_ellipse(img):
     plt.imshow(img, 'gray')
     # plt.show()
 
-    
     img = cv.morphologyEx(img, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_RECT, (5, 5))) # 5
     # plt.imshow(img, 'gray')
     # plt.show()
@@ -37,16 +36,24 @@ def find_ellipse(img):
     # plt.imshow(img, 'gray')
     # plt.show()
     
-    img = cv.medianBlur(img, 63) #63
+    # img = cv.morphologyEx(img, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_RECT, (3, 3))) # 5
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    # img = cv.morphologyEx(img, cv.MORPH_DILATE, cv.getStructuringElement(cv.MORPH_RECT, (2, 2))) # 3
+    # plt.imshow(img, 'gray')
+    # plt.show()
+    
+    img = cv.medianBlur(img, 75) #63
     # plt.imshow(img, 'gray')
     # plt.show()
         
-    img = cv.medianBlur(img, 63) #63
+    # img = cv.medianBlur(img, 63) #63
     # plt.imshow(img, 'gray')
     # plt.show()
 
-    treshold_calc = np.amin(img) + (np.amax(img) - np.amin(img))*130/255
-    img = cv.threshold(img, treshold_calc, 255, cv.THRESH_TOZERO)[1]
+    # treshold_calc = np.amin(img) + (np.amax(img) - np.amin(img))*130/255
+    # img = cv.threshold(img, treshold_calc, 255, cv.THRESH_TOZERO)[1]
     # plt.imshow(img, 'gray')
     # plt.show()
     
@@ -68,7 +75,7 @@ def find_ellipse(img):
 
         elps = cv.fitEllipse(cont)
         # plt.imshow(img, 'gray', alpha=0.1)
-        plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont])
+        plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont], alpha = 0.7)
 
         u =     elps[0][0]        # x-position of the center
         v =     elps[0][1]        # y-position of the center
@@ -86,7 +93,7 @@ def find_ellipse(img):
         for i in range(Ell.shape[1]):
             Ell_rot[:,i] = np.dot(R_rot,Ell[:,i])
 
-        plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r' )
+        plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r', alpha = 0.7)
         plt.savefig('images/ellipse/' + str(time.time()) + '.tif')
         plt.clf()
         # plt.show()
@@ -183,7 +190,7 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     
     # file = open(askopenfilename())
 
-    stack = imread('E:\LM LEBAS\Quattro 2022-02-08\Stack_44_stigY.tif')
+    stack = imread('E:\LM LEBAS\Quattro 2022-02-08\Stack_64_stigY.tif')
     # stack = imread('images\\Stack_HAADF.tif')
     
     if stack.dtype == np.uint8:
@@ -216,18 +223,25 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
             t = time.time()
             vec_image = np.reshape(img_fft, (-1,1))
             # labels = KMeans(n_clusters=2).fit_predict(vec_image) #MiniBatch
+            
             labels = faiss.Kmeans(d=vec_image.shape[1], k=2)
             labels.train(vec_image)
             _, labels = labels.index.search(vec_image, 1)
-            # binary_image = np.reshape(labels, img_fft.shape)
-            # print(time.time() - t)
 
             means = [np.mean(vec_image[labels == label]) for label in np.unique(labels)]
-            index_array = np.argsort(means)[0:1]
-            mask = np.array([label in index_array for label in labels])
-        
+            index_array = [np.argsort(means)[0]]
+
+            # mask = np.array([label in index_array for label in labels])
+
+            if index_array[0] == 0:
+                mask = np.where((labels==0)|(labels==1), labels^1, labels)
+            else:
+                mask = labels
+
             binary_image = np.reshape(mask, img_fft.shape)
+            
             print(time.time() - t)
+            
             # plt.imshow(binary_image, 'gray')
             # plt.show()
             # exit()
@@ -290,8 +304,8 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
             focus_scores_std2.append((  focus_score_std2))# + focus_scores_std2[-1])/2)
             focus_scores_std3.append((  focus_score_std3))# + focus_scores_std3[-1])/2)
 
-            if elps != None:
-                print(i, elps, focus_score_std3)
+            # if elps != None:
+                # print(i, elps, focus_score_std3)
             # print(time.time()-t, 's')
 
         # images_prev = copy.deepcopy(images)

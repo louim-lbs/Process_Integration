@@ -95,9 +95,9 @@ def find_ellipse(img):
         # plt.show()
     return ((0, 0), (0, 0), 0)
 
-def function_displacement(x, z, y):
+def function_displacement(x, z, y, R, x2, x3):
     x = [i*np.pi/180 for i in x]
-    return y*(1-np.cos(x)) + z*np.sin(x)
+    return y*(1-np.cos(x)) + z*np.sin(x) + R*(1-np.sin(np.multiply(x, x2))) + x3
 
 def correct_eucentric(microscope, positioner, displacement, angle):
     ''' Calculate z and y parameters for postioner eucentric correction, correct it, correct microscope view and focus.
@@ -144,11 +144,11 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     finterpa               = interpolate.PchipInterpolator([i/pas for i in angle_sort], displacement_filt)
     displacement_y_interpa = finterpa(alpha)
 
-    res, cov         = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0], bounds=(-1e7, 1e7))
-    z0_calc, y0_calc = res
+    res, cov         = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0,0,5,0], bounds=(-1e7, 1e7))
+    z0_calc, y0_calc, R_calc, x2_calc, x3_calc = res
     stdevs           = np.sqrt(np.diag(cov))
 
-    logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(direction*y0_calc) + '+-' + str(stdevs[1]))
+    logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(direction*y0_calc) + '+-' + str(stdevs[1]) + 'R = ' + str(R_calc) + '+-' + str(stdevs[2]) + 'x2 = ' + str(x2_calc) + '+-' + str(stdevs[3]) + 'x3 = ' + str(x3_calc) + '+-' + str(stdevs[4]))
     print('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1])
     
     plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
