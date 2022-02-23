@@ -282,7 +282,7 @@ def set_eucentric(microscope, positioner) -> int:
     image_euc       = np.zeros((2, image_height, image_width))
     displacement    = [[0,0]]
     angle           = [positioner.angle_convert_Smaract2SI(positioner.getpos()[2])]
-    direction   = 1
+    direction       = 1
     logging.info('z0' + str(z0) + 'y0' + str(y0) + 'hfw' + str(hfw) + 'angle_step0' + str(angle_step0) + 'angle_step' + str(angle_step) + 'angle_max' + str(angle_max) + 'precision' + str(precision) + 'resolution' + str(resolution) + 'settings' + str(settings) + 'angle' + str(angle))
 
     # HAADF analysis
@@ -350,11 +350,11 @@ def set_eucentric(microscope, positioner) -> int:
             
             ### Test increase angle
             if 2*angle_max <= 50000000:
-                angle_step *= 2
-                angle_max  *= 2
+                angle_step *= 1.5
+                angle_max  *= 1.5
             else:
                 angle_max   = 50000000
-                angle_step  =  5000000
+                angle_step  =  4000000
             
             img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
             image_euc[0] = img_tmp.data
