@@ -436,19 +436,7 @@ def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_na
                                                                     y=beamshift_y + correction_y + anticipation_y)
             beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
 
-        if focus_correction == True:
-            noise_level      = np.mean(img[img<dtype_number//2])
-            noise_level_std  = np.std( img[img<dtype_number//2])
-            img2             = img - np.full(img.shape, noise_level + noise_level_std)
-            focus_score      = np.std(img2[img2>0])
-            
-            if i > 0:
-                corr
-
-
-
         images_prev      = deepcopy(images)
-        focus_score_prev = deepcopy(focus_score)
 
     print('Tomography is a Succes')
     return 0
@@ -501,23 +489,6 @@ def record(microscope, positioner, work_folder='data/record/', images_name='imag
             microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
                                                                     y=beamshift_y + correction_y + anticipation_y)
             beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
-
-        if focus_correction == True and i > 0:
-            
-            fft_1 = fft(images_prev[2].data, threshold=150)
-            fft_2 = fft(images[2].data,      threshold=150)
-            
-            plt.imshow(fft_1)
-            plt.imshow(fft_2)
-            plt.show()
-
-            elps_1 = find_ellipse(fft_1)
-            elps_2 = find_ellipse(fft_2)
-
-            print(elps_1)
-            print(elps_2)
-
-
 
         images_prev = deepcopy(images)
         i += 1

@@ -395,24 +395,9 @@ class acquisition(object):
         
         self.image_width  = int(resolution[:resolution.find('x')])
         self.image_height = int(resolution[-resolution.find('x'):])
-        
-        # if follow == 'tomo':
-        #     self.tomo()
-        #     return
-        # elif follow == 'f_drift_correction':
-        #     self.f_drift_correction()
-        #     return
-        
+
     
-    def tomo(self):
-        for i in range(10000):
-            if self.flag == 0:
-                print(0)
-            else:
-                return
-        self.flag = 1
-        
-        return
+    def tomo(self):    
         if self.positioner.angle_convert_Smaract2SI(self.pos[2]) > 0:
             self.direction = -1
             if tilt_end > 0:
@@ -429,6 +414,9 @@ class acquisition(object):
         self.microscope.beams.electron_beam.angular_correction.mode = 'Manual'
 
         for i in range(nb_images):
+            if self.flag == 1:
+                return
+
             tangle = self.positioner.angle_convert_Smaract2SI(self.positioner.getpos()[2])
             self.microscope.beams.electron_beam.angular_correction.angle.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
 
@@ -440,19 +428,14 @@ class acquisition(object):
             images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
             images[2].save(self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
             self.positioner.setpos_rel([0, 0, direction*self.tilt_increment])
-            
+        
+        self.flag = 1
         print('Tomography is a Success')
         return 0
 
     def f_drift_correction(self):
         '''
         '''
-        print('lolf_drift_correction')
-        while True:
-            if self.flag == 0:
-                print(1)
-            else:
-                return
         anticipation_x = 0
         anticipation_y = 0
         correction_x   = 0
@@ -461,6 +444,8 @@ class acquisition(object):
         img_prev_path_0  = ''
         
         while True:
+            if self.flag == 1:
+                return
             # Load two most recent images
             try:
                 list_of_imgs  = glob.glob(self.path + '*.tif')
@@ -496,6 +481,9 @@ class acquisition(object):
         '''
         '''
         while True:
+            if self.flag == 1:
+                return
+
             try:
                 list_of_imgs = glob.glob(self.path + '*.tif')
                 img_path     = max(list_of_imgs, key=os.path.getctime)
@@ -514,79 +502,27 @@ class acquisition(object):
             dFS = 0 ###########################
             self.microscope.beams.electron_beam.working_distance.value += direction_focus*dFS
             direction_focus = +-1
-        
+
+    def record(self, microscope, positioner, work_folder='data/record/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, drift_correction:bool=False, focus_correction:bool=False) -> int:
+        ''' 
+        '''
+        settings = GrabFrameSettings(resolution=self.resolution, dwell_time=self.dwell_time, bit_depth=self.bit_depth)
+        self.microscope.beams.electron_beam.angular_correction.tilt_correction.turn_on()
+        self.microscope.beams.electron_beam.angular_correction.mode = 'Manual'
+
+        while True:
+            if self.flag == 1:
+                return
+
+            tangle = self.positioner.angle_convert_Smaract2SI(self.positioner.getpos()[2])
+            self.microscope.beams.electron_beam.angular_correction.angle.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
+
+            print(i, tangle)
+            logging.info(str(i) + str(self.positioner.getpos()[2]))
             
+            images = self.microscope.imaging.grab_multiple_frames(settings)
+            images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            images[2].save(self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
 
-        
-
-def record(microscope, positioner, work_folder='data/record/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, drift_correction:bool=False, focus_correction:bool=False) -> int:
-    ''' 
-    '''
-    pos = positioner.getpos()
-    if None in pos:
-        return 1
-
-    image_width  = int(resolution[:resolution.find('x')])
-    image_height = int(resolution[-resolution.find('x'):])
-    
-    path = work_folder + images_name + '_' + str(round(time.time()))
-    os.makedirs(path, exist_ok=True)
-
-    settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
-    microscope.beams.electron_beam.angular_correction.tilt_correction.turn_on()
-    
-    anticipation_x = 0
-    anticipation_y = 0
-    correction_x   = 0
-    correction_y   = 0
-    i              = 0
-
-    while True:
-        tangle = positioner.angle_convert_Smaract2SI(positioner.getpos()[2])
-        microscope.beams.electron_beam.angular_correction.specimen_pretilt.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
-
-        print(i, tangle)
-        logging.info(str(i) + str(positioner.getpos()[2]))
-        
-        images = microscope.imaging.grab_multiple_frames(settings)
-        # images[0].save(path + '/SE_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-        images[1].save(path + '/BF_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-                
-        if drift_correction == True and i > 0:
-            hfw = microscope.beams.electron_beam.horizontal_field_width.value
-            dy_pix, dx_pix, _        =   match(images[2].data, images_prev[2].data, resize_factor=0.5)
-            print('dy_pix', 'dx_pix', dy_pix, dx_pix)
-            dx_si                    = - dx_pix * hfw / image_width
-            dy_si                    =   dy_pix * hfw / image_width
-            correction_x             = - dx_si + correction_x
-            correction_y             = - dy_si + correction_y
-            anticipation_x          +=   correction_x
-            anticipation_y          +=   correction_y
-            beamshift_x, beamshift_y =   microscope.beams.electron_beam.beam_shift.value
-            microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
-                                                                    y=beamshift_y + correction_y + anticipation_y)
-            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
-
-        if focus_correction == True and i > 0:
-            
-            fft_1 = fft(images_prev[2].data, threshold=150)
-            fft_2 = fft(images[2].data,      threshold=150)
-            
-            plt.imshow(fft_1)
-            plt.imshow(fft_2)
-            plt.show()
-
-            elps_1 = find_ellipse(fft_1)
-            elps_2 = find_ellipse(fft_2)
-
-            print(elps_1)
-            print(elps_2)
-
-
-
-        images_prev = deepcopy(images)
-        i += 1
-
-    print('Tomography is a Succes')
-    return 0
+            i += 1
