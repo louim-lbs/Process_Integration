@@ -503,7 +503,7 @@ class acquisition(object):
             self.microscope.beams.electron_beam.working_distance.value += direction_focus*dFS
             direction_focus = +-1
 
-    def record(self, microscope, positioner, work_folder='data/record/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, drift_correction:bool=False, focus_correction:bool=False) -> int:
+    def record(self) -> int:
         ''' 
         '''
         settings = GrabFrameSettings(resolution=self.resolution, dwell_time=self.dwell_time, bit_depth=self.bit_depth)
