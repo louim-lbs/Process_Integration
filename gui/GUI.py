@@ -1,17 +1,14 @@
-import re
-import time
-# import threading
 import logging
 import tkinter as tk
 import tkinter.scrolledtext as ScrolledText
 from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory, test
 from PIL import ImageTk, Image
-from numpy import lexsort
+from matplotlib.pyplot import flag
 import scripts
+import scripts_2
 from autoscript_sdb_microscope_client.structures import StagePosition
-
-
+import threading
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -35,7 +32,7 @@ class TextHandler(logging.Handler):
         self.text.after(0, append)
 
 class App(object):
-    def __init__(self, root, microscope, positioner, pool):
+    def __init__(self, root, microscope, positioner):
         ''' Initialize GUI
         
         '''
@@ -43,9 +40,6 @@ class App(object):
         # Title
         root.title("Tomo Controller for Quattro and Smaract positioner - version 0.1")
         root.iconbitmap('gui/img/PI.ico')
-
-        self.pool = pool
-        self.letsgo = True
 
         try:
             self.microscope = microscope
@@ -247,10 +241,8 @@ class App(object):
     def eucentric(self):
         ''' Set the eucentric point
         '''
-        self.letsgo = True
         self.lbl_eucent.config(bg='orange')
         self.lbl_eucent.update()
-        
         try:
             set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
         except:
@@ -343,25 +335,42 @@ class App(object):
         self.lbl_t_pos.update()
         return 0
 
+    # def freeze_btn(self):
+    #     self.btn_acquisition.config(state=tk.DISABLED)
+    #     self.btn_record.config(state=tk.DISABLED)
+    #     self.btn_eucentric.config(state=tk.DISABLED)
+    #     self.btn_zero_eucentric.config(state=tk.DISABLED)
+    #     self.btn_folder1.config(state=tk.DISABLED)
+        
+    # def defreeze_btn(self):
+    #     self.btn_acquisition.config(state=tk.NORMAL)
+    #     self.btn_record.config(state=tk.NORMAL)
+    #     self.btn_eucentric.config(state=tk.NORMAL)
+    #     self.btn_zero_eucentric.config(state=tk.NORMAL)
+    #     self.btn_folder1.config(state=tk.NORMAL)
+        
     def acquisition(self):
-        self.letsgo = True
         self.lbl_acquisition.config(bg="green")
         self.lbl_acquisition.update()
-        # print('acqui')
-        # self.pool.submit(self.testlol, self.rootix, self.letsgo)
-        
+
         try:
-            scripts.tomo_acquisition(self.microscope,
+            global acqui
+            acqui = scripts_2.acquisition(self.microscope,
                                     self.positioner,
                                     work_folder      = 'data/tomo/',
                                     images_name      = self.ent_name.get(),
-                                    resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                                    # resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
                                     bit_depth        = 16,
-                                    dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                    # dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
                                     tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                     tilt_end         = int(self.ent_end_tilt.get())*1e6,
                                     drift_correction = self.check1.get(),
                                     focus_correction = self.check2.get())
+
+            p = threading.Thread(target=acqui.tomo)
+            q = threading.Thread(target=acqui.f_drift_correction)
+            p.start()
+            q.start()
         except Exception as e:
             logging.info(str(e))
             pass
@@ -373,10 +382,8 @@ class App(object):
     def record(self):
         ''' Record a tiff movie
         '''
-        self.letsgo = True
         self.lbl_record.config(bg='green')
         self.lbl_record.update()
-        
         try:
             scripts.record(self.microscope,
                         self.positioner,
@@ -395,16 +402,9 @@ class App(object):
         self.lbl_record.update()
         return 0
 
-    def testlol(self, win, letsgo):
-        for i in range(5):
-            if letsgo == False:
-                win.after(1000, print(letsgo))
-                return 1
-            win.after(1000, print(letsgo))
-        return 0
-
     def stop(self):
-        self.letsgo = False
+        global acqui
+        acqui.flag = 1
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
         self.lbl_acquisition.config(bg="red")

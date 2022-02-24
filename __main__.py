@@ -8,8 +8,6 @@ Updated on Dec 08 2021
 
 import os
 import logging
-from concurrent import futures 
-thread_pool_executor = futures.ThreadPoolExecutor(max_workers=2)
 
 dir_pi = os.getcwd()
 logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -42,13 +40,11 @@ smaract = sm.smaract_class(calibrate=False)
 # Lauch GUI
 os.chdir(dir_pi)
 
-global letsgo
-
 from gui import GUI
 
 def main_start():
     root = GUI.tk.Tk()
-    GUI.App(root, quattro, smaract, thread_pool_executor)
+    GUI.App(root, quattro, smaract)
     root.mainloop()
     
 main_start()

@@ -1,3 +1,6 @@
+import glob
+import threading
+from traceback import print_tb
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
 import numpy as np
 import cv2 as cv
@@ -9,6 +12,8 @@ import logging
 import time
 from shutil import copyfile
 from copy import deepcopy
+from tifffile import imread
+
 
 def fft(img):
     rows, cols = img.shape
@@ -354,104 +359,165 @@ def set_eucentric(microscope, positioner) -> int:
     copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
     return 0
 
-def tomo_acquisition(microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False) -> int:
-    ''' Acquire set of images according to input parameters.
-
-    Input:
-        - Microscope parameters "micro_settings":
-            - work folder
-            - images naming
-            - image resolution
-            - bit depht
-            - dwell time
-        - Smaract parameters:
-            - tilt increment
+class acquisition(object):
     
-    Return:
-        - success or error code (int).
-
-    Exemple:
-        tomo_status = tomo_acquisition(micro_settings, smaract_settings, drift_correction=False)
-            -> 0
-    '''
-    pos = positioner.getpos()
-    if None in pos:
-        return 1
-    
-    if bit_depth == 16:
-        dtype_number = 65536
-    elif bit_depth == 8:
-        dtype_number = 255
-
-    if positioner.angle_convert_Smaract2SI(pos[2]) > 0:
-        direction = -1
-        if tilt_end > 0:
-            tilt_end *= -1
-    else:
-        direction = 1
-        if tilt_end < 0:
-            tilt_end *= -1
-    print(dwell_time)
-    nb_images = int((abs(pos[2])+abs(tilt_end))/tilt_increment + 1)
-
-    image_width  = int(resolution[:resolution.find('x')])
-    image_height = int(resolution[-resolution.find('x'):])
-    
-    path = work_folder + images_name + '_' + str(round(time.time()))
-    os.makedirs(path, exist_ok=True)
-
-    settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
-    microscope.beams.electron_beam.angular_correction.tilt_correction.turn_on()
-    
-    anticipation_x = 0
-    anticipation_y = 0
-    correction_x   = 0
-    correction_y   = 0
-
-    for i in range(nb_images):
-        tangle = positioner.angle_convert_Smaract2SI(positioner.getpos()[2])
-        microscope.beams.electron_beam.angular_correction.specimen_pretilt.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
-
-        print(i, tangle)
-        logging.info(str(i) + str(positioner.getpos()[2]))
+    def __init__(self, microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False, follow:str=None) -> int:
+        '''
+        '''
+        self.flag = 0
         
-        images = microscope.imaging.grab_multiple_frames(settings)
-        images[0].save(path + '/SE_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-        images[1].save(path + '/BF_'    + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-        images[2].save(path + '/HAADF_' + str(images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-        positioner.setpos_rel([0, 0, direction*tilt_increment])
+        try:
+            self.microscope = microscope
+            self.positioner = positioner
+            self.images_name = images_name
+            self.resolution = resolution
+            self.bit_depth = bit_depth
+            self.dwell_time = dwell_time
+            self.tilt_increment = tilt_increment
+            self.tilt_end = tilt_end
+            self.drift_correction = drift_correction
+            self.focus_correction = focus_correction
+        except:
+            self.microscope       = 0
+            self.positioner       = 0
+
+        self.pos = positioner.getpos()
+        if None in self.pos:
+            return None
+
+        if bit_depth == 16:
+            self.dtype_number = 65536
+        elif bit_depth == 8:
+            self.dtype_number = 255
+
+        self.path = work_folder + images_name + '_' + str(round(time.time()))
+        os.makedirs(self.path, exist_ok=True)
         
-        img = images[2].data
-        if drift_correction == True and i > 0:
-            hfw = microscope.beams.electron_beam.horizontal_field_width.value
-            dy_pix, dx_pix, _        =   match(img, images_prev[2].data, resize_factor=0.5)
-            dx_si                    = - dx_pix * hfw / image_width
-            dy_si                    =   dy_pix * hfw / image_width
+        self.image_width  = int(resolution[:resolution.find('x')])
+        self.image_height = int(resolution[-resolution.find('x'):])
+        
+        # if follow == 'tomo':
+        #     self.tomo()
+        #     return
+        # elif follow == 'f_drift_correction':
+        #     self.f_drift_correction()
+        #     return
+        
+    
+    def tomo(self):
+        for i in range(10000):
+            if self.flag == 0:
+                print(0)
+            else:
+                return
+        self.flag = 1
+        
+        return
+        if self.positioner.angle_convert_Smaract2SI(self.pos[2]) > 0:
+            self.direction = -1
+            if tilt_end > 0:
+                tilt_end *= -1
+        else:
+            direction = 1
+            if tilt_end < 0:
+                tilt_end *= -1
+
+        nb_images = int((abs(self.pos[2])+abs(tilt_end))/self.tilt_increment + 1)
+
+        settings = GrabFrameSettings(resolution=self.resolution, dwell_time=self.dwell_time, bit_depth=self.bit_depth)
+        self.microscope.beams.electron_beam.angular_correction.tilt_correction.turn_on()
+        self.microscope.beams.electron_beam.angular_correction.mode = 'Manual'
+
+        for i in range(nb_images):
+            tangle = self.positioner.angle_convert_Smaract2SI(self.positioner.getpos()[2])
+            self.microscope.beams.electron_beam.angular_correction.angle.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
+
+            print(i, tangle)
+            logging.info(str(i) + str(self.positioner.getpos()[2]))
+            
+            images = self.microscope.imaging.grab_multiple_frames(settings)
+            images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            images[2].save(self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            self.positioner.setpos_rel([0, 0, direction*self.tilt_increment])
+            
+        print('Tomography is a Success')
+        return 0
+
+    def f_drift_correction(self):
+        '''
+        '''
+        print('lolf_drift_correction')
+        while True:
+            if self.flag == 0:
+                print(1)
+            else:
+                return
+        anticipation_x = 0
+        anticipation_y = 0
+        correction_x   = 0
+        correction_y   = 0
+        img_path_0       = ''
+        img_prev_path_0  = ''
+        
+        while True:
+            # Load two most recent images
+            try:
+                list_of_imgs  = glob.glob(self.path + '*.tif')
+                img_path      = max(list_of_imgs, key=os.path.getctime)
+                img_prev_path = max(list_of_imgs.remove(img_path), key=os.path.getctime)
+                
+                img           = imread(self.path + img_path)
+                img_prev      = imread(self.path + img_prev_path)
+            except:
+                continue
+            
+            if img_path == img_path_0 or img_prev_path == img_prev_path_0:
+                continue
+            else:
+                img_path_0      = deepcopy(img_path)
+                img_prev_path_0 = deepcopy(img_prev_path)
+            
+            hfw = self.microscope.beams.electron_beam.horizontal_field_width.value
+            
+            dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
+            dx_si                    = - dx_pix * hfw / self.image_width
+            dy_si                    =   dy_pix * hfw / self.image_width
             correction_x             = - dx_si + correction_x
             correction_y             = - dy_si + correction_y
             anticipation_x          +=   correction_x
             anticipation_y          +=   correction_y
-            beamshift_x, beamshift_y =   microscope.beams.electron_beam.beam_shift.value
-            microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
-                                                                    y=beamshift_y + correction_y + anticipation_y)
-            beamshift_x, beamshift_y = microscope.beams.electron_beam.beam_shift.value
-
-        if focus_correction == True:
-            noise_level      = np.mean(img[img<dtype_number//2])
-            noise_level_std  = np.std( img[img<dtype_number//2])
+            beamshift_x, beamshift_y =   self.microscope.beams.electron_beam.beam_shift.value
+            self.microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
+                                                                         y=beamshift_y + correction_y + anticipation_y)
+            beamshift_x, beamshift_y = self.microscope.beams.electron_beam.beam_shift.value
+    
+    def f_focus_correction(self):
+        '''
+        '''
+        while True:
+            try:
+                list_of_imgs = glob.glob(self.path + '*.tif')
+                img_path     = max(list_of_imgs, key=os.path.getctime)
+                img          = imread(self.path + img_path)
+            except:
+                continue
+                    
+            noise_level      = np.mean(img[img<self.dtype_number//2])
+            noise_level_std  = np.std( img[img<self.dtype_number//2])
             img2             = img - np.full(img.shape, noise_level + noise_level_std)
             focus_score      = np.std(img2[img2>0])
             
-            if i > 0:
-                corr
+            if len(list_of_imgs) == 1:
+                focus_score_0 = deepcopy(focus_score)
+        
+            dFS = 0 ###########################
+            self.microscope.beams.electron_beam.working_distance.value += direction_focus*dFS
+            direction_focus = +-1
+        
+            
 
-
-
-        images_prev      = deepcopy(images)
-        focus_score_prev = deepcopy(focus_score)
-
-    print('Tomography is a Succes')
-    return 0
+        
 
 def record(microscope, positioner, work_folder='data/record/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, drift_correction:bool=False, focus_correction:bool=False) -> int:
     ''' 
