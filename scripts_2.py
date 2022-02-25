@@ -361,7 +361,7 @@ def set_eucentric(microscope, positioner) -> int:
 
 class acquisition(object):
     
-    def __init__(self, microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000, drift_correction:bool=False, focus_correction:bool=False, follow:str=None) -> int:
+    def __init__(self, microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2000000, tilt_end=60000000) -> int:
         '''
         '''
         self.flag = 0
@@ -375,8 +375,6 @@ class acquisition(object):
             self.dwell_time = dwell_time
             self.tilt_increment = tilt_increment
             self.tilt_end = tilt_end
-            self.drift_correction = drift_correction
-            self.focus_correction = focus_correction
         except:
             self.microscope       = 0
             self.positioner       = 0
@@ -436,10 +434,10 @@ class acquisition(object):
     def f_drift_correction(self):
         '''
         '''
-        anticipation_x = 0
-        anticipation_y = 0
-        correction_x   = 0
-        correction_y   = 0
+        anticipation_x   = 0
+        anticipation_y   = 0
+        correction_x     = 0
+        correction_y     = 0
         img_path_0       = ''
         img_prev_path_0  = ''
         
@@ -452,16 +450,17 @@ class acquisition(object):
                 img_path      = max(list_of_imgs, key=os.path.getctime)
                 img_prev_path = max(list_of_imgs.remove(img_path), key=os.path.getctime)
                 
+                if img_path == img_path_0 or img_prev_path == img_prev_path_0:
+                    continue
+                else:
+                    img_path_0      = deepcopy(img_path)
+                    img_prev_path_0 = deepcopy(img_prev_path)
+                    
                 img           = imread(self.path + img_path)
                 img_prev      = imread(self.path + img_prev_path)
             except:
+                time.sleep(0.1)
                 continue
-            
-            if img_path == img_path_0 or img_prev_path == img_prev_path_0:
-                continue
-            else:
-                img_path_0      = deepcopy(img_path)
-                img_prev_path_0 = deepcopy(img_prev_path)
             
             hfw = self.microscope.beams.electron_beam.horizontal_field_width.value
             
@@ -480,22 +479,29 @@ class acquisition(object):
     def f_focus_correction(self):
         '''
         '''
+        img_path_0 = ''
+        
         while True:
             if self.flag == 1:
                 return
-
             try:
                 list_of_imgs = glob.glob(self.path + '*.tif')
                 img_path     = max(list_of_imgs, key=os.path.getctime)
+                if img_path == img_path_0:
+                    continue
+                else:
+                    img_path_0   = deepcopy(img_path)
                 img          = imread(self.path + img_path)
             except:
+                time.sleep(0.1)
                 continue
-                    
+            
             noise_level      = np.mean(img[img<self.dtype_number//2])
             noise_level_std  = np.std( img[img<self.dtype_number//2])
             img2             = img - np.full(img.shape, noise_level + noise_level_std)
             focus_score      = np.std(img2[img2>0])
             
+            ##########
             if len(list_of_imgs) == 1:
                 focus_score_0 = deepcopy(focus_score)
         
