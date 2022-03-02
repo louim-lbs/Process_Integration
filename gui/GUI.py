@@ -1,12 +1,12 @@
 import logging
+import time
 import tkinter as tk
 import tkinter.scrolledtext as ScrolledText
 from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory, test
 from PIL import ImageTk, Image
 from matplotlib.pyplot import flag
-import scripts
-import scripts_2
+import scripts_2 as scripts
 from autoscript_sdb_microscope_client.structures import StagePosition
 import threading
 
@@ -117,14 +117,13 @@ class App(object):
         self.frm_img = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//2, height=height, bg='#202020')
         self.frm_img.place(x=width//4, y=0)
 
-        image = Image.open('images/cell_15.tif')
-        img_width = int(width//2-35)
-        img_height = int((width//2-35)*1094/1536)
-        image = image.resize((img_width, img_height), Image.ANTIALIAS)
-        img_0 = ImageTk.PhotoImage(image)
-        self.lbl_img = tk.Label(master=self.frm_img, width=img_width, height=img_height, image=img_0)
-        self.lbl_img.photo = img_0
-        self.lbl_img.place(x=10, y=height//2-img_height//2)
+        image = Image.open('images/PI_cov.tif')
+        img_width, img_height = image.size
+        image = image.resize((int(width/2-80), int(width/2-80)), Image.ANTIALIAS)
+        self.img_0 = ImageTk.PhotoImage(image)
+        self.lbl_img = tk.Label(master=self.frm_img, width=width//2-100, height=width//2-100, image=self.img_0)
+        self.lbl_img.photo = self.img_0
+        self.lbl_img.place(x=50, y=25)
 
         self.btn_eucentric = tk.Button(master=self.frm_img, width=20, height=1, bg='#373737', fg='white', text="Set Eucentric", justify='left', command=self.eucentric)
         self.btn_eucentric.place(x=int(width//4-100), rely=0.88)
@@ -355,7 +354,7 @@ class App(object):
 
         try:
             global acqui
-            acqui = scripts_2.acquisition(self.microscope,
+            acqui = scripts.acquisition(self.microscope,
                                           self.positioner,
                                           work_folder      = 'data/tomo/',
                                           images_name      = self.ent_name.get(),
@@ -368,8 +367,11 @@ class App(object):
                                           focus_correction = self.check2.get())
 
             threading.Thread(target=acqui.tomo).start()
-            threading.Thread(target=acqui.f_drift_correction).start()
-            threading.Thread(target=acqui.f_focus_correction).start()
+            if self.check1.get() == True:
+                threading.Thread(target=acqui.f_drift_correction).start()
+            if self.check2.get() == True:
+                threading.Thread(target=acqui.f_focus_correction).start()
+                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
             
         except Exception as e:
             logging.info(str(e))
@@ -386,22 +388,24 @@ class App(object):
         self.lbl_record.update()
         try:
             global acqui
-            acqui = scripts_2.acquisition(self.microscope,
-                                          self.positioner,
-                                          work_folder      = 'data/record/',
-                                          images_name      = self.ent_name.get(),
-                                          resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
-                                          bit_depth        = 16,
-                                          dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
-                                          tilt_increment   = int(self.ent_tilt_step.get())*1e6,
-                                          tilt_end         = int(self.ent_end_tilt.get())*1e6)
-
-            threading.Thread(target=acqui.record).start()
+            acqui = scripts.acquisition(self.microscope,
+                                            self.positioner,
+                                            work_folder      = 'data/record/',
+                                            images_name      = 0,#self.ent_name.get(),
+                                            resolution       = '1536x1024',#self.microscope.beams.electron_beam.scanning.resolution.value,
+                                            bit_depth        = 16,
+                                            dwell_time       = 0,#self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                            tilt_increment   = int(self.ent_tilt_step.get())*1e6,
+                                            tilt_end         = int(self.ent_end_tilt.get())*1e6)
+            # time.sleep(0.1)
+            # threading.Thread(target=acqui.record).start()
             if self.check1.get() == True:
-                threading.Thread(target=acqui.f_drift_correction).start()
+                # threading.Thread(target=acqui.f_drift_correction).start()
+                pass
             if self.check2.get() == True:
-                threading.Thread(target=acqui.f_focus_correction).start()
-            
+                # threading.Thread(target=acqui.f_focus_correction).start()
+                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
+                
         except Exception as e:
             logging.info(str(e))
             pass
@@ -411,14 +415,19 @@ class App(object):
         return 0
 
     def stop(self):
-        global acqui
-        acqui.flag = 1
+        if 'acqui' in globals():
+            global acqui
+            acqui.flag = 1
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
         self.lbl_acquisition.config(bg="red")
         self.lbl_acquisition.update()
         self.lbl_record.config(bg='orange')
         self.lbl_record.update()
+        
+        self.lbl_img.configure(image = self.img_0)
+        self.lbl_img.photo = self.img_0
+        self.lbl_img.update()
         return 0
 
 if __name__ == "__main__":

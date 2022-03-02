@@ -1,6 +1,4 @@
 import glob
-import threading
-from traceback import print_tb
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
 import numpy as np
 import cv2 as cv
@@ -13,7 +11,45 @@ import time
 from shutil import copyfile
 from copy import deepcopy
 from tifffile import imread
+from PIL import Image, ImageTk
 
+# Automatic brightness and contrast optimization with optional histogram clipping
+def automatic_brightness_and_contrast(image, clip_hist_percent=1):
+    '''
+    from:
+    https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape
+    '''
+    # Calculate grayscale histogram
+    hist = cv.calcHist([image],[0],None,[256],[0,256])
+    hist_size = len(hist)
+    
+    # Calculate cumulative distribution from the histogram
+    accumulator = []
+    accumulator.append(float(hist[0]))
+    for index in range(1, hist_size):
+        accumulator.append(accumulator[index -1] + float(hist[index]))
+    
+    # Locate points to clip
+    maximum = accumulator[-1]
+    clip_hist_percent *= (maximum/100.0)
+    clip_hist_percent /= 2.0
+    
+    # Locate left cut
+    minimum_gray = 0
+    while accumulator[minimum_gray] < clip_hist_percent:
+        minimum_gray += 1
+    
+    # Locate right cut
+    maximum_gray = hist_size -1
+    while accumulator[maximum_gray] >= (maximum - clip_hist_percent):
+        maximum_gray -= 1
+    
+    # Calculate alpha and beta values
+    alpha = 255 / (maximum_gray - minimum_gray)
+    beta = -minimum_gray * alpha
+
+    auto_result = cv.convertScaleAbs(image, alpha=alpha, beta=beta)
+    return auto_result
 
 def fft(img):
     rows, cols = img.shape
@@ -366,6 +402,9 @@ class acquisition(object):
         '''
         self.flag = 0
         
+        self.image_width  = int(resolution[:resolution.find('x')])
+        self.image_height = int(resolution[-resolution.find('x'):])
+        
         try:
             self.microscope = microscope
             self.positioner = positioner
@@ -390,11 +429,7 @@ class acquisition(object):
 
         self.path = work_folder + images_name + '_' + str(round(time.time()))
         os.makedirs(self.path, exist_ok=True)
-        
-        self.image_width  = int(resolution[:resolution.find('x')])
-        self.image_height = int(resolution[-resolution.find('x'):])
 
-    
     def tomo(self):    
         if self.positioner.angle_convert_Smaract2SI(self.pos[2]) > 0:
             self.direction = -1
@@ -448,7 +483,8 @@ class acquisition(object):
             try:
                 list_of_imgs  = glob.glob(self.path + '*.tif')
                 img_path      = max(list_of_imgs, key=os.path.getctime)
-                img_prev_path = max(list_of_imgs.remove(img_path), key=os.path.getctime)
+                list_of_imgs.remove(img_path)
+                img_prev_path = max(list_of_imgs, key=os.path.getctime)
                 
                 if img_path == img_path_0 or img_prev_path == img_prev_path_0:
                     continue
@@ -456,8 +492,8 @@ class acquisition(object):
                     img_path_0      = deepcopy(img_path)
                     img_prev_path_0 = deepcopy(img_prev_path)
                     
-                img           = imread(self.path + img_path)
-                img_prev      = imread(self.path + img_prev_path)
+                img       = imread(self.path + img_path)
+                img_prev  = imread(self.path + img_prev_path)
             except:
                 time.sleep(0.1)
                 continue
@@ -481,6 +517,8 @@ class acquisition(object):
         '''
         img_path_0 = ''
         
+        focus_tollerance = 0.98
+        
         while True:
             if self.flag == 1:
                 return
@@ -490,8 +528,8 @@ class acquisition(object):
                 if img_path == img_path_0:
                     continue
                 else:
-                    img_path_0   = deepcopy(img_path)
-                img          = imread(self.path + img_path)
+                    img_path_0 = deepcopy(img_path)
+                img = imread(self.path + img_path)
             except:
                 time.sleep(0.1)
                 continue
@@ -504,9 +542,12 @@ class acquisition(object):
             ##########
             if len(list_of_imgs) == 1:
                 focus_score_0 = deepcopy(focus_score)
-        
-            dFS = 0 ###########################
-            self.microscope.beams.electron_beam.working_distance.value += direction_focus*dFS
+
+            if focus_score < focus_score_0*focus_tollerance:
+                
+                dFS = 0# ? ###########################
+                self.microscope.beams.electron_beam.working_distance.value += direction_focus*dFS
+                
             direction_focus = +-1
 
     def record(self) -> int:
@@ -532,3 +573,38 @@ class acquisition(object):
             images[2].save(self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
 
             i += 1
+    
+    def f_image_fft(self, appPI):
+        '''
+        '''
+        img_path_0 = ''
+        i = 0
+        while True:
+            if self.flag == 1:
+                return
+            # try:
+            # list_of_imgs = glob.glob(self.path + '*.tif')
+            # img_path     = max(list_of_imgs, key=os.path.getctime)
+            # if img_path == img_path_0:
+            #     continue
+            # else:
+            #     img_path_0 = deepcopy(img_path)
+                
+            # img = imread(self.path + img_path)
+            img = imread('images/cell_15.tif')
+            
+            image_width  = img.shape[1]
+            image_height = img.shape[0]
+            img = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
+
+            img_0 = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(fft(img))))
+            # img_0 = ImageTk.PhotoImage(Image.fromarray(fft(img)))
+
+            appPI.lbl_img.configure(image = img_0)
+            appPI.lbl_img.photo = img_0
+            appPI.lbl_img.update()
+            print(i)
+            i += 1
+            # except:
+            #     time.sleep(0.1)
+            #     continue
