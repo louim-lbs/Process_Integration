@@ -38,7 +38,7 @@ class App(object):
         '''
         self.rootix = root
         # Title
-        root.title("Tomo Controller for Quattro and Smaract positioner - version 0.1")
+        root.title("Tomo Controller for Quattro and Smaract positioner - Alpha version")
         root.iconbitmap('gui/img/PI.ico')
 
         try:
@@ -121,7 +121,7 @@ class App(object):
         img_width, img_height = image.size
         image = image.resize((int(width/2-80), int(width/2-80)), Image.ANTIALIAS)
         self.img_0 = ImageTk.PhotoImage(image)
-        self.lbl_img = tk.Label(master=self.frm_img, width=width//2-100, height=width//2-100, image=self.img_0)
+        self.lbl_img = tk.Label(master=self.frm_img, width=width//2-100, height=width//2-100, image=self.img_0, borderwidth=2, relief="groove")
         self.lbl_img.photo = self.img_0
         self.lbl_img.place(x=50, y=25)
 
@@ -391,19 +391,19 @@ class App(object):
             acqui = scripts.acquisition(self.microscope,
                                             self.positioner,
                                             work_folder      = 'data/record/',
-                                            images_name      = 0,#self.ent_name.get(),
-                                            resolution       = '1536x1024',#self.microscope.beams.electron_beam.scanning.resolution.value,
+                                            images_name      = self.ent_name.get(),
+                                            resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
                                             bit_depth        = 16,
-                                            dwell_time       = 0,#self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                            dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
                                             tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                             tilt_end         = int(self.ent_end_tilt.get())*1e6)
             # time.sleep(0.1)
-            # threading.Thread(target=acqui.record).start()
+            threading.Thread(target=acqui.record).start()
             if self.check1.get() == True:
-                # threading.Thread(target=acqui.f_drift_correction).start()
+                threading.Thread(target=acqui.f_drift_correction).start()
                 pass
             if self.check2.get() == True:
-                # threading.Thread(target=acqui.f_focus_correction).start()
+                threading.Thread(target=acqui.f_focus_correction).start()
                 threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
                 
         except Exception as e:

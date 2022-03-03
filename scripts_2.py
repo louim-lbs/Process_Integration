@@ -582,29 +582,25 @@ class acquisition(object):
         while True:
             if self.flag == 1:
                 return
-            # try:
-            # list_of_imgs = glob.glob(self.path + '*.tif')
-            # img_path     = max(list_of_imgs, key=os.path.getctime)
-            # if img_path == img_path_0:
-            #     continue
-            # else:
-            #     img_path_0 = deepcopy(img_path)
+            try:
+                list_of_imgs = glob.glob(self.path + '*.tif')
+                img_path     = max(list_of_imgs, key=os.path.getctime)
+                if img_path == img_path_0:
+                    continue
+                else:
+                    img_path_0 = deepcopy(img_path)
+                    
+                img = imread(self.path + img_path)
                 
-            # img = imread(self.path + img_path)
-            img = imread('images/cell_15.tif')
-            
-            image_width  = img.shape[1]
-            image_height = img.shape[0]
-            img = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
+                image_width  = img.shape[1]
+                image_height = img.shape[0]
+                img = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
 
-            img_0 = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(fft(img))))
-            # img_0 = ImageTk.PhotoImage(Image.fromarray(fft(img)))
+                img_0 = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(fft(img))))
 
-            appPI.lbl_img.configure(image = img_0)
-            appPI.lbl_img.photo = img_0
-            appPI.lbl_img.update()
-            print(i)
-            i += 1
-            # except:
-            #     time.sleep(0.1)
-            #     continue
+                appPI.lbl_img.configure(image = img_0)
+                appPI.lbl_img.photo = img_0
+                appPI.lbl_img.update()
+            except:
+                time.sleep(0.1)
+                continue
