@@ -190,8 +190,8 @@ def tomo_acquisition(work_folder='data/tomo/', images_name='image', resolution='
     
     # file = open(askopenfilename())
 
-    stack = imread('E:\LM LEBAS\Quattro 2022-02-08\Stack_64_stigY.tif')
-    # stack = imread('images\\Stack_HAADF.tif')
+    # stack = imread('E:\LM LEBAS\Quattro 2022-02-08\Stack_64_stigY.tif')
+    stack = imread('images\Cell_norm.tif')
     
     if stack.dtype == np.uint8:
         dtype_number = 255

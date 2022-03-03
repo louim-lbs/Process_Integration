@@ -117,7 +117,7 @@ class App(object):
         self.frm_img = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//2, height=height, bg='#202020')
         self.frm_img.place(x=width//4, y=0)
 
-        image = Image.open('images/PI_cov.tif')
+        image = Image.open('images/PI_cov-1.tif')
         img_width, img_height = image.size
         image = image.resize((int(width/2-80), int(width/2-80)), Image.ANTIALIAS)
         self.img_0 = ImageTk.PhotoImage(image)
@@ -199,7 +199,7 @@ class App(object):
         self.ent_end_tilt  = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text2, justify='left')
         self.ent_name      = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text3, justify='left')
         self.check_drift   = tk.Checkbutton(master=self.frm_sav, width=17, bg='#2B2B2B', fg='white', activebackground='#2B2B2B', activeforeground='white', selectcolor="#2B2B2B", variable=self.check1, onvalue=True, offvalue=False, text="  Drift correction")
-        self.check_focus   = tk.Checkbutton(master=self.frm_sav, width=14, bg='#2B2B2B', fg='white', activebackground='#2B2B2B', activeforeground='white', selectcolor="#2B2B2B", variable=self.check2, onvalue=True, offvalue=False, text="  Auto focus")
+        self.check_focus   = tk.Checkbutton(master=self.frm_sav, width=14, bg='#2B2B2B', fg='white', activebackground='#2B2B2B', activeforeground='white', selectcolor="#2B2B2B", variable=self.check2, onvalue=True, offvalue=False, text="  Auto focus (BC!)")
 
         self.lbl_tilt_step.place(x=20, y=20)
         self.lbl_end_tilt.place(x=20, y=60)
@@ -225,7 +225,7 @@ class App(object):
         self.lbl_acquisition = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.acquisition_col.get())
         self.lbl_acquisition.place(x=100+160, y=240)
         
-        self.record_col = tk.StringVar(value='orange')
+        self.record_col = tk.StringVar(value='red')
         self.lbl_record = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.record_col.get())
         self.lbl_record.place(x=100+160, y=290)
 
@@ -367,11 +367,11 @@ class App(object):
                                           focus_correction = self.check2.get())
 
             threading.Thread(target=acqui.tomo).start()
+            threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
             if self.check1.get() == True:
                 threading.Thread(target=acqui.f_drift_correction).start()
             if self.check2.get() == True:
                 threading.Thread(target=acqui.f_focus_correction).start()
-                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
             
         except Exception as e:
             logging.info(str(e))
@@ -399,18 +399,17 @@ class App(object):
                                             tilt_end         = int(self.ent_end_tilt.get())*1e6)
             # time.sleep(0.1)
             threading.Thread(target=acqui.record).start()
+            threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
             if self.check1.get() == True:
                 threading.Thread(target=acqui.f_drift_correction).start()
-                pass
             if self.check2.get() == True:
                 threading.Thread(target=acqui.f_focus_correction).start()
-                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
                 
         except Exception as e:
             logging.info(str(e))
             pass
         
-        self.lbl_record.config(bg='orange')
+        self.lbl_record.config(bg='red')
         self.lbl_record.update()
         return 0
 
@@ -422,7 +421,7 @@ class App(object):
         self.lbl_eucent.update()
         self.lbl_acquisition.config(bg="red")
         self.lbl_acquisition.update()
-        self.lbl_record.config(bg='orange')
+        self.lbl_record.config(bg='red')
         self.lbl_record.update()
         
         self.lbl_img.configure(image = self.img_0)

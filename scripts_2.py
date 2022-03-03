@@ -1,5 +1,6 @@
 import glob
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
+from cv2 import mean
 import numpy as np
 import cv2 as cv
 from scipy import interpolate
@@ -516,37 +517,43 @@ class acquisition(object):
         '''
         '''
         img_path_0 = ''
-        
         focus_tollerance = 0.98
+        averaging = 2
+        focus_score_list = []*averaging
         
         while True:
-            if self.flag == 1:
-                return
-            try:
-                list_of_imgs = glob.glob(self.path + '*.tif')
-                img_path     = max(list_of_imgs, key=os.path.getctime)
-                if img_path == img_path_0:
+            
+            for i in averaging:
+                if self.flag == 1:
+                    return
+                try:
+                    list_of_imgs = glob.glob(self.path + '*.tif')
+                    img_path     = max(list_of_imgs, key=os.path.getctime)
+                    if img_path == img_path_0:
+                        continue
+                    else:
+                        img_path_0 = deepcopy(img_path)
+                    img = imread(self.path + img_path)
+                except:
+                    time.sleep(0.1)
                     continue
-                else:
-                    img_path_0 = deepcopy(img_path)
-                img = imread(self.path + img_path)
-            except:
-                time.sleep(0.1)
-                continue
-            
-            noise_level      = np.mean(img[img<self.dtype_number//2])
-            noise_level_std  = np.std( img[img<self.dtype_number//2])
-            img2             = img - np.full(img.shape, noise_level + noise_level_std)
-            focus_score      = np.std(img2[img2>0])
-            
-            ##########
-            if len(list_of_imgs) == 1:
-                focus_score_0 = deepcopy(focus_score)
-
-            if focus_score < focus_score_0*focus_tollerance:
                 
+                noise_level         = np.mean(img[img<self.dtype_number//2])
+                noise_level_std     = np.std( img[img<self.dtype_number//2])
+                img2                = img - np.full(img.shape, noise_level + noise_level_std)
+                focus_score_list[i] = np.std(img2[img2>0])
+                
+                ##########
+                if len(list_of_imgs) == 1:
+                    focus_score_0 = deepcopy(focus_score_list[0])
+
+            focus_score_mean = mean(focus_score_list)
+            
+            if focus_score_mean < focus_score_0*focus_tollerance:
+                
+                direction_guess = 1
                 dFS = 0# ? ###########################
-                self.microscope.beams.electron_beam.working_distance.value += direction_focus*dFS
+                self.microscope.beams.electron_beam.working_distance.value += direction_guess*dFS
                 
             direction_focus = +-1
 
