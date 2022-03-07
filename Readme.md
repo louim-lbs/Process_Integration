@@ -5,7 +5,7 @@
 ********** TO DO
 
 - Improve performances
-- Investigate threading (see above).
+- Investigate threading
 
 ### Smaract
 - **Calibrate and Set software limits** and check it to prevent breaking device cables. SA_FindReferenceMark_S()
@@ -24,7 +24,6 @@
     - Logging
     - Check limits of displacement.
     - Centering image on particle after correction.
-- **Dynamical focus** for low-deep-field STEM acquisition?
 - Angles file
 - Biner les images du match pour les rendre résistantes au bruit.
 
@@ -38,6 +37,7 @@
 
 
 ********** DONE
+- OK. **Dynamical focus** for low-deep-field STEM acquisition?
 - OK. **16-bits** default acquisition.
 - OK. Attention aux sens et aux axes. Match function: x and y from left-up corner of the image.
 - OK. Increase angle not zoom?
