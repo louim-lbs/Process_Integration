@@ -367,11 +367,12 @@ class App(object):
                                           focus_correction = self.check2.get())
 
             threading.Thread(target=acqui.tomo).start()
-            threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
             if self.check1.get() == True:
                 threading.Thread(target=acqui.f_drift_correction).start()
             if self.check2.get() == True:
-                threading.Thread(target=acqui.f_focus_correction).start()
+                threading.Thread(target=acqui.f_focus_correction(appPI = self)).start()
+            else:
+                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
             
         except Exception as e:
             logging.info(str(e))
@@ -399,11 +400,12 @@ class App(object):
                                             tilt_end         = int(self.ent_end_tilt.get())*1e6)
             # time.sleep(0.1)
             threading.Thread(target=acqui.record).start()
-            threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
             if self.check1.get() == True:
                 threading.Thread(target=acqui.f_drift_correction).start()
             if self.check2.get() == True:
-                threading.Thread(target=acqui.f_focus_correction).start()
+                threading.Thread(target=acqui.f_focus_correction(appPI = self)).start()
+            else:
+                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
                 
         except Exception as e:
             logging.info(str(e))

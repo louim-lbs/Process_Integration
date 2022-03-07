@@ -1,4 +1,5 @@
 import glob
+import io
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
 from cv2 import mean
 import numpy as np
@@ -13,6 +14,8 @@ from shutil import copyfile
 from copy import deepcopy
 from tifffile import imread
 from PIL import Image, ImageTk
+import faiss
+
 
 # Automatic brightness and contrast optimization with optional histogram clipping
 def automatic_brightness_and_contrast(image, clip_hist_percent=1):
@@ -65,8 +68,9 @@ def fft(img):
     image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
     return image_fft_mag
 
-def find_ellipse(img):
-    plt.imshow(img, 'gray')
+def find_ellipse(img, save=False):
+    if save:
+        plt.imshow(img, 'gray')
     
     img = cv.morphologyEx(img, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_RECT, (5, 5))) # 5
     img = cv.morphologyEx(img, cv.MORPH_DILATE, cv.getStructuringElement(cv.MORPH_RECT, (3, 3))) # 3
@@ -84,13 +88,15 @@ def find_ellipse(img):
         cont = contours[ind]
         if len(cont) < 5:
             print('len contour < 5', len(contours))
-            # plt.imshow(img)
-            # plt.show()
+            if save:
+                plt.imshow(img)
+                # plt.show()
             pass
 
         elps = cv.fitEllipse(cont)
         # plt.imshow(img, 'gray', alpha=0.1)
-        plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont], alpha = 0.7)
+        if save:
+            plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont], alpha = 0.7)
 
         u =     elps[0][0]        # x-position of the center
         v =     elps[0][1]        # y-position of the center
@@ -108,15 +114,18 @@ def find_ellipse(img):
         for i in range(Ell.shape[1]):
             Ell_rot[:,i] = np.dot(R_rot,Ell[:,i])
 
-        plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r', alpha = 0.7)
-        plt.savefig('images/ellipse/' + str(time.time()) + '.tif')
-        plt.clf()
-        # plt.show()
+        if save:
+            plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r', alpha = 0.7)
+            plt.savefig('images/ellipse/' + str(time.time()) + '.tif')
+            
+            # plt.show()
+            plt.clf()
         return elps
     else:
         print('no contour found')
-        # plt.imshow(img, 'gray')
-        # plt.show()
+        if save:
+            plt.imshow(img, 'gray')
+            # plt.show()
     return ((0, 0), (0, 0), 0)
 
 def function_displacement(x, z, y, R, x2, x3):
@@ -513,17 +522,27 @@ class acquisition(object):
                                                                          y=beamshift_y + correction_y + anticipation_y)
             beamshift_x, beamshift_y = self.microscope.beams.electron_beam.beam_shift.value
     
-    def f_focus_correction(self):
+    def f_focus_correction(self, appPI):
         '''
         '''
         img_path_0 = ''
-        focus_tollerance = 0.98
+        focus_tollerance = 0.95
         averaging = 2
         focus_score_list = []*averaging
+        dtype_number = 2**self.bit_depth
+        
+        img = imread('images/cell_15.tif')
+        image_height, image_width  = img.shape
+        # Create radial alpha/transparency layer. 255 in centre, 0 at edge
+        Y = np.linspace(-1, 1, image_height)[None, :]*dtype_number
+        X = np.linspace(-1, 1, image_height)[:, None]*dtype_number
+        alpha_factor = 1
+        alpha = np.sqrt(alpha_factor*X**2 + alpha_factor*Y**2)
+        alpha = (dtype_number - np.clip(0, dtype_number, alpha))/dtype_number
         
         while True:
             
-            for i in averaging:
+            for i in range(averaging):
                 if self.flag == 1:
                     return
                 try:
@@ -538,24 +557,61 @@ class acquisition(object):
                     time.sleep(0.1)
                     continue
                 
-                noise_level         = np.mean(img[img<self.dtype_number//2])
-                noise_level_std     = np.std( img[img<self.dtype_number//2])
-                img2                = img - np.full(img.shape, noise_level + noise_level_std)
-                focus_score_list[i] = np.std(img2[img2>0])
+                # # STDEV
+                # noise_level         = np.mean(img[img<self.dtype_number//2])
+                # noise_level_std     = np.std( img[img<self.dtype_number//2])
+                # img2                = img - np.full(img.shape, noise_level + noise_level_std)
+                # focus_score_list[i] = np.std(img2[img2>0])
+                
+                image_height, image_width  = img.shape
+                img_crop = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
+                img_crop_alpha = np.uint16(np.multiply(img_crop, alpha))
+                
+                img_fft = fft(img_crop_alpha)
+                
+                vec_image = np.reshape(img_fft, (-1,1))
+                labels = faiss.Kmeans(d=vec_image.shape[1], k=2)
+                labels.train(vec_image)
+                _, labels = labels.index.search(vec_image, 1)
+                means = [np.mean(vec_image[labels == label]) for label in np.unique(labels)]
+                index_array = [np.argsort(means)[0]]
+
+                if index_array[0] == 0:
+                    mask = np.where((labels==0)|(labels==1), labels^1, labels)
+                else:
+                    mask = labels
+
+                img_fft = np.uint8(np.reshape(mask, img_fft.shape))
+                
+                elps = find_ellipse(img_fft, save=True)
+                
+                img_fft = (img_fft * 255).astype(np.uint8)
+                img_fft = cv.cvtColor(img_fft, cv.COLOR_GRAY2RGB)
+
+                img_fft = cv.ellipse(img_fft, (round(elps[0][0]), round(elps[0][1])), (round(elps[1][0]), round(elps[1][1])), round(elps[2]), 0, 360, (255, 0, 0), 2)
+                
+                im = Image.fromarray(img_fft)
+                
+                # img_elps = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(img_fft)))
+                img_elps = ImageTk.PhotoImage(im)
+                
+                appPI.lbl_img.configure(image = img_elps)
+                appPI.lbl_img.photo = img_elps
+                appPI.lbl_img.update()
                 
                 ##########
-                if len(list_of_imgs) == 1:
-                    focus_score_0 = deepcopy(focus_score_list[0])
+                # if len(list_of_imgs) == 1:
+                #     focus_score_0 = deepcopy(focus_score_list[0])
 
-            focus_score_mean = mean(focus_score_list)
+            # focus_score_mean = mean(focus_score_list)
             
-            if focus_score_mean < focus_score_0*focus_tollerance:
+            # if focus_score_mean < focus_score_0*focus_tollerance:
                 
-                direction_guess = 1
-                dFS = 0# ? ###########################
-                self.microscope.beams.electron_beam.working_distance.value += direction_guess*dFS
+            #     direction_guess = 1
+            #     dFS = 0# ? ###########################
+            #     self.microscope.beams.electron_beam.working_distance.value += direction_guess*dFS
                 
-            direction_focus = +-1
+            # direction_focus = +-1
 
     def record(self) -> int:
         ''' 
@@ -599,8 +655,7 @@ class acquisition(object):
                     
                 img = imread(self.path + img_path)
                 
-                image_width  = img.shape[1]
-                image_height = img.shape[0]
+                image_height, image_width  = img.shape
                 img = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
 
                 img_0 = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(fft(img))))
