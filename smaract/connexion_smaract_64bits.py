@@ -57,7 +57,8 @@ class smaract_class(object):
                 version_status, version = self.smaract.SA_GetDLLVersion()
 
                 # Init state
-                self.InitState_status, InitState = self.smaract.SA_GetInitState(ctypes.byref(InitState))
+                # InitState = ctypes.c_uint32()
+                self.InitState_status, InitState = self.smaract.SA_GetInitState()
 
                 logging.info(' Initialization... OK')
                 logging.info(' System ID:       ' + str(AvailableSys_list[0]))

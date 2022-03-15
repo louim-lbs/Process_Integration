@@ -24,30 +24,30 @@ class smaract_lib_server32(Server32):
     def SA_GetDLLVersion(self):
         version = ctypes.c_uint32()
         version_status = self.lib.SA_GetDLLVersion(ctypes.byref(version))
-        return int(version_status), int(version)
+        return int(version_status), int(version.value)
 
     def SA_GetInitState(self):
         InitState = ctypes.c_uint32()
         InitState_status = self.lib.SA_GetInitState(ctypes.byref(InitState))
-        return int(InitState_status), int(InitState)
+        return int(InitState_status), int(InitState.value)
         
     def SA_GetStatus_S(self, channel):
         channel = ctypes.c_uint32(channel)
         status = ctypes.c_uint32()
         status_status = self.lib.SA_GetStatus_S(ctypes.c_uint32(0), channel, ctypes.byref(status))
-        return int(status_status), int(status)
+        return int(status_status), int(status.value)
         
     def SA_GetPosition_S(self, channel):
         channel      = ctypes.c_uint32(channel)
         pos          = ctypes.c_int32()
         pos_status   = self.lib.SA_GetPosition_S(ctypes.c_uint32(0), channel, ctypes.byref(pos))
-        return int(pos_status), int(pos)
+        return int(pos_status), int(pos.value)
         
     def SA_GetAngle_S(self):
         angle = ctypes.c_uint32()
         revol = ctypes.c_int32()
         ang_status   = self.lib.SA_GetPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ctypes.byref(angle), ctypes.byref(revol))
-        return int(ang_status), int(angle), int(revol)
+        return int(ang_status), int(angle.value), int(revol.value)
 
     def SA_GotoPositionAbsolute_S(self, channel, pos):
         channel = ctypes.c_uint32(channel)
