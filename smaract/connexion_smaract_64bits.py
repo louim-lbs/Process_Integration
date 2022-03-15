@@ -57,7 +57,6 @@ class smaract_class(object):
                 version_status, version = self.smaract.SA_GetDLLVersion()
 
                 # Init state
-                # InitState = ctypes.c_uint32()
                 self.InitState_status, InitState = self.smaract.SA_GetInitState()
 
                 logging.info(' Initialization... OK')

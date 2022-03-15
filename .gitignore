@@ -4,5 +4,6 @@ __pycache__/
 *.pyc
 *.tif
 !Cell_norm.tif
+!PI_cov-1.tif
 *.cpython
 gui/__pycache__/GUI.cpython-37.pyc
