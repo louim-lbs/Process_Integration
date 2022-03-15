@@ -4,7 +4,10 @@ import ctypes
 class smaract_lib_server32(Server32):
     def __init__(self, host, port) -> None:
         super(smaract_lib_server32, self).__init__('smaract\\lib\\MCSControl.dll', 'cdll', host, port)
-        
+    
+    def SA_ReleaseSystems(self):
+        return self.lib.SA_ReleaseSystems()
+
     def SA_ClearInitSystemsList(self):
         return self.lib.SA_ClearInitSystemsList()
 
@@ -46,7 +49,7 @@ class smaract_lib_server32(Server32):
     def SA_GetAngle_S(self):
         angle = ctypes.c_uint32()
         revol = ctypes.c_int32()
-        ang_status   = self.lib.SA_GetPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ctypes.byref(angle), ctypes.byref(revol))
+        ang_status   = self.lib.SA_GetAngle_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ctypes.byref(angle), ctypes.byref(revol))
         return int(ang_status), int(angle.value), int(revol.value)
 
     def SA_GotoPositionAbsolute_S(self, channel, pos):
@@ -62,12 +65,12 @@ class smaract_lib_server32(Server32):
     def SA_GotoPositionRelative_S(self, channel, pos):
         channel = ctypes.c_uint32(channel)
         pos = ctypes.c_uint32(pos)
-        return self.lib.SA_GotoPositionAbsolute_S(ctypes.c_uint32(0),channel,pos,ctypes.c_uint32(60000))
+        return self.lib.SA_GotoPositionRelative_S(ctypes.c_uint32(0),channel,pos,ctypes.c_uint32(60000))
 
     def SA_GotoAngleRelative_S(self, ang, revol):
         ang = ctypes.c_uint32(ang)
         revol = ctypes.c_uint32(revol)
-        return self.lib.SA_GotoAngleAbsolute_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ang, revol, ctypes.c_uint32(60000))
+        return self.lib.SA_GotoAngleRelative_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ang, revol, ctypes.c_uint32(60000))
 
 class smaract_lib_client64(Client64):
     def __init__(self) -> None:

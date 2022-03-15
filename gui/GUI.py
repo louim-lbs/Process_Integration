@@ -161,7 +161,7 @@ class App(object):
         positioner_pos = self.positioner.getpos()
         self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[0]) + " nm", justify='left')
         self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[1]) + " nm", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner.angle_convert_Smaract2SI(positioner_pos[2])) + " u°", justify='left')
+        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[2]) + " u°", justify='left')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
@@ -242,10 +242,11 @@ class App(object):
         '''
         self.lbl_eucent.config(bg='orange')
         self.lbl_eucent.update()
-        try:
-            set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
-        except:
-            pass
+        # try:
+        set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
+        # except:
+        #     set_eucentric_status = 1
+        #     pass
         
         if set_eucentric_status == 0:
             self.lbl_eucent.config(bg='green')
@@ -292,7 +293,7 @@ class App(object):
         if status != 0:
             return 1
         positioner_pos = self.positioner.getpos()
-        self.lbl_t_pos.config(text=str(self.positioner.angle_convert_Smaract2SI(positioner_pos[2])) + ' u°')
+        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_pos[2]/1e6)) + ' °')
         self.lbl_t_pos.update()
         return 0
     
@@ -320,7 +321,7 @@ class App(object):
         if status != 0:
             return 1
         positioner_pos = self.positioner.getpos()
-        self.lbl_t_pos.config(text=str(self.positioner.angle_convert_Smaract2SI(positioner_pos[2])) + ' u°')
+        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_pos[2]/1e6)) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -330,7 +331,7 @@ class App(object):
             return 1
         self.positioner.setpos_abs([zed, ygrec, 0])
         positioner_pos = self.positioner.getpos()
-        self.lbl_t_pos.config(text=str(self.positioner.angle_convert_Smaract2SI(positioner_pos[2])) + ' u°')
+        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_pos[2]/1e6)) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -390,15 +391,15 @@ class App(object):
         try:
             global acqui
             acqui = scripts.acquisition(self.microscope,
-                                            self.positioner,
-                                            work_folder      = 'data/record/',
-                                            images_name      = self.ent_name.get(),
-                                            resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
-                                            bit_depth        = 16,
-                                            dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
-                                            tilt_increment   = int(self.ent_tilt_step.get())*1e6,
-                                            tilt_end         = int(self.ent_end_tilt.get())*1e6)
-            # time.sleep(0.1)
+                                        self.positioner,
+                                        work_folder      = 'data/record/',
+                                        images_name      = self.ent_name.get(),
+                                        resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                                        bit_depth        = 16,
+                                        dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                        tilt_increment   = int(self.ent_tilt_step.get())*1e6,
+                                        tilt_end         = int(self.ent_end_tilt.get())*1e6)
+            time.sleep(0.1)
             threading.Thread(target=acqui.record).start()
             if self.check1.get() == True:
                 threading.Thread(target=acqui.f_drift_correction).start()

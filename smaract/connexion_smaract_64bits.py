@@ -277,7 +277,8 @@ class smaract_class(object):
         try:
             z_pos_status, z_pos              = self.smaract.SA_GetPosition_S(0)
             y_pos_status, y_pos              = self.smaract.SA_GetPosition_S(1)
-            t_angle_status, t_angle, t_revol = self.smaract.SA_GetAngle_S(2)
+            t_angle_status, t_angle, t_revol = self.smaract.SA_GetAngle_S()
+            t_angle = self.angle_convert_Smaract2SI(t_angle)
         except:
             logging.info('Error when acquiring postitions')
             return [None, None, None]
@@ -285,10 +286,8 @@ class smaract_class(object):
         if self.check_status([z_pos_status, y_pos_status, t_angle_status]) == 1:
             return [None, None, None]
 
-        logging.info('Current position: ' + str([z_pos, y_pos, t_angle]))
+        # logging.info('Current position: ' + str([z_pos, y_pos, t_angle]))
 
-        if t_revol == -1:
-            t_angle *= -1
         return [z_pos, y_pos, t_angle]
     
     def setpos_abs(self, pos:vector) -> int:
@@ -351,10 +350,10 @@ class smaract_class(object):
                 return 1
         except:
             return 1
-        
-        step = [int(step[0]), int(step[1]), int(step[2])]
-        revolution = 0
 
+        step[2], revolution = self.angle_convert_SI2Smaract(step[2])
+
+        step = [int(step[0]), int(step[1]), int(step[2])]
         try:
             z_setpos_status = self.smaract.SA_GotoPositionRelative_S(0, step[0])
             y_setpos_status = self.smaract.SA_GotoPositionRelative_S(1, step[1])
