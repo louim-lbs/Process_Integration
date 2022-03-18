@@ -1,4 +1,9 @@
-# Process Integration
+# Microsoft-Stage Integration Software M-SIS
+
+M-SIS is an integration software to facilitate the acquisition of images, initially thought for tomograms.
+
+The soft works with a two-buttons philosophy: one to set up, and one to acquire a set of images.
+
 
 ## Features enhancement
 
