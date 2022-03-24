@@ -317,7 +317,7 @@ class smaract_class(object):
             y_setpos_status = self.smaract.SA_GotoPositionAbsolute_S(1, pos[1])
             t_setpos_status = self.smaract.SA_GotoAngleAbsolute_S(      pos[2], revolution)
         except:
-            logging.info('Error when setting absolute position.')
+            print('Error when setting absolute position.')
             return 1
         
         if self.check_status([z_setpos_status, y_setpos_status, t_setpos_status]) == 1:
@@ -328,7 +328,7 @@ class smaract_class(object):
         if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
             return 1
 
-        logging.info('Position set to:  ' + str([pos[0], pos[1], pos[2]]))
+        print('Position set to:  ' + str([pos[0], pos[1], pos[2]]))
 
         return 0
     
@@ -350,7 +350,7 @@ class smaract_class(object):
                 return 1
         except:
             return 1
-
+    
         step[2], revolution = self.angle_convert_SI2Smaract(step[2])
 
         step = [int(step[0]), int(step[1]), int(step[2])]
@@ -359,19 +359,16 @@ class smaract_class(object):
             y_setpos_status = self.smaract.SA_GotoPositionRelative_S(1, step[1])
             t_setpos_status = self.smaract.SA_GotoAngleRelative_S(      step[2], revolution)
         except:
-            logging.info('Error when setting relative position.')
+            print('Error when setting relative position.')
             return 1
-        
         if self.check_status([z_setpos_status, y_setpos_status, t_setpos_status]) == 1:
             return 1
 
         z_status_status, y_status_status, t_status_status = self.hold_during_move()
-
         if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
             return 1
 
-        logging.info('Position increased of: ' + str([step[0], step[1], step[2]]))
-        
+        print('Position increased of: ' + str([step[0], step[1], step[2]]))
         return 0
     
 if __name__ == "__main__":

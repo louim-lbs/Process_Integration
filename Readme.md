@@ -39,9 +39,7 @@ Any additional information goes here
 
 ## Roadmap
 
-- Additional browser support
-
-- Add more integrations
+- Asynchronous comunication for microscope functions
 
 
 ## License

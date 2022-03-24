@@ -1,47 +1,12 @@
 INFO: Initialization...
-INFO: Available Systems IDs: [0]
-INFO: No systems detected: 3 SA_NO_SYSTEMS_FOUND_ERROR
-INFO: Check if MCS-3D is turned on. Check USB connexion.
+INFO: Available Systems IDs: [3919851221]
+INFO: Initialization... OK
+INFO: System ID:       3919851221
+INFO: Dll version:     17301603
+INFO: Init state:      1 SA_INIT_STATE_SYNC
+INFO: ---------------------------------------
 INFO:Loading faiss with AVX2 support.
 INFO:Could not load library with AVX2 support due to:
 ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
 INFO:Loading faiss.
 INFO:Successfully loaded faiss.
-<<<<<<< HEAD
-INFO:Error when acquiring postitions
-=======
-INFO:Moving...
-INFO:Position set to:  [-2, 0, 0]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 2000000]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 2000000]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 2000000]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 2000000]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 2000000]
-INFO:displacement[[0, 0], [33110.99774643372, 196.23974957476884], [66025.75574329267, 177.35036191516542], [97967.71027568204, -125.92925106402276], [130614.86861402994, -463.9498723411365], [163404.7467702504, -463.9498723411365]]
-INFO:angle[4, 1999982, 3999995, 6000002, 8000001, 10000008]
-INFO:direction1
-INFO:z0 =944676.2039956059+-692.5966395875748y0 = -73999.8412253255+-10207.927758721447
-INFO:Moving...
-INFO:Position increased of: [944676, 73999, 0]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 2000000]
-INFO:Moving...
-INFO:Position set to:  [944671, 74000, 10000000]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 357000000]
-INFO:Moving...
-INFO:Position increased of: [0, 0, 357000000]
-INFO:Moving...
-INFO:Position set to:  [944671, 74000, 0]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 0]
-INFO:Moving...
-INFO:Position set to:  [0, 0, 359999998]
-INFO:Moving...
-INFO:Position set to:  [-1, -1, 0]
->>>>>>> 572573e529ea343d41679d8f5844639f85a5555b

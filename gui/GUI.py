@@ -363,9 +363,7 @@ class App(object):
                                           bit_depth        = 16,
                                           dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
                                           tilt_increment   = int(self.ent_tilt_step.get())*1e6,
-                                          tilt_end         = int(self.ent_end_tilt.get())*1e6,
-                                          drift_correction = self.check1.get(),
-                                          focus_correction = self.check2.get())
+                                          tilt_end         = int(self.ent_end_tilt.get())*1e6,)
 
             threading.Thread(target=acqui.tomo).start()
             if self.check1.get() == True:

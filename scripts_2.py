@@ -129,9 +129,9 @@ def find_ellipse(img, save=False):
             # plt.show()
     return ((0, 0), (0, 0), 0)
 
-def function_displacement(x, z, y):#, R, x2, x3):
+def function_displacement(x, z, y, R):#, x2, x3):
     x = [i*np.pi/180 for i in x]
-    return y*(1-np.cos(x)) + z*np.sin(x)# + R*(1-np.sin(np.multiply(x, x2))) + x3
+    return y*(1-np.cos(x)) + z*np.sin(x) + R*(1-np.sin(x))#np.multiply(x, x2))) + x3
 
 def correct_eucentric(microscope, positioner, displacement, angle):
     ''' Calculate z and y parameters for postioner eucentric correction, correct it, correct microscope view and focus.
@@ -172,30 +172,24 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     finterpa               = interpolate.PchipInterpolator([i/pas for i in angle_sort], displacement_filt)
     displacement_y_interpa = finterpa(alpha)
 
-    res, cov         = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0], bounds=(-1e7, 1e7))
+    res, cov         = curve_fit(f=function_displacement, xdata=alpha, ydata=displacement_y_interpa, p0=[0,0,0], bounds=(-1e7, 1e7))
     # z0_calc, y0_calc, R_calc, x2_calc, x3_calc = res
-    z0_calc, y0_calc = res
-
+    z0_calc, y0_calc, R_calc = res
     stdevs           = np.sqrt(np.diag(cov))
 
-    logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(direction*y0_calc) + '+-' + str(stdevs[1]))# + 'R = ' + str(R_calc) + '+-' + str(stdevs[2]) + 'x2 = ' + str(x2_calc) + '+-' + str(stdevs[3]) + 'x3 = ' + str(x3_calc) + '+-' + str(stdevs[4]))
-    print('z0 =', z0_calc, '+-', stdevs[0], 'y0 = ', direction*y0_calc, '+-', stdevs[1])
+    logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(-direction*y0_calc) + '+-' + str(stdevs[1]))# + 'R = ' + str(R_calc) + '+-' + str(stdevs[2]) + 'x2 = ' + str(x2_calc) + '+-' + str(stdevs[3]) + 'x3 = ' + str(x3_calc) + '+-' + str(stdevs[4]))
+    print('z0 =', z0_calc, 'y0 = ', -direction*y0_calc)
     
     plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
     plt.plot(alpha, displacement_y_interpa, 'blue')
     plt.plot(alpha, function_displacement(alpha, *res), 'red')
     plt.savefig('data/tmp/' + str(time.time()) + 'correct_eucentric.png')
     plt.show()
-    
-    # Adjust positioner position
-    positioner.setpos_rel([z0_calc, -direction*y0_calc, 0])
 
-    # Adjust microscope stage position
-    microscope.specimen.stage.relative_move(StagePosition(y=1e-9*direction*y0_calc))
+    positioner.setpos_rel([-z0_calc, -y0_calc, 0])
+
+    microscope.specimen.stage.relative_move(StagePosition(y=1e-9*y0_calc))
     microscope.beams.electron_beam.working_distance.value += z0_calc*1e-9
-    # plt.plot([0, 1, 2], [0, 2, 3])
-    # plt.show()
-    # Check limits
 
 def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0, resize_factor = 1):
     ''' Match two images
@@ -301,8 +295,8 @@ def set_eucentric(microscope, positioner) -> int:
         print('lol')
         return 1
     hfw             = microscope.beams.electron_beam.horizontal_field_width.value # meters
-    angle_step0     =  2000000
-    angle_step      =  2000000  # udegrees
+    angle_step0     =  1000000
+    angle_step      =  1000000  # udegrees
     angle_max       = 10000000  # udegrees
     precision       = 5         # pixels
     eucentric_error = 0
@@ -385,7 +379,7 @@ def set_eucentric(microscope, positioner) -> int:
                 angle_max  *= 1.5
             else:
                 angle_max   = 50000000
-                angle_step  =  4000000
+                angle_step  =  2000000
             
             img_tmp = microscope.imaging.grab_multiple_frames(settings)[2]
             image_euc[0] = img_tmp.data
@@ -441,35 +435,37 @@ class acquisition(object):
     def tomo(self):    
         if self.positioner.getpos()[2] > 0:
             self.direction = -1
-            if tilt_end > 0:
-                tilt_end *= -1
+            if self.tilt_end > 0:
+                self.tilt_end *= -1
         else:
-            direction = 1
-            if tilt_end < 0:
-                tilt_end *= -1
+            self.direction = 1
+            if self.tilt_end < 0:
+                self.tilt_end *= -1
 
-        nb_images = int((abs(self.pos[2])+abs(tilt_end))/self.tilt_increment + 1)
+        nb_images = int((abs(self.pos[2])+abs(self.tilt_end))/self.tilt_increment + 1)
+        print('nb_images', nb_images)
 
         settings = GrabFrameSettings(resolution=self.resolution, dwell_time=self.dwell_time, bit_depth=self.bit_depth)
         self.microscope.beams.electron_beam.angular_correction.tilt_correction.turn_on()
         self.microscope.beams.electron_beam.angular_correction.mode = 'Manual'
-
+        
         for i in range(nb_images):
             if self.flag == 1:
+                print('stopped')
                 return
-
+            
             tangle = self.positioner.getpos()[2]
             self.microscope.beams.electron_beam.angular_correction.angle.value = 1e-6*tangle*np.pi/180 # Tilt correction for e- beam
 
             print(i, tangle)
             # logging.info(str(i) + str(self.positioner.getpos()[2]))
-            
             images = self.microscope.imaging.grab_multiple_frames(settings)
-            images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-            images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            # images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            # images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
             images[2].save(self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-            self.positioner.setpos_rel([0, 0, direction*self.tilt_increment])
-        
+            print('lol1', self.direction, self.tilt_increment)
+            self.positioner.setpos_rel([0, 0, self.direction*self.tilt_increment])
+            print('there', self.flag)
         self.flag = 1
         print('Tomography is a Success')
         return 0
@@ -483,18 +479,18 @@ class acquisition(object):
         correction_y     = 0
         img_path_0       = ''
         img_prev_path_0  = ''
-        # path_absolute = os.getcwd()
-        # path_absolute = path_absolute.replace(os.sep, '/') + self.path
+
         while True:
             if self.flag == 1:
                 return
             # Load two most recent images
             try:
-                list_of_imgs  = os.listdir(self.path)# + '*.tif')
+                list_of_imgs  = [file for file in os.listdir(self.path) if 'HAADF' in file]
+                print(list_of_imgs)
                 img_path      = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
                 list_of_imgs.remove(img_path)
                 img_prev_path = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
-                print(img_path, img_prev_path)
+
                 if img_path == img_path_0 or img_prev_path == img_prev_path_0:
                     continue
                 else:
@@ -506,17 +502,17 @@ class acquisition(object):
             except:
                 time.sleep(0.1)
                 continue
-            print('Correction to be done')
             
             hfw = self.microscope.beams.electron_beam.horizontal_field_width.value
             
             dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
-            dx_si                    = - dx_pix * hfw / self.image_width
+            dx_si                    =   dx_pix * hfw / self.image_width
             dy_si                    =   dy_pix * hfw / self.image_width
             correction_x             = - dx_si + correction_x
             correction_y             = - dy_si + correction_y
             anticipation_x          +=   correction_x
             anticipation_y          +=   correction_y
+            print(dy_pix)
             beamshift_x, beamshift_y =   self.microscope.beams.electron_beam.beam_shift.value
             self.microscope.beams.electron_beam.beam_shift.value = Point(x=beamshift_x + correction_x + anticipation_x,
                                                                          y=beamshift_y + correction_y + anticipation_y)
@@ -532,8 +528,8 @@ class acquisition(object):
         focus_score_list = []*averaging
         dtype_number = 2**self.bit_depth
         
-        img = imread('images/cell_15.tif')
-        image_height, image_width  = img.shape
+        image_width  = self.image_width
+        image_height = self.image_height
         # Create radial alpha/transparency layer. 255 in centre, 0 at edge
         Y = np.linspace(-1, 1, image_height)[None, :]*dtype_number
         X = np.linspace(-1, 1, image_height)[:, None]*dtype_number
@@ -542,18 +538,17 @@ class acquisition(object):
         alpha = (dtype_number - np.clip(0, dtype_number, alpha))/dtype_number
         
         while True:
-            
             for i in range(averaging):
                 if self.flag == 1:
                     return
                 try:
-                    list_of_imgs = glob.glob(self.path + '*.tif')
-                    img_path     = max(list_of_imgs, key=os.path.getctime)
+                    list_of_imgs = os.listdir(self.path)
+                    img_path     = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
                     if img_path == img_path_0:
                         continue
                     else:
                         img_path_0 = deepcopy(img_path)
-                    img = imread(self.path + img_path)
+                    img = imread(self.path + '/' + img_path)
                 except:
                     time.sleep(0.1)
                     continue
@@ -564,7 +559,6 @@ class acquisition(object):
                 # img2                = img - np.full(img.shape, noise_level + noise_level_std)
                 # focus_score_list[i] = np.std(img2[img2>0])
                 
-                image_height, image_width  = img.shape
                 img_crop = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
                 img_crop_alpha = np.uint16(np.multiply(img_crop, alpha))
                 
@@ -590,11 +584,9 @@ class acquisition(object):
                 img_fft = cv.cvtColor(img_fft, cv.COLOR_GRAY2RGB)
 
                 img_fft = cv.ellipse(img_fft, (round(elps[0][0]), round(elps[0][1])), (round(elps[1][0]), round(elps[1][1])), round(elps[2]), 0, 360, (255, 0, 0), 2)
-                
-                im = Image.fromarray(img_fft)
-                
+                                
                 # img_elps = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(img_fft)))
-                img_elps = ImageTk.PhotoImage(im)
+                img_elps = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(np.uint8(fft(img)))))
                 
                 appPI.lbl_img.configure(image = img_elps)
                 appPI.lbl_img.photo = img_elps
@@ -634,7 +626,7 @@ class acquisition(object):
             
             images = self.microscope.imaging.grab_multiple_frames(settings)
             # images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
-            # images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
+            images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
             images[2].save(self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle/100000)) + '.tif')
             
             i += 1
@@ -648,19 +640,20 @@ class acquisition(object):
             if self.flag == 1:
                 return
             try:
-                list_of_imgs = glob.glob(self.path + '*.tif')
-                img_path     = max(list_of_imgs, key=os.path.getctime)
+                list_of_imgs = os.listdir(self.path)
+                img_path     = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
                 if img_path == img_path_0:
                     continue
                 else:
                     img_path_0 = deepcopy(img_path)
                     
-                img = imread(self.path + img_path)
+                img = imread(self.path + '/' + img_path)
                 
                 image_height, image_width  = img.shape
                 img = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
 
-                img_0 = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(fft(img))))
+                img_0 = ImageTk.PhotoImage(Image.fromarray(automatic_brightness_and_contrast(np.uint8(fft(img)))))
+                # img_0 = ImageTk.PhotoImage(Image.fromarray(np.uint8(fft(img))))
 
                 appPI.lbl_img.configure(image = img_0)
                 appPI.lbl_img.photo = img_0
