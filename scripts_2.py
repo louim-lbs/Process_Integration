@@ -1,8 +1,4 @@
-import glob
-import io
-from pickle import TRUE
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
-from cv2 import mean, pencilSketch
 import numpy as np
 import cv2 as cv
 from scipy import interpolate

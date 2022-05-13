@@ -1,9 +1,9 @@
 ''' Process Integration fot tomogram acquisition using Quattro ESEM and Smaract MCS-3D
 
-Use Python 32-bits
+Use Python 64-bits
 
 @author: Louis-Marie Lebas
-Updated on Dec 08 2021  
+Updated on May 13 2022  
 '''
 
 import os

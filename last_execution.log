@@ -1,7 +1,7 @@
 INFO: Initialization...
-INFO: Available Systems IDs: [3919851221]
+INFO: Available Systems IDs: [3668626781]
 INFO: Initialization... OK
-INFO: System ID:       3919851221
+INFO: System ID:       3668626781
 INFO: Dll version:     17301603
 INFO: Init state:      1 SA_INIT_STATE_SYNC
 INFO: ---------------------------------------
@@ -10,3 +10,4 @@ INFO:Could not load library with AVX2 support due to:
 ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
 INFO:Loading faiss.
 INFO:Successfully loaded faiss.
+INFO:Error. 143 SA_WRONG_SENSOR_TYPE_ERROR
