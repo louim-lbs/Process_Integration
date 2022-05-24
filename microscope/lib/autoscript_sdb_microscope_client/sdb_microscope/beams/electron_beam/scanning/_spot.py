@@ -9,10 +9,10 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import Limits 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class Spot(object):    
+class Spot(object):
     """
     The object provides control and status of the electron beam spot size.
     """
@@ -24,9 +24,9 @@ class Spot(object):
 
 
     @property
-    def limits(self) -> 'Limits':        
+    def limits(self) -> 'Limits':
         """
-        The property retrieves range values for the spot size. Spot size doesn't have a physical unit.
+        The property retrieves the range of values for spot size. The spot size has no physical unit.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Limits_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -36,9 +36,9 @@ class Spot(object):
         return call_response.result.value
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
-        The property retrieves or sets the current spot size. Spot size doesn't have a physical unit.
+        The property retrieves or sets the current spot size. The spot size has no physical unit.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Value_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -48,9 +48,9 @@ class Spot(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'float'):
         """
-        The property retrieves or sets the current spot size. Spot size doesn't have a physical unit.
+        The property retrieves or sets the current spot size. The spot size has no physical unit.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Value_SET", signature=[DataType.DOUBLE], parameters=[value])
         if isinstance(value, (int, float)):

@@ -9,13 +9,13 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import VacuumSettings 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .vacuum._chamber_pressure import ChamberPressure
 
 
-class Vacuum(object):    
+class Vacuum(object):
     """
-    The object provides control and status of the microscope's vacuum.
+    The object provides control and status of the specimen chamber vacuum.
     """
     __slots__ = ["__id", "__application_client", "__chamber_pressure"]
 
@@ -26,24 +26,24 @@ class Vacuum(object):
         self.__chamber_pressure = ChamberPressure(self.__application_client)
 
     @property
-    def chamber_pressure(self) -> 'ChamberPressure':        
+    def chamber_pressure(self) -> 'ChamberPressure':
         """
         The object provides status of the chamber pressure.
         """
         return self.__chamber_pressure
 
-    def pump(self, settings = UndefinedParameter):        
+    def pump(self, settings: 'VacuumSettings' = None):
         """
-        Pump the chamber.
+        The function pumps the specimen chamber into vacuum or changes vacuum conditions according to the specified settings.
         
-        :param VacuumSettings settings: Pump related settings.
+        :param settings: A structure specifying vacuum mode, pressure and gas type.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Pump", signature=[], parameters=[])
         if isinstance(settings, VacuumSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="VacuumSettings")]
             call_request.parameters.values = [settings]
             call_response = self.__application_client._perform_call(call_request)
-        elif settings is UndefinedParameter:
+        elif settings is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -51,17 +51,17 @@ class Vacuum(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def vent(self):        
+    def vent(self):
         """
-        Vent the chamber.
+        The function vents the specimen chamber.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Vent", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def chamber_state(self) -> 'str':        
+    def chamber_state(self) -> 'str':
         """
-        The object provides status of the chamber state.
+        The object provides status of the specimen chamber.
         """
         call_request = CallRequest(object_id=self.__id, method_name="ChamberState_GET")
         call_response = self.__application_client._perform_call(call_request)

@@ -8,12 +8,12 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class NeutralMillPosition(object):    
+class NeutralMillPosition(object):
     """
-    The object provides control and status of the microscope's compustage neutral mill position.
+    The object provides control and status of the compustage neutral mill position.
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -22,15 +22,15 @@ class NeutralMillPosition(object):
         self.__id = "SdbMicroscope.Specimen.Compustage.NeutralMillPosition"
 
 
-    def set(self):        
+    def set(self):
         """
-        The method sets neutral mill position to alpha axis coordinate.
+        The function sets neutral mill position to alpha axis coordinate.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Set", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         The property sets or returns neutral mill position value.
         """
@@ -42,7 +42,7 @@ class NeutralMillPosition(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'float'):
         """
         The property sets or returns neutral mill position value.
         """

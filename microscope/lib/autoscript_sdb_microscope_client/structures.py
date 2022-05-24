@@ -7,22 +7,25 @@ from autoscript_core.common import InvalidOperationException
 import numpy
 from hashlib import sha1
 import cv2
+from math import isclose
 from PIL import Image
 from PIL.TiffImagePlugin import ImageFileDirectory_v2
 from xml.etree import ElementTree
+from typing import Union
 
 
 class StagePosition(shell.StagePosition):
     __slots__ = []
 
     def __repr__(self):
-        repr_attrs = (ReprAttr("x", "%.8g"), ReprAttr("y", "%.8g"), ReprAttr("z", "%.8g"), ReprAttr("t", "%.8g"), ReprAttr("r", "%.8g"))
+        repr_attrs = (ReprAttr("x", "%.8g"), ReprAttr("y", "%.8g"), ReprAttr("z", "%.8g"), ReprAttr("t", "%.8g"),
+                      ReprAttr("r", "%.8g"), ReprAttr("coordinate_system", "%s"))
         return self._generate_repr(repr_attrs)
 
     def __len__(self):
         return 5
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: Union[int, str]) -> float:
         """
         Provides coordinate with the given index.
 
@@ -32,7 +35,7 @@ class StagePosition(shell.StagePosition):
         if not isinstance(index, (int, str)):
             raise TypeError("Stage position coordinate index has to be an integer or string.")
         if isinstance(index, str) and index not in ('x', 'y', 'z', 'r', 't'):
-            raise TypeError("Stage axis must be in ('x', 'y', 'z', 'r', 't').")
+            raise IndexError("Stage axis must be in ('x', 'y', 'z', 'r', 't').")
 
         if index in (0, 'x'):
             return self.x
@@ -45,9 +48,9 @@ class StagePosition(shell.StagePosition):
         elif index in (4, 't'):
             return self.t
         else:
-            raise IndexError("Stage position coordinate index is out of allowed range of (0, 4).")
+            raise IndexError("Stage position coordinate index is out of allowed range (0, 4).")
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: Union[int, str], value: float):
         """
         Assigns the given value to the coordinate with the given index.
 
@@ -70,18 +73,20 @@ class StagePosition(shell.StagePosition):
         elif index in (4, 't'):
             self.t = value
         else:
-            raise IndexError("Stage position coordinate index is out of allowed range of (0, 4).")
+            raise IndexError("Stage position coordinate index is out of allowed range (0, 4).")
 
     def __add__(self, other):
         """
         Adds the given position-like object or scalar value to this position and provides the result.
 
-        :param other: Position-like object (with coordinates accessible by 0, 1, 2, 3, 4 indices) or a scalar value.
+        :param other: Position-like object (with coordinates accessible by indices 0-6) or a scalar value.
         :return: New position created as a result of the addition.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             if hasattr(other, "__getitem__"):
                 for i in range(len(self)):
                     if self[i] is not None and other[i] is not None:
@@ -90,15 +95,16 @@ class StagePosition(shell.StagePosition):
                 for i in range(len(self)):
                     if self[i] is not None:
                         result[i] = self[i] + other
-            return result
         except Exception:
             raise ValueError(f"Cannot add the given {type(other).__name__} to a StagePosition.") from None
+
+        return result
 
     def __radd__(self, other):
         """
         Adds the given position-like object or scalar value to this position and provides the result.
 
-        :param other: Position-like object (with coordinates accessible by 0, 1, 2, 3, 4 indices) or a scalar value.
+        :param other: Position-like object (with coordinates accessible by indices 0-6) or a scalar value.
         :return: New position created as a result of the addition.
         """
 
@@ -108,12 +114,14 @@ class StagePosition(shell.StagePosition):
         """
         Subtracts the given position-like object or scalar value from this position and provides the result.
 
-        :param other: Position-like object (with coordinates accessible by 0, 1, 2, 3, 4 indices) or a scalar value.
+        :param other: Position-like object (with coordinates accessible by indices 0-6) or a scalar value.
         :return: New position created as a result of the subtraction.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             if hasattr(other, "__getitem__"):
                 for i in range(len(self)):
                     if self[i] is not None and other[i] is not None:
@@ -122,20 +130,23 @@ class StagePosition(shell.StagePosition):
                 for i in range(len(self)):
                     if self[i] is not None:
                         result[i] = self[i] - other
-            return result
         except Exception:
             raise ValueError(f"Cannot subtract the given {type(other).__name__} from a StagePosition.") from None
+
+        return result
 
     def __rsub__(self, other):
         """
         Subtracts this position or scalar value from the given position-like object and provides the result.
 
-        :param other: Position-like object (with coordinates accessible by 0, 1, 2, 3, 4 indices) or a scalar value.
+        :param other: Position-like object (with coordinates accessible by indices 0-6) or a scalar value.
         :return: New position created as a result of the subtraction.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             if hasattr(other, "__getitem__"):
                 for i in range(len(self)):
                     if self[i] is not None and other[i] is not None:
@@ -144,9 +155,10 @@ class StagePosition(shell.StagePosition):
                 for i in range(len(self)):
                     if self[i] is not None:
                         result[i] = other - self[i]
-            return result
         except Exception:
             raise ValueError(f"Cannot subtract a StagePosition from the given {type(other).__name__}.") from None
+
+        return result
 
     def __mul__(self, other):
         """
@@ -156,14 +168,17 @@ class StagePosition(shell.StagePosition):
         :return: New position created as a result of the multiplication.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             for i in range(len(self)):
                 if self[i] is not None:
                     result[i] = self[i] * other
-            return result
         except Exception:
             raise ValueError(f"Cannot multiply the given {type(other).__name__} by a StagePosition.") from None
+
+        return result
 
     def __rmul__(self, other):
         """
@@ -183,14 +198,17 @@ class StagePosition(shell.StagePosition):
         :return: New position created as a result of the division.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             for i in range(len(self)):
                 if self[i] is not None:
                     result[i] = self[i] / other
-            return result
         except Exception:
             raise ValueError(f"Cannot divide the given {type(other).__name__} by a StagePosition.") from None
+
+        return result
 
     def __rtruediv__(self, other):
         """
@@ -200,14 +218,17 @@ class StagePosition(shell.StagePosition):
         :return: New position created as a result of the division.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             for i in range(len(self)):
                 if self[i] is not None:
                     result[i] = other / self[i]
-            return result
         except Exception:
             raise ValueError(f"Cannot divide a StagePosition by the given {type(other).__name__}.") from None
+
+        return result
 
     def __floordiv__(self, other):
         """
@@ -217,14 +238,17 @@ class StagePosition(shell.StagePosition):
         :return: New position created as a result of the floor division.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             for i in range(len(self)):
                 if self[i] is not None:
                     result[i] = self[i] // other
-            return result
         except Exception:
             raise ValueError(f"Cannot divide the given {type(other).__name__} by a StagePosition.") from None
+
+        return result
 
     def __rfloordiv__(self, other):
         """
@@ -234,16 +258,26 @@ class StagePosition(shell.StagePosition):
         :return: New position created as a result of the floor division.
         """
 
+        result = StagePosition()
+        result.coordinate_system = self.__resolve_coordinate_system(other)
+
         try:
-            result = StagePosition()
             for i in range(len(self)):
                 if self[i] is not None:
                     result[i] = other // self[i]
-            return result
         except Exception:
             raise ValueError(f"Cannot divide a StagePosition by the given {type(other).__name__}.") from None
 
+        return result
+
     def __eq__(self, other):
+        """
+        Compares equality of all existing coordinates. Tests approximate equality with maximum tolerance of 1e-6.
+
+        :param other: Position to compare to.
+        :return: True if the positions are equal, otherwise False.
+        """
+
         if not isinstance(other, StagePosition):
             return False
 
@@ -253,10 +287,25 @@ class StagePosition(shell.StagePosition):
         for i in range(len(self)):
             if (self[i] is not None and other[i] is None) or (self[i] is None and other[i] is not None):
                 return False
-            if self[i] is not None and other[i] is not None and self[i] != other[i]:
+            if self[i] is not None and other[i] is not None and not isclose(self[i], other[i], abs_tol=1e-6):
                 return False
 
+        if self.coordinate_system != other.coordinate_system:
+            return False
+
         return True
+
+    def __resolve_coordinate_system(self, other):
+        if not isinstance(other, StagePosition):
+            return self.coordinate_system
+        if self.coordinate_system is not None and other.coordinate_system is None:
+            return self.coordinate_system
+        if self.coordinate_system is None and other.coordinate_system is not None:
+            return other.coordinate_system
+        if self.coordinate_system is not None and other.coordinate_system is not None:
+            if self.coordinate_system != other.coordinate_system:
+                raise ValueError("StagePosition operands must have the same coordinate system")
+            return self.coordinate_system
 
 
 class AdornedImage(shell.AdornedImage):
@@ -264,7 +313,7 @@ class AdornedImage(shell.AdornedImage):
     __INI_METADATA_TIFF_TAG = 34682
     __XML_METADATA_TIFF_TAG = 34683
 
-    def __init__(self, data=None, metadata=None):
+    def __init__(self, data: numpy.ndarray = None, metadata: 'AdornedImageMetadata' = None):
         """
         Constructs a new AdornedImage.
 
@@ -287,7 +336,7 @@ class AdornedImage(shell.AdornedImage):
             self.metadata = metadata
 
     @property
-    def encoding(self):
+    def encoding(self) -> int:
         if self.bit_depth == 24 and self.raw_encoding == ImageDataEncoding.BGR:
             # BGR is presented as RGB and a conversion is done on .data access
             return ImageDataEncoding.RGB
@@ -354,7 +403,7 @@ class AdornedImage(shell.AdornedImage):
         resized_data = cv2.resize(self.data, (512, thumbnail_height))
         return AdornedImage(resized_data)
 
-    def save(self, path):
+    def save(self, path: str):
         if not path.endswith("tiff") and not path.endswith("tif"):
             path = path + ".tiff"
 
@@ -561,8 +610,35 @@ class Limits(shell.Limits):
         repr_attrs = (ReprAttr("min", "%.8g"), ReprAttr("max", "%.8g"))
         return self._generate_repr(repr_attrs)
 
-    def is_in(self, value):
-        return self.min <= value <= self.max
+    def is_in(self, value: float) -> bool:
+        """
+        Checks if the given value follows the limits. Tests approximate equality with maximum tolerance of 1e-9.
+
+        :param value: Value to be checked.
+        :return: True if the value is in the closed interval, otherwise False.
+        """
+
+        if isclose(self.min, value, abs_tol=1e-9) or isclose(self.max, value, abs_tol=1e-9):
+            return True
+
+        return self.min < value < self.max
+
+    @property
+    def midpoint(self) -> float:
+        """
+        Returns the center value of the range.
+        """
+        return self.min + (self.max - self.min) / 2.0
+
+    def __eq__(self, other):
+        """
+        Tests equality of two limits with absolute tolerance of 1e-9.
+
+        """
+        if not isinstance(other, Limits):
+            return False
+
+        return isclose(self.min, other.min, abs_tol=1e-9) and isclose(self.max, other.max, abs_tol=1e-9)
 
 
 class Limits2d(shell.Limits2d):
@@ -572,11 +648,28 @@ class Limits2d(shell.Limits2d):
         repr_attrs = (ReprAttr("limits_x", "%s"), ReprAttr("limits_y", "%s"))
         return self._generate_repr(repr_attrs)
 
-    def is_in(self, point):
+    def is_in(self, point: 'Point') -> bool:
+        """
+        Checks if the given point follows the limits. Tests approximate equality with maximum tolerance of 1e-9.
+
+        :param point: Point to be checked.
+        :return: True if the point is in the closed interval, otherwise False.
+        """
+
         if not isinstance(point, Point):
             raise ValueError("You need to provide Point.")
 
-        return (self.limits_x.min <= point.x <= self.limits_x.max) and (self.limits_y.min <= point.y <= self.limits_y.max)
+        return self.limits_x.is_in(point.x) and self.limits_y.is_in(point.y)
+
+    def __eq__(self, other):
+        """
+        Tests equality of two limits2d with absolute tolerance of 1e-9.
+
+        """
+        if not isinstance(other, Limits2d):
+            return False
+
+        return self.limits_x == other.limits_x and self.limits_y == other.limits_y
 
 
 class Point(shell.Point):
@@ -585,7 +678,7 @@ class Point(shell.Point):
     def __len__(self):
         return 2
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> float:
         """
         Provides coordinate with the given index.
 
@@ -604,7 +697,7 @@ class Point(shell.Point):
         else:
             raise IndexError("Point coordinate index is out of range (0, 1).")
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: int, value: float):
         """
         Assigns a value to the coordinate with the given index.
 
@@ -762,19 +855,30 @@ class Point(shell.Point):
             raise ValueError(f"Cannot divide a Point by the given {type(other).__name__}.") from None
 
     def __eq__(self, other):
+        """
+        Compares equality of two point-like objects. Tests approximate equality with maximum tolerance of 1e-9.
+
+        :param other: Point-like object to compare to.
+        :return: True if the points are equal, otherwise False.
+        """
+
         if not isinstance(other, Point):
             return False
 
         if len(self) != len(other):
             return False
 
-        return self[0] == other[0] and self[1] == other[1]
+        for i in range(len(self)):
+            if not isclose(self[i], other[i], abs_tol=1e-9):
+                return False
+
+        return True
 
     def __repr__(self):
         repr_attrs = (ReprAttr("x", "%.8g"), ReprAttr("y", "%.8g"))
         return self._generate_repr(repr_attrs)
 
-    def magnitude(self):
+    def magnitude(self) -> float:
         """
         Returns the magnitude of the point which is the distance from 0, 0.
 
@@ -786,7 +890,7 @@ class Point(shell.Point):
         except:
             raise ValueError("Cannot compute Point distance.")
 
-    def angle(self):
+    def angle(self) -> float:
         """
         Returns the angle of the point.
 
@@ -799,7 +903,7 @@ class Point(shell.Point):
             raise ValueError("Cannot compute Point angle.")
 
     @classmethod
-    def create_from(cls, value):
+    def create_from(cls, value) -> 'Point':
         instance = cls()
         if isinstance(value, Point):
             return value
@@ -836,13 +940,282 @@ class ManipulatorPosition(shell.ManipulatorPosition):
         repr_attrs = (ReprAttr("x", "%.8g"), ReprAttr("y", "%.8g"), ReprAttr("z", "%.8g"), ReprAttr("r", "%.8g"))
         return self._generate_repr(repr_attrs)
 
+    def __len__(self):
+        return 4
+
+    def __getitem__(self, index: Union[str, int]) -> float:
+        """
+        Provides coordinate with the given index.
+
+        The method is designed to behave in the same way as standard tuple/list indexer.
+        """
+
+        if not isinstance(index, (int, str)):
+            raise TypeError("Manipulator position coordinate index has to be an integer or string.")
+        if isinstance(index, str) and index not in ('x', 'y', 'z', 'r'):
+            raise IndexError("Manipulator axis must be in ('x', 'y', 'z', 'r').")
+
+        if index in (0, 'x'):
+            return self.x
+        elif index in (1, 'y'):
+            return self.y
+        elif index in (2, 'z'):
+            return self.z
+        elif index in (3, 'r'):
+            return self.r
+        else:
+            raise IndexError("Manipulator position coordinate index is out of allowed range of (0, 3).")
+
+    def __setitem__(self, index: Union[str, int], value: float):
+        """
+        Assigns the given value to the coordinate with the given index.
+
+        The method is designed to behave in the same way as standard tuple/list indexer.
+        """
+
+        if not isinstance(index, (int, str)):
+            raise TypeError("Manipulator position coordinate index has to be an integer or string.")
+        if isinstance(index, str) and index not in ('x', 'y', 'z', 'r'):
+            raise TypeError("Manipulator axis must be in ('x', 'y', 'z', 'r').")
+
+        if index in (0, 'x'):
+            self.x = value
+        elif index in (1, 'y'):
+            self.y = value
+        elif index in (2, 'z'):
+            self.z = value
+        elif index in (3, 'r'):
+            self.r = value
+        else:
+            raise IndexError("Manipulator position coordinate index is out of allowed range of (0, 3).")
+
+    def __add__(self, other):
+        """
+        Adds the given position-like object or scalar value to this position and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-3) or a scalar value.
+        :return: New position created as a result of the addition.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            if hasattr(other, "__getitem__"):
+                for i in range(len(self)):
+                    if self[i] is not None and other[i] is not None:
+                        result[i] = self[i] + other[i]
+            else:
+                for i in range(len(self)):
+                    if self[i] is not None:
+                        result[i] = self[i] + other
+        except Exception:
+            raise ValueError(f"Cannot add the given {type(other).__name__} to a ManipulatorPosition.") from None
+
+        return result
+
+    def __radd__(self, other):
+        """
+        Adds the given position-like object or scalar value to this position and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-3) or a scalar value.
+        :return: New position created as a result of the addition.
+        """
+
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        """
+        Subtracts the given position-like object or scalar value from this position and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-3) or a scalar value.
+        :return: New position created as a result of the subtraction.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            if hasattr(other, "__getitem__"):
+                for i in range(len(self)):
+                    if self[i] is not None and other[i] is not None:
+                        result[i] = self[i] - other[i]
+            else:
+                for i in range(len(self)):
+                    if self[i] is not None:
+                        result[i] = self[i] - other
+        except Exception:
+            raise ValueError(f"Cannot subtract the given {type(other).__name__} from a ManipulatorPosition.") from None
+
+        return result
+
+    def __rsub__(self, other):
+        """
+        Subtracts this position or scalar value from the given position-like object and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-3) or a scalar value.
+        :return: New position created as a result of the subtraction.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            if hasattr(other, "__getitem__"):
+                for i in range(len(self)):
+                    if self[i] is not None and other[i] is not None:
+                        result[i] = other[i] - self[i]
+            else:
+                for i in range(len(self)):
+                    if self[i] is not None:
+                        result[i] = other - self[i]
+        except Exception:
+            raise ValueError(f"Cannot subtract a ManipulatorPosition from the given {type(other).__name__}.") from None
+
+        return result
+
+    def __mul__(self, other):
+        """
+        Multiplies this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the multiplication.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = self[i] * other
+        except Exception:
+            raise ValueError(f"Cannot multiply the given {type(other).__name__} by a ManipulatorPosition.") from None
+
+        return result
+
+    def __rmul__(self, other):
+        """
+        Multiplies this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the multiplication.
+        """
+
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        """
+        Divides this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the division.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = self[i] / other
+        except Exception:
+            raise ValueError(f"Cannot divide the given {type(other).__name__} by a ManipulatorPosition.") from None
+
+        return result
+
+    def __rtruediv__(self, other):
+        """
+        Divides given scalar value by this position and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the division.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = other / self[i]
+        except Exception:
+            raise ValueError(f"Cannot divide a ManipulatorPosition by the given {type(other).__name__}.") from None
+
+        return result
+
+    def __floordiv__(self, other):
+        """
+        Divides (with floor) this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the floor division.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = self[i] // other
+        except Exception:
+            raise ValueError(f"Cannot divide the given {type(other).__name__} by a ManipulatorPosition.") from None
+
+        return result
+
+    def __rfloordiv__(self, other):
+        """
+        Divides (with floor) given scalar value by this position and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the floor division.
+        """
+
+        result = ManipulatorPosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = other // self[i]
+        except Exception:
+            raise ValueError(f"Cannot divide a ManipulatorPosition by the given {type(other).__name__}.") from None
+
+        return result
+
+    def __eq__(self, other):
+        """
+        Compares equality of all existing coordinates. Tests approximate equality with maximum tolerance of 1e-6.
+
+        :param other: Position to compare to.
+        :return: True if the positions are equal, otherwise False.
+        """
+
+        if not isinstance(other, ManipulatorPosition):
+            return False
+
+        if len(self) != len(other):
+            return False
+
+        for i in range(len(self)):
+            if (self[i] is not None and other[i] is None) or (self[i] is None and other[i] is not None):
+                return False
+            if self[i] is not None and other[i] is not None and not isclose(self[i], other[i], abs_tol=1e-6):
+                return False
+
+        return True
+
 
 class MoveSettings(shell.MoveSettings):
     __slots__ = []
 
+    def __repr__(self):
+        repr_attrs = (ReprAttr("rotate_compucentric", "%s"), ReprAttr("z_cap_move", "%s"), ReprAttr("link_z_y", "%s"), ReprAttr("link_z_b", "%s"),
+                      ReprAttr("tilt_compucentric", "%s"))
+        return self._generate_repr(repr_attrs)
+
 
 class GrabFrameSettings(shell.GrabFrameSettings):
     __slots__ = []
+
+    def __repr__(self):
+        repr_attrs = (ReprAttr("resolution", "%s"), ReprAttr("dwell_time", "%.8g"), ReprAttr("bit_depth", "%i"), ReprAttr("line_integration", "%s"),
+                      ReprAttr("scan_interlacing", "%s"), ReprAttr("reduced_area", "%s"), ReprAttr("preview_resolution", "%s"),
+                      ReprAttr("frame_integration", "%s"), ReprAttr("drift_correction", "%s"))
+        return self._generate_repr(repr_attrs)
 
 
 class ImageMatch(shell.ImageMatch):
@@ -867,7 +1240,7 @@ class StreamPatternDefinition(shell.StreamPatternDefinition):
     #    toBlank = TRUE;
     # }
 
-    # overwrite __init__ so load_from_file has to be called to initialize data
+    # Overwrite __init__ so load_from_file has to be called to initialize data
     def __init__(self):
         super().__init__(bit_depth=16)
         self._dwell_time_base = 25
@@ -883,7 +1256,7 @@ class StreamPatternDefinition(shell.StreamPatternDefinition):
         self._points = arr
 
     @shell.StreamPatternDefinition.bit_depth.setter
-    def bit_depth(self, value):
+    def bit_depth(self, value: int):
         if value == 12 or value == 16:
             super(StreamPatternDefinition, self.__class__).bit_depth.fset(self, value)
         else:
@@ -894,7 +1267,7 @@ class StreamPatternDefinition(shell.StreamPatternDefinition):
         spd = StreamPatternDefinition()
 
         with open(path, 'r') as f:
-            # line 1
+            # Line 1
             line = f.readline()
             tokens = [x.strip().lower() for x in line.split(',')]
             if "s16" in tokens:
@@ -909,11 +1282,11 @@ class StreamPatternDefinition(shell.StreamPatternDefinition):
             else:
                 spd._dwell_time_base = 100
 
-            # line 2
+            # Line 2
             line = f.readline()
             spd.repeat_count = int(line)
 
-            # line 3
+            # Line 3
             line = f.readline()
             points_count = int(line)
 
@@ -922,7 +1295,7 @@ class StreamPatternDefinition(shell.StreamPatternDefinition):
             import re
             numeric_tokens_regex = re.compile(r'\d\d*')
 
-            # points
+            # Points
             for i in range(0, points_count):
                 line = f.readline()
                 numeric_tokens = numeric_tokens_regex.findall(line)
@@ -930,16 +1303,16 @@ class StreamPatternDefinition(shell.StreamPatternDefinition):
                 if len(numeric_tokens) < 3:
                     continue
 
-                points[i][0] = int(numeric_tokens[1])  # x
-                points[i][1] = int(numeric_tokens[2])  # y
-                points[i][2] = float(numeric_tokens[0]) * spd._dwell_time_base * 1e-9  # dwell time in seconds
-                points[i][3] = 0  # bit mask for additional settings
+                points[i][0] = int(numeric_tokens[1])  # X
+                points[i][1] = int(numeric_tokens[2])  # Y
+                points[i][2] = float(numeric_tokens[0]) * spd._dwell_time_base * 1e-9  # Dwell time in seconds
+                points[i][3] = 0  # Bit mask for additional settings
 
                 if len(numeric_tokens) > 3:
-                    # reads blank setting from stream file: 0 means blank, 1 means unblank
+                    # Read blank setting from stream file: 0 means blank, 1 means unblank
                     blank_setting = int(numeric_tokens[3])
 
-                    # sets blanking bit in the additional settings bitmask if blank setting says the point should be blanked
+                    # Set blanking bit in the additional settings bitmask if blank setting says the point should be blanked
                     if blank_setting == 0:
                         points[i][3] |= 1
 
@@ -1059,9 +1432,270 @@ class CompustagePosition(shell.CompustagePosition):
     __slots__ = []
 
     def __repr__(self):
-        repr_attrs = (ReprAttr("x", "%.8g"), ReprAttr("y", "%.8g"), ReprAttr("z", "%.8g"), ReprAttr("a", "%.8g"),
-                      ReprAttr("b", "%.8g"))
+        repr_attrs = (ReprAttr("x", "%.8g"), ReprAttr("y", "%.8g"), ReprAttr("z", "%.8g"), ReprAttr("a", "%.8g"), ReprAttr("b", "%.8g"))
         return self._generate_repr(repr_attrs)
+
+    def __len__(self):
+        return 5
+
+    def __getitem__(self, index: Union[int, str]) -> float:
+        """
+        Provides coordinate with the given index.
+
+        The method is designed to behave in the same way as standard tuple/list indexer.
+        """
+
+        if not isinstance(index, (int, str)):
+            raise TypeError("Compustage position coordinate index has to be an integer or string.")
+        if isinstance(index, str) and index not in ('x', 'y', 'z', 'a', 'b'):
+            raise IndexError("Compustage axis must be in ('x', 'y', 'z', 'a', 'b').")
+
+        if index in (0, 'x'):
+            return self.x
+        elif index in (1, 'y'):
+            return self.y
+        elif index in (2, 'z'):
+            return self.z
+        elif index in (3, 'a'):
+            return self.a
+        elif index in (4, 'b'):
+            return self.b
+        else:
+            raise IndexError("Compustage position coordinate index is out of allowed range of (0, 4).")
+
+    def __setitem__(self, index: Union[int, str], value: float):
+        """
+        Assigns the given value to the coordinate with the given index.
+
+        The method is designed to behave in the same way as standard tuple/list indexer.
+        """
+
+        if not isinstance(index, (int, str)):
+            raise TypeError("Compustage position coordinate index has to be an integer or string.")
+        if isinstance(index, str) and index not in ('x', 'y', 'z', 'a', 'b'):
+            raise TypeError("Compustage axis must be in ('x', 'y', 'z', 'a', 'b').")
+
+        if index in (0, 'x'):
+            self.x = value
+        elif index in (1, 'y'):
+            self.y = value
+        elif index in (2, 'z'):
+            self.z = value
+        elif index in (3, 'a'):
+            self.a = value
+        elif index in (4, 'b'):
+            self.b = value
+        else:
+            raise IndexError("Compustage position coordinate index is out of allowed range of (0, 4).")
+
+    def __add__(self, other):
+        """
+        Adds the given position-like object or scalar value to this position and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-4) or a scalar value.
+        :return: New position created as a result of the addition.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            if hasattr(other, "__getitem__"):
+                for i in range(len(self)):
+                    if self[i] is not None and other[i] is not None:
+                        result[i] = self[i] + other[i]
+            else:
+                for i in range(len(self)):
+                    if self[i] is not None:
+                        result[i] = self[i] + other
+        except Exception:
+            raise ValueError(f"Cannot add the given {type(other).__name__} to a CompustagePosition.") from None
+
+        return result
+
+    def __radd__(self, other):
+        """
+        Adds the given position-like object or scalar value to this position and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-4) or a scalar value.
+        :return: New position created as a result of the addition.
+        """
+
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        """
+        Subtracts the given position-like object or scalar value from this position and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-4) or a scalar value.
+        :return: New position created as a result of the subtraction.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            if hasattr(other, "__getitem__"):
+                for i in range(len(self)):
+                    if self[i] is not None and other[i] is not None:
+                        result[i] = self[i] - other[i]
+            else:
+                for i in range(len(self)):
+                    if self[i] is not None:
+                        result[i] = self[i] - other
+        except Exception:
+            raise ValueError(f"Cannot subtract the given {type(other).__name__} from a CompustagePosition.") from None
+
+        return result
+
+    def __rsub__(self, other):
+        """
+        Subtracts this position or scalar value from the given position-like object and provides the result.
+
+        :param other: Position-like object (with coordinates accessible by indices 0-4) or a scalar value.
+        :return: New position created as a result of the subtraction.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            if hasattr(other, "__getitem__"):
+                for i in range(len(self)):
+                    if self[i] is not None and other[i] is not None:
+                        result[i] = other[i] - self[i]
+            else:
+                for i in range(len(self)):
+                    if self[i] is not None:
+                        result[i] = other - self[i]
+        except Exception:
+            raise ValueError(f"Cannot subtract a CompustagePosition from the given {type(other).__name__}.") from None
+
+        return result
+
+    def __mul__(self, other):
+        """
+        Multiplies this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the multiplication.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = self[i] * other
+        except Exception:
+            raise ValueError(f"Cannot multiply the given {type(other).__name__} by a CompustagePosition.") from None
+
+        return result
+
+    def __rmul__(self, other):
+        """
+        Multiplies this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the multiplication.
+        """
+
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        """
+        Divides this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the division.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = self[i] / other
+        except Exception:
+            raise ValueError(f"Cannot divide the given {type(other).__name__} by a CompustagePosition.") from None
+
+        return result
+
+    def __rtruediv__(self, other):
+        """
+        Divides given scalar value by this position and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the division.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = other / self[i]
+        except Exception:
+            raise ValueError(f"Cannot divide a CompustagePosition by the given {type(other).__name__}.") from None
+
+        return result
+
+    def __floordiv__(self, other):
+        """
+        Divides (with floor) this position by the given scalar value and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the floor division.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = self[i] // other
+        except Exception:
+            raise ValueError(f"Cannot divide the given {type(other).__name__} by a CompustagePosition.") from None
+
+        return result
+
+    def __rfloordiv__(self, other):
+        """
+        Divides (with floor) given scalar value by this position and provides the result.
+
+        :param other: Scalar value.
+        :return: New position created as a result of the floor division.
+        """
+
+        result = CompustagePosition()
+
+        try:
+            for i in range(len(self)):
+                if self[i] is not None:
+                    result[i] = other // self[i]
+        except Exception:
+            raise ValueError(f"Cannot divide a CompustagePosition by the given {type(other).__name__}.") from None
+
+        return result
+
+    def __eq__(self, other):
+        """
+        Compares equality of all existing coordinates. Tests approximate equality with maximum tolerance of 1e-6.
+
+        :param other: Position to compare to.
+        :return: True if the positions are equal, otherwise False.
+        """
+
+        if not isinstance(other, CompustagePosition):
+            return False
+
+        if len(self) != len(other):
+            return False
+
+        for i in range(len(self)):
+            if (self[i] is not None and other[i] is None) or (self[i] is None and other[i] is not None):
+                return False
+            if self[i] is not None and other[i] is not None and not isclose(self[i], other[i], abs_tol=1e-6):
+                return False
+
+        return True
 
 
 class LargeImageHeader(shell.LargeImageHeader):
@@ -1119,13 +1753,17 @@ class BitmapPatternDefinition(shell.BitmapPatternDefinition):
         image = TiffImageLoader().open_image(path)
         arr = numpy.array(image)
 
+        bytes_per_pixel = len(arr.shape)
+        if bytes_per_pixel != 3:
+            raise Exception("The bitmap must be in 24-bit uncompressed RGB format.")
+
         bpd.width = len(arr[0])
         bpd.height = len(arr)
         bpd.points = numpy.zeros(shape=(bpd.height, bpd.width, 2), dtype=object)
         bpd.points[:, :, 0] = arr[:, :, 2] / 255.0
 
-        # The logic below is reverted, in original image blanking was signaled by providing zero,
-        # in BitmapPatternDefinition blanking is signaled by providing a non zero value.
+        # The logic below is reverted compared to stream files where image blanking is signaled by providing zero flag,
+        # in BitmapPatternDefinition blanking is signaled by providing a non zero flag.
         bpd.points[arr[:, :, 1] == 0, 1] = 1  # 1 means blank
         bpd.points[arr[:, :, 1] != 0, 1] = 0  # 0 means do not blank
 
@@ -1191,6 +1829,15 @@ class Variant(shell.Variant):
             instance.value_bool = value
         elif isinstance(value, str):
             instance.value_string = value
+        elif isinstance(value, Variant):
+            if value._is_float():
+                instance.value_double = value.value
+            elif value._is_bool():
+                instance.value_bool = value.value
+            elif value._is_int():
+                instance.value_int = value.value
+            elif value._is_string():
+                instance.value_string = value.value
         else:
             raise TypeError(f"Can't create Variant from {type(value)}.")
         return instance
@@ -1282,6 +1929,7 @@ class Variant(shell.Variant):
     def __rfloordiv__(self, other):
         return other // self.value
 
+
 class AdornedImageMetadataBinaryResult(shell.AdornedImageMetadataBinaryResult):
     __slots__ = []
 
@@ -1349,20 +1997,5 @@ class AdornedImageMetadataOptics(shell.AdornedImageMetadataOptics):
 class AdornedImageMetadataAcquisition(shell.AdornedImageMetadataAcquisition):
     __slots__ = []
 
-
-
-class TemperatureSettings(shell.TemperatureSettings):    
-    """
-    Settings for controlling temperature of heating or cooling stages.
-    
-    :param float target_temperature: Target temperature in Kelvins.
-    
-    :param float ramp_speed: Ramping speed in Kelvins per second.
-    
-    :param float soak_time: Time in seconds to remain at the target temperature after it has been reached within the specified tolerance.
-    
-    :param float tolerance: Minimum desired difference between target and actual temperatures, in Kelvins.
-    
-    :param int timeout: Maximum time the temperature ramping can last, in seconds.
-    """
+class TemperatureSettings(shell.TemperatureSettings):
     __slots__ = []

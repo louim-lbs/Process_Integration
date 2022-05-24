@@ -9,13 +9,13 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import CompustagePosition, MoveSettings 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .compustage._neutral_mill_position import NeutralMillPosition
 
 
-class Compustage(object):    
+class Compustage(object):
     """
-    The object provides control and status of the microscope's compustage device.
+    The object provides control and status of the compustage device.
     """
     __slots__ = ["__id", "__application_client", "__neutral_mill_position"]
 
@@ -26,93 +26,93 @@ class Compustage(object):
         self.__neutral_mill_position = NeutralMillPosition(self.__application_client)
 
     @property
-    def neutral_mill_position(self) -> 'NeutralMillPosition':        
+    def neutral_mill_position(self) -> 'NeutralMillPosition':
         """
-        The object provides control and status of the microscope's compustage neutral mill position.
+        The object provides control and status of the compustage neutral mill position.
         """
         return self.__neutral_mill_position
 
-    def absolute_move(self, target_position, settings = UndefinedParameter):        
+    def absolute_move(self, target_position: 'CompustagePosition', settings: 'MoveSettings' = None):
         """
-        The method moves the compustage to the specified position.
+        The function moves the compustage to the specified position.
         
-        :param CompustagePosition target_position: The absolute position to which the compustage should move.
+        :param target_position: The absolute position to which the compustage should move.
         
-        :param MoveSettings settings: Additional move settings.
+        :param settings: Additional move settings.
         """
         call_request = CallRequest(object_id=self.__id, method_name="AbsoluteMove", signature=[], parameters=[])
-        if isinstance(target_position, CompustagePosition) and settings is UndefinedParameter:
-            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="CompustagePosition")]
-            call_request.parameters.values = [target_position]
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(target_position, CompustagePosition) and isinstance(settings, MoveSettings):
+        if isinstance(target_position, CompustagePosition) and isinstance(settings, MoveSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="CompustagePosition"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="MoveSettings")]
             call_request.parameters.values = [target_position, settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif isinstance(target_position, CompustagePosition) and settings is None:
+            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="CompustagePosition")]
+            call_request.parameters.values = [target_position]
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def relative_move(self, position_delta, settings = UndefinedParameter):        
+    def relative_move(self, position_delta: 'CompustagePosition', settings: 'MoveSettings' = None):
         """
-        The method moves the compustage by the specified delta position.
+        The function moves the compustage by the specified delta position.
         
-        :param CompustagePosition position_delta: The position by which the compustage should move.
+        :param position_delta: The position by which the compustage should move.
         
-        :param MoveSettings settings: Additional move settings.
+        :param settings: Additional move settings.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RelativeMove", signature=[], parameters=[])
-        if isinstance(position_delta, CompustagePosition) and settings is UndefinedParameter:
-            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="CompustagePosition")]
-            call_request.parameters.values = [position_delta]
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(position_delta, CompustagePosition) and isinstance(settings, MoveSettings):
+        if isinstance(position_delta, CompustagePosition) and isinstance(settings, MoveSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="CompustagePosition"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="MoveSettings")]
             call_request.parameters.values = [position_delta, settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif isinstance(position_delta, CompustagePosition) and settings is None:
+            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="CompustagePosition")]
+            call_request.parameters.values = [position_delta]
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def insert(self):        
+    def insert(self):
         """
-        The method inserts the compustage.
+        The function inserts the compustage.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Insert", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def retract(self):        
+    def retract(self):
         """
-        The method retracts the compustage.
+        The function retracts the compustage.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Retract", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def home(self):        
+    def home(self):
         """
-        The method homes all axis of the compustage.
+        The function homes all axes of the compustage.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Home", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def link(self):        
+    def link(self):
         """
-        The method links the sample Z to the working distance.
+        The function links the sample Z to the working distance.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Link", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def flip(self):        
+    def flip(self):
         """
-        The method flips the compustage by 180 degrees.
+        The function flips the compustage by 180 degrees.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Flip", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def is_installed(self) -> 'bool':        
+    def is_installed(self) -> 'bool':
         """
-        Tells whether Compustage is installed on the system. This property does not indicate whether the Compustage rod is loaded and/or inserted.
+        Tells whether the compustage is installed on the system. This property does not indicate whether the compustage rod is loaded or inserted.
         """
         call_request = CallRequest(object_id=self.__id, method_name="IsInstalled_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -122,7 +122,7 @@ class Compustage(object):
         return call_response.result.value
 
     @property
-    def is_homed(self) -> 'bool':        
+    def is_homed(self) -> 'bool':
         """
         The property returns if the compustage is homed or not.
         """
@@ -134,9 +134,9 @@ class Compustage(object):
         return call_response.result.value
 
     @property
-    def is_linked(self) -> 'bool':        
+    def is_linked(self) -> 'bool':
         """
-        The property returns true if the sample Z is linked to the free working distance.
+        The property returns True if the sample Z is linked to the free working distance.
         """
         call_request = CallRequest(object_id=self.__id, method_name="IsLinked_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -146,7 +146,7 @@ class Compustage(object):
         return call_response.result.value
 
     @property
-    def current_position(self) -> 'CompustagePosition':        
+    def current_position(self) -> 'CompustagePosition':
         """
         The property retrieves current compustage position.
         """

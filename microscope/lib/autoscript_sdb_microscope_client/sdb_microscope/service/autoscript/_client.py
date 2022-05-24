@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class Client(object):    
+class Client(object):
     """
     The object provides service information regarding the AutoScript client.
     """
@@ -23,7 +23,7 @@ class Client(object):
 
 
     @property
-    def version(self) -> 'str':        
+    def version(self) -> 'str':
         """
         Provides AutoScript client version.
         """

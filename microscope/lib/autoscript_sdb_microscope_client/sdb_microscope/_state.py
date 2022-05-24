@@ -8,14 +8,14 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .state._chamber_pressure import ChamberPressure
 from .state._specimen_current import SpecimenCurrent
 
 
-class State(object):    
+class State(object):
     """
-    The object provides status of some of the microscope's subsystems.
+    The object provides status of various microscope subsystems.
     """
     __slots__ = ["__id", "__application_client", "__chamber_pressure", "__specimen_current"]
 
@@ -27,14 +27,14 @@ class State(object):
         self.__specimen_current = SpecimenCurrent(self.__application_client)
 
     @property
-    def chamber_pressure(self) -> 'ChamberPressure':        
+    def chamber_pressure(self) -> 'ChamberPressure':
         """
         [OBSOLETE] The object provides status of the chamber pressure.
         """
         return self.__chamber_pressure
 
     @property
-    def specimen_current(self) -> 'SpecimenCurrent':        
+    def specimen_current(self) -> 'SpecimenCurrent':
         """
         The object provides control and status of the specimen current.
         """

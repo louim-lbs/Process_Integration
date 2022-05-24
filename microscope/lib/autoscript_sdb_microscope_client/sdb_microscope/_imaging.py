@@ -9,11 +9,11 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, ImageMatch, LargeImageHeader, AdornedImage 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .imaging._scanning_filter import ScanningFilter
 
 
-class Imaging(object):    
+class Imaging(object):
     """
     The object provides control of the microscope imaging.
     """
@@ -26,18 +26,17 @@ class Imaging(object):
         self.__scanning_filter = ScanningFilter(self.__application_client)
 
     @property
-    def scanning_filter(self) -> 'ScanningFilter':        
+    def scanning_filter(self) -> 'ScanningFilter':
         """
-        The object provides control of the microscope's scanning filter.
+        The object provides control of the microscope scanning filter.
         """
         return self.__scanning_filter
 
-    def get_active_view(self) -> 'int':        
+    def get_active_view(self) -> 'int':
         """
-        The method gets the index of the active view.
+        The function gets the index of the active view.
         
-        :return: The value is in range 1 .. 4, where 1 is left top view, 2 is right top view, 3 is left bottom view, 4 is right bottom view.
-        :rtype: int
+        :return: The value is in the range 1 ... 4, where 1 stands for the left upper view, 2 for the right upper view, 3 for the left lower view, and 4 for the right lower view.
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetActiveView", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -46,12 +45,11 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def get_active_device(self) -> 'int':        
+    def get_active_device(self) -> 'int':
         """
-        The method gets the active device in the active view.
+        The function returns the type of imaging device set in the active view.
         
-        :return: Type of the active device. To explain the returned value, you can use ImagingDevice enumeration.
-        :rtype: int
+        :return: Type of imaging device expressed as integer ID. To explain the returned value, you can use ImagingDevice enumeration.
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetActiveDevice", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -60,12 +58,11 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def get_image(self) -> 'AdornedImage':        
+    def get_image(self) -> 'AdornedImage':
         """
         Retrieves microscope image currently present in the active view
         
         :return: Microscope image retrieved from the active view.
-        :rtype: AdornedImage
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetImage", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -74,23 +71,22 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def grab_frame(self, settings = UndefinedParameter) -> 'AdornedImage':        
+    def grab_frame(self, settings: 'GrabFrameSettings' = None) -> 'AdornedImage':
         """
         Scans a completely new frame in the active view and provides the corresponding image.
         
-        :param GrabFrameSettings settings: Custom scan settings to be used instead of default values.
+        :param settings: Custom scan settings to be used instead of default values.
         
         :return: Microscope image corresponding to the grabbed frame.
-        :rtype: AdornedImage
         """
         call_request = CallRequest(object_id=self.__id, method_name="GrabFrame", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, GrabFrameSettings):
+        if isinstance(settings, GrabFrameSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="GrabFrameSettings")]
             call_request.parameters.values = [settings]
+            call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
@@ -100,23 +96,22 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def grab_multiple_frames(self, settings = UndefinedParameter) -> 'List[AdornedImage]':        
+    def grab_multiple_frames(self, settings: 'GrabFrameSettings' = None) -> 'List[AdornedImage]':
         """
         Scans completely new frames in all compatible views and provides the corresponding images.
         
-        :param GrabFrameSettings settings: Custom scan settings to be used instead of default values.
+        :param settings: Custom scan settings to be used instead of default values.
         
         :return: List of microscope images, each corresponding to a single compatible view.
-        :rtype: list
         """
         call_request = CallRequest(object_id=self.__id, method_name="GrabMultipleFrames", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, GrabFrameSettings):
+        if isinstance(settings, GrabFrameSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="GrabFrameSettings")]
             call_request.parameters.values = [settings]
+            call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
@@ -126,22 +121,21 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def grab_frame_to_disk(self, file_path, file_format, settings) -> 'AdornedImage':        
+    def grab_frame_to_disk(self, file_path: 'str', file_format: 'str' = None, settings: 'GrabFrameSettings' = None) -> 'AdornedImage':
         """
         Scans a completely new frame in the active view, saves the image to disk and provides the preview image.
         
-        :param str file_path: The path where to store the image. The extension specified in this property does not influence the file format.
+        :param file_path: The path where to store the image. The extension specified in this property does not influence the file format.
         
-        :param str file_format: The format of the file. ImageFileFormat enumeration can be used for easier manipulation.
+        :param file_format: The format of the file. ImageFileFormat enumeration can be used for easier manipulation.
         
-        :param GrabFrameSettings settings: Custom scan settings to be used instead of default values.
+        :param settings: Custom scan settings to be used instead of default values.
         
         :return: Preview of a microscope image corresponding to the grabbed frame.
-        :rtype: AdornedImage
         """
         return SdbMicroscopeClientExtensions.grab_frame_to_disk(self, file_path, file_format, settings)
 
-    def _grab_large_frame(self, file_format, settings) -> 'LargeImageHeader':
+    def _grab_large_frame(self, file_format: 'str', settings: 'GrabFrameSettings') -> 'LargeImageHeader':
         call_request = CallRequest(object_id=self.__id, method_name="GrabLargeFrame", signature= [DataType.STRING, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="GrabFrameSettings")], parameters=[file_format, settings]) 
         if isinstance(file_format, str) and isinstance(settings, GrabFrameSettings):
             call_response = self.__application_client._perform_call(call_request)
@@ -152,7 +146,7 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def _get_large_image_part(self, image_id, part_index) -> 'bytes':
+    def _get_large_image_part(self, image_id: 'str', part_index: 'int') -> 'bytes':
         call_request = CallRequest(object_id=self.__id, method_name="GetLargeImagePart", signature= [DataType.STRING, DataType.INT32], parameters=[image_id, part_index]) 
         if isinstance(image_id, str) and isinstance(part_index, int):
             call_response = self.__application_client._perform_call(call_request)
@@ -163,23 +157,22 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def _release_large_image(self, image_id):
+    def _release_large_image(self, image_id: 'str'):
         call_request = CallRequest(object_id=self.__id, method_name="ReleaseLargeImage", signature= [DataType.STRING], parameters=[image_id]) 
         if isinstance(image_id, str):
             call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def match_template(self, image, template_image) -> 'ImageMatch':        
+    def match_template(self, image: 'AdornedImage', template_image: 'AdornedImage') -> 'ImageMatch':
         """
         Tries to locate feature from the given template image in the given searched image.
         
-        :param AdornedImage image: Image to be searched for the feature from the given template image.
+        :param image: Image to be searched for the feature from the given template image.
         
-        :param AdornedImage template_image: Image containing the template of the feature to be located.
+        :param template_image: Image containing the template of the feature to be located.
         
         :return: Possible location of the feature, accompanied with a confidence score in a range of [0, 1].
-        :rtype: ImageMatch
         """
         call_request = CallRequest(object_id=self.__id, method_name="MatchTemplate", signature= [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="AdornedImage"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="AdornedImage")], parameters=[image, template_image]) 
         if isinstance(image, AdornedImage) and isinstance(template_image, AdornedImage):
@@ -191,11 +184,11 @@ class Imaging(object):
 
         return call_response.result.value
 
-    def set_active_view(self, index):        
+    def set_active_view(self, index: 'int'):
         """
-        The method changes active view as can be seen in the XT UI.
+        The function changes the active view in the main user interface of the microscope (XTUI).
         
-        :param int index: Index is in range 1 .. 4, where 1 is left top view, 2 is right top view, 3 is left bottom view, 4 is right bottom view.
+        :param index: The index is in the range 1..4, where 1 is the upper left view, 2 is the upper right view, 3 is the lower left view, and 4 is the lower right view.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetActiveView", signature= [DataType.INT32], parameters=[index]) 
         if isinstance(index, int):
@@ -203,11 +196,11 @@ class Imaging(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def set_active_device(self, imaging_device):        
+    def set_active_device(self, imaging_device: 'int'):
         """
-        The method changes active device in the active view.
+        The function changes active device in the active view.
         
-        :param int imaging_device: New device type. Use the ImagingDevice enumeration to specify the proper device name.
+        :param imaging_device: New device type. Use the ImagingDevice enumeration to specify the proper device name.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetActiveDevice", signature= [DataType.INT32], parameters=[imaging_device]) 
         if isinstance(imaging_device, int):
@@ -215,25 +208,25 @@ class Imaging(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def start_acquisition(self):        
+    def start_acquisition(self):
         """
-        The method starts the acquisition in the active view with the active device.
+        The function starts the acquisition in the active view with the active device.
         """
         call_request = CallRequest(object_id=self.__id, method_name="StartAcquisition", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def stop_acquisition(self):        
+    def stop_acquisition(self):
         """
-        The method stops the running acquisition.
+        The function stops the running acquisition.
         """
         call_request = CallRequest(object_id=self.__id, method_name="StopAcquisition", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def set_image(self, image):        
+    def set_image(self, image: 'AdornedImage'):
         """
-        The method loads an image into the active view, including its metadata.
+        The function loads an image into the active view, including its metadata.
         
-        :param AdornedImage image: An image in form of AdornedImage instance.
+        :param image: An image in form of AdornedImage instance.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetImage", signature= [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="AdornedImage")], parameters=[image]) 
         if isinstance(image, AdornedImage):

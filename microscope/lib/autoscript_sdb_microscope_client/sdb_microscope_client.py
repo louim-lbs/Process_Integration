@@ -7,13 +7,13 @@
 # --------------------------------------------------------------------------------------------------
 
 from typing import List, Union
+from autoscript_sdb_microscope_client._sdb_microscope_logging import Logging, LogDomain
 from autoscript_core.common import ApiErrorCode, ApiException, MarshallingException, TransportEndpointDefinition
-from autoscript_core.logging import Logging, LogDomain
 from autoscript_core.orc import ClientEndpoint, EndpointException, EndpointExceptionCause, ApplicationClientLoggingHelper
 from autoscript_core.serialization import AdvancedValueSerializer, AdvancedValueDeserializer
 from autoscript_sdb_microscope_client.structures import Point, Rectangle, Limits, Limits2d, GrabFrameSettings, RunAutoSourceTiltSettings, RunAutoCbSettings, RunAutoFocusSettings, RunAutoLensAlignmentSettings, RunAutoStigmatorCenteringSettings, RunAutoStigmatorSettings, CompustagePosition, StagePosition, ManipulatorPosition, MoveSettings, ImageMatch, StreamPatternDefinition, StreamPatternPoint, BitmapPatternDefinition, BitmapPatternPoint, GetRtmPositionSettings, RtmPositionSet, RtmPosition, GetRtmDataSettings, RtmDataSet, LargeImageHeader, AdornedImageMetadataOpticsScanFieldSize, AdornedImageMetadataAcquisition, AdornedImageMetadataBinaryResult, AdornedImageMetadataCore, AdornedImageMetadataDetector, AdornedImageMetadataEnergyFilterSettings, AdornedImageMetadataGasInjectionSystemGas, AdornedImageMetadataGasInjectionSystem, AdornedImageMetadataInstrument, AdornedImageMetadataOpticsAperture, AdornedImageMetadataOptics, AdornedImageMetadataSample, AdornedImageMetadataScanSettings, AdornedImageMetadataStageSettings, AdornedImageMetadataVacuumProperties, AdornedImageMetadata, AdornedImage, DetectorInsertSettings, VacuumSettings, Variant, TemperatureSettings 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .sdb_microscope._auto_functions import AutoFunctions
 from .sdb_microscope._beams import Beams
 from .sdb_microscope._detector import Detector
@@ -25,8 +25,8 @@ from .sdb_microscope._specimen import Specimen
 from .sdb_microscope._state import State
 from .sdb_microscope._vacuum import Vacuum
 from autoscript_sdb_microscope_client._dynamic_object_handles import *
-
 import struct
+
 
 class SdbMicroscopeClient(object):
 
@@ -110,58 +110,51 @@ class SdbMicroscopeClient(object):
         self.__deserializer.dynamic_object_handle_factory.register_dynamic_object_handle_constructor("ControlItem", SdbMicroscopeClient._create_control_item)
         self.__deserializer.dynamic_object_handle_factory.register_dynamic_object_handle_constructor("ControlItemPair", SdbMicroscopeClient._create_control_item_pair)
         self.__deserializer.dynamic_object_handle_factory.register_dynamic_object_handle_constructor("ServerAction", SdbMicroscopeClient._create_server_action)
-
-        Logging.initialize_application_client_logging("SdbMicroscope")
     
-    def connect(self, host=UndefinedParameter, port=UndefinedParameter):
+    def connect(self, host: Union[str, List[str]] = "192.168.0.1", port: Union[int, List[int]] = 7520):
         """
         Connects to the server.
 
-        :param Union[str, list] host: Host name of the server. Default value is '192.168.0.1'.
-        :param Union[int, list] port: Port number of the server. Default value is 7520.
+        :param host: Host name of the server. Default value is '192.168.0.1'.
+        :param port: Port number of the server. Default value is 7520.
         """
 
-        if host is UndefinedParameter and port is UndefinedParameter:
-            error_message = self._try_connect("192.168.0.1", 7520)
-        elif isinstance(host, str) and isinstance(port, int):
+        error_message = ""
+
+        if isinstance(host, str) and isinstance(port, int):
             error_message = self._try_connect(host, port)
-        elif host is UndefinedParameter and isinstance(port, int):
-            error_message = self._try_connect("192.168.0.1", port)
-        elif isinstance(host, str) and port is UndefinedParameter:
-            error_message = self._try_connect(host, 7520)
         elif isinstance(host, (list, tuple)) and isinstance(port, (list, tuple)):
             if len(host) != len(port) or len(host) == 0: 
-                raise Exception("Number of hosts and number of ports must be the same and can't be zero.")
+                raise ValueError("Number of hosts and number of ports must be the same and can't be zero.")
 
             for i in range(len(host)):
                 error_message = self._try_connect(host[i], port[i])
 
                 if error_message is None:
                     break
-        elif isinstance(host, (list, tuple)) and port is UndefinedParameter:
+        elif isinstance(host, (list, tuple)) and isinstance(port, int):
             if len(host) == 0: 
-                raise Exception("Number of hosts can't be zero.")
+                raise ValueError("Number of hosts can't be zero.")
 
             for single_host in host:
-                error_message = self._try_connect(single_host, 7520)
+                error_message = self._try_connect(single_host, port)
 
                 if error_message is None:
                     break
         else:
-            raise Exception("Cannot execute method with the given parameters combination. "
+            raise TypeError("Cannot execute method with the given parameters combination. "
                             "Read the documentation for details of how to call this method.")
 
         if error_message is not None:
             raise ApiException(ApiErrorCode.APPLICATION_CLIENT_ERROR, error_message)
 
-    def _try_connect(self, host, port) -> 'str':
+    def _try_connect(self, host: str, port: int) -> 'str':
         """
         Tries to connect to the server.
 
-        :param str host: Host name of the server.
-        :param int port: Port number of the server.
+        :param host: Host name of the server.
+        :param port: Port number of the server.
         :return: Error message if the connection fails, None if the connection is successful.
-        :rtype: str
         """
 
         server_transport_endpoint = TransportEndpointDefinition(host, port)
@@ -245,72 +238,72 @@ class SdbMicroscopeClient(object):
         return call_response
 
     @property
-    def auto_functions(self) -> 'AutoFunctions':        
+    def auto_functions(self) -> 'AutoFunctions':
         """
-        The object provides control of the microscope's auto functions.
+        The object provides control of the microscope auto functions.
         """
         return self.__auto_functions
 
     @property
-    def beams(self) -> 'Beams':        
+    def beams(self) -> 'Beams':
         """
-        The object provides control and status of the microscope's beams.
+        The object provides control and status of the microscope beams.
         """
         return self.__beams
 
     @property
-    def detector(self) -> 'Detector':        
+    def detector(self) -> 'Detector':
         """
-        The object provides control and status of the microscope's detectors.
+        The object provides control and status of detectors.
         """
         return self.__detector
 
     @property
-    def gas(self) -> 'Gas':        
+    def gas(self) -> 'Gas':
         """
-        The object provides control of the microscope's gas systems.
+        The object provides control of the gas injection system (GIS).
         """
         return self.__gas
 
     @property
-    def imaging(self) -> 'Imaging':        
+    def imaging(self) -> 'Imaging':
         """
         The object provides control of the microscope imaging.
         """
         return self.__imaging
 
     @property
-    def patterning(self) -> 'Patterning':        
+    def patterning(self) -> 'Patterning':
         """
-        The object provides control and status of the microscope's patterning engine.
+        The object provides control and status of the microscope patterning engine.
         """
         return self.__patterning
 
     @property
-    def service(self) -> 'Service':        
+    def service(self) -> 'Service':
         """
         The object provides service information regarding the whole microscope system and the AutoScript product.
         """
         return self.__service
 
     @property
-    def specimen(self) -> 'Specimen':        
+    def specimen(self) -> 'Specimen':
         """
-        The object provides control and status of the microscope's stages and manipulator.
+        The object provides control and status of the stage, compustage, temperature stage and manipulator.
         """
         return self.__specimen
 
     @property
-    def state(self) -> 'State':        
+    def state(self) -> 'State':
         """
-        The object provides status of some of the microscope's subsystems.
+        The object provides status of various microscope subsystems.
         """
         return self.__state
 
     @property
-    def vacuum(self) -> 'Vacuum':        
+    def vacuum(self) -> 'Vacuum':
         """
-        The object provides control and status of the microscope's vacuum.
+        The object provides control and status of the specimen chamber vacuum.
         """
         return self.__vacuum
     

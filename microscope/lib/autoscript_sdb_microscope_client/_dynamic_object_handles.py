@@ -10,7 +10,6 @@ from autoscript_core.serialization import DynamicObjectHandle
 
 
 class RectanglePatternHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -18,7 +17,6 @@ class RectanglePatternHandle(DynamicObjectHandle):
 
 
 class LinePatternHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -26,7 +24,6 @@ class LinePatternHandle(DynamicObjectHandle):
 
 
 class CirclePatternHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -34,7 +31,6 @@ class CirclePatternHandle(DynamicObjectHandle):
 
 
 class CleaningCrossSectionPatternHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -42,7 +38,6 @@ class CleaningCrossSectionPatternHandle(DynamicObjectHandle):
 
 
 class RegularCrossSectionPatternHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -50,7 +45,6 @@ class RegularCrossSectionPatternHandle(DynamicObjectHandle):
 
 
 class StreamPatternHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -58,7 +52,6 @@ class StreamPatternHandle(DynamicObjectHandle):
 
 
 class BitmapPatternHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -66,7 +59,6 @@ class BitmapPatternHandle(DynamicObjectHandle):
 
 
 class GisPortHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -74,7 +66,6 @@ class GisPortHandle(DynamicObjectHandle):
 
 
 class MultichemHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -82,7 +73,6 @@ class MultichemHandle(DynamicObjectHandle):
 
 
 class ControlItemHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -90,7 +80,6 @@ class ControlItemHandle(DynamicObjectHandle):
 
 
 class ControlItemPairHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 
@@ -98,7 +87,6 @@ class ControlItemPairHandle(DynamicObjectHandle):
 
 
 class ServerActionHandle(DynamicObjectHandle):
-
     __slots__ = []
 
     def __init__(self, id): 

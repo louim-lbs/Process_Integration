@@ -8,13 +8,13 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .service._autoscript import AutoScript
 from .service._system import System
 from .service._generic_access import GenericAccess
 
 
-class Service(object):    
+class Service(object):
     """
     The object provides service information regarding the whole microscope system and the AutoScript product.
     """
@@ -29,22 +29,22 @@ class Service(object):
         self.__generic_access = GenericAccess(self.__application_client)
 
     @property
-    def autoscript(self) -> 'AutoScript':        
+    def autoscript(self) -> 'AutoScript':
         """
         The object provides service information regarding the AutoScript product.
         """
         return self.__autoscript
 
     @property
-    def system(self) -> 'System':        
+    def system(self) -> 'System':
         """
         The object provides service information regarding the whole microscope system.
         """
         return self.__system
 
     @property
-    def generic_access(self) -> 'GenericAccess':        
+    def generic_access(self) -> 'GenericAccess':
         """
-        The object for accessing generic interfaces on the instrument server. Requires a special license.
+        The object allows accessing generic interfaces on the instrument server. Requires a special license.
         """
         return self.__generic_access

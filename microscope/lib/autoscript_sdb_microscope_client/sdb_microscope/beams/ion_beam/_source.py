@@ -8,11 +8,11 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .source._plasma_gas import PlasmaGas
 
 
-class Source(object):    
+class Source(object):
     """
     The object provides control and status of the ion beam source.
     """
@@ -25,23 +25,23 @@ class Source(object):
         self.__plasma_gas = PlasmaGas(self.__application_client)
 
     @property
-    def plasma_gas(self) -> 'PlasmaGas':        
+    def plasma_gas(self) -> 'PlasmaGas':
         """
         The object provides control of the type of gas used in Multiple Ion Plasma FIB.
         """
         return self.__plasma_gas
 
-    def heat(self):        
+    def heat(self):
         """
-        Method for heating ion beam source.
+        Heats the ion beam source.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Heat", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def time_to_heat(self) -> 'float':        
+    def time_to_heat(self) -> 'float':
         """
-        Gets remaining time to heat the ion beam source in seconds.
+        Returns the remaining time to heat the ion beam source in seconds.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TimeToHeat_GET")
         call_response = self.__application_client._perform_call(call_request)

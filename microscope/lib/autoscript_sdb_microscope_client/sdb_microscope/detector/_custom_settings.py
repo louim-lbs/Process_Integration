@@ -8,7 +8,7 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .custom_settings._grid_voltage import GridVoltage
 from .custom_settings._suction_tube_voltage import SuctionTubeVoltage
 from .custom_settings._mirror_voltage import MirrorVoltage
@@ -17,7 +17,7 @@ from .custom_settings._scintillator_voltage import ScintillatorVoltage
 from .custom_settings._md_shutter import MdShutter
 
 
-class CustomSettings(object):    
+class CustomSettings(object):
     """
     The object provides control and status of the additional detectors settings.
     """
@@ -35,54 +35,54 @@ class CustomSettings(object):
         self.__md_shutter = MdShutter(self.__application_client)
 
     @property
-    def grid_voltage(self) -> 'GridVoltage':        
+    def grid_voltage(self) -> 'GridVoltage':
         """
         The object provides control and status of the active detector grid voltage.
         """
         return self.__grid_voltage
 
     @property
-    def suction_tube_voltage(self) -> 'SuctionTubeVoltage':        
+    def suction_tube_voltage(self) -> 'SuctionTubeVoltage':
         """
         The object provides control and status of the active detector suction tube voltage.
         """
         return self.__suction_tube_voltage
 
     @property
-    def mirror_voltage(self) -> 'MirrorVoltage':        
+    def mirror_voltage(self) -> 'MirrorVoltage':
         """
         The object provides control and status of the active detector mirror voltage.
         """
         return self.__mirror_voltage
 
     @property
-    def converter_voltage(self) -> 'ConverterVoltage':        
+    def converter_voltage(self) -> 'ConverterVoltage':
         """
         The object provides control and status of the active detector converter voltage.
         """
         return self.__converter_voltage
 
     @property
-    def scintillator_voltage(self) -> 'ScintillatorVoltage':        
+    def scintillator_voltage(self) -> 'ScintillatorVoltage':
         """
         The object provides control and status of the active detector scintillator voltage.
         """
         return self.__scintillator_voltage
 
     @property
-    def md_shutter(self) -> 'MdShutter':        
+    def md_shutter(self) -> 'MdShutter':
         """
-        The object represents a Mirror Detector Shutter.
+        The object representing Mirror Detector Shutter.
         """
         return self.__md_shutter
 
-    def set_segment_polarity(self, name, polarity):        
+    def set_segment_polarity(self, name: 'str', polarity: 'int'):
         """
         Sets the polarity of a segment.
         
-        :param str name: Name of the segment. DetectorSegment enumeration can be used to access segment names.
+        :param name: Name of the segment. DetectorSegment enumeration can be used to access segment names.
         
-        :param int polarity: The new polarity of the segment. SegmentPolarity enumeration can be used to obtain polarity names.
+        :param polarity: The new polarity of the segment. SegmentPolarity enumeration can be used to obtain polarity names.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetSegmentPolarity", signature= [DataType.STRING, DataType.INT32], parameters=[name, polarity]) 
         if isinstance(name, str) and isinstance(polarity, int):
@@ -90,14 +90,13 @@ class CustomSettings(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def get_segment_polarity(self, name) -> 'int':        
+    def get_segment_polarity(self, name: 'str') -> 'int':
         """
         Gets the polarity of a segment.
         
-        :param str name: Name of the segment. DetectorSegment enumeration can be used to access segment names.
+        :param name: Name of the segment. DetectorSegment enumeration can be used to access segment names.
         
         :return: The polarity of the segment. SegmentPolarity enumeration can be used to explain polarity name.
-        :rtype: int
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetSegmentPolarity", signature= [DataType.STRING], parameters=[name]) 
         if isinstance(name, str):
@@ -109,12 +108,11 @@ class CustomSettings(object):
 
         return call_response.result.value
 
-    def list_all_segments(self) -> 'List[str]':        
+    def list_all_segments(self) -> 'List[str]':
         """
-        The method returns all segments available on the active detector.
+        The function returns all segments available on the active detector.
         
         :return: The list of all segments available on the active detector.
-        :rtype: list
         """
         call_request = CallRequest(object_id=self.__id, method_name="ListAllSegments", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -123,9 +121,9 @@ class CustomSettings(object):
 
         return call_response.result.value
 
-    def reset_segments(self):        
+    def reset_segments(self):
         """
-        The method resets all eligible active detector segments in custom mode.
+        The function resets all eligible active detector segments in custom mode.
         """
         call_request = CallRequest(object_id=self.__id, method_name="ResetSegments", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)

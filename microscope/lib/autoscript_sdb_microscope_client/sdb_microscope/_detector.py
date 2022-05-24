@@ -9,7 +9,7 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import DetectorInsertSettings 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .detector._brightness import Brightness
 from .detector._contrast import Contrast
 from .detector._mode import Mode
@@ -17,9 +17,9 @@ from .detector._type import Type
 from .detector._custom_settings import CustomSettings
 
 
-class Detector(object):    
+class Detector(object):
     """
-    The object provides control and status of the microscope's detectors.
+    The object provides control and status of detectors.
     """
     __slots__ = ["__id", "__application_client", "__brightness", "__contrast", "__mode", "__type", "__custom_settings"]
 
@@ -34,47 +34,47 @@ class Detector(object):
         self.__custom_settings = CustomSettings(self.__application_client)
 
     @property
-    def brightness(self) -> 'Brightness':        
+    def brightness(self) -> 'Brightness':
         """
         The group provides control of the voltage offset of the active detector.
         """
         return self.__brightness
 
     @property
-    def contrast(self) -> 'Contrast':        
+    def contrast(self) -> 'Contrast':
         """
         The group provides control of the electronic gain of the active detector.
         """
         return self.__contrast
 
     @property
-    def mode(self) -> 'Mode':        
+    def mode(self) -> 'Mode':
         """
         The group provides control of the active detector mode.
         """
         return self.__mode
 
     @property
-    def type(self) -> 'Type':        
+    def type(self) -> 'Type':
         """
         The group provides control of the active detector type.
         """
         return self.__type
 
     @property
-    def custom_settings(self) -> 'CustomSettings':        
+    def custom_settings(self) -> 'CustomSettings':
         """
         The object provides control and status of the additional detectors settings.
         """
         return self.__custom_settings
 
-    def set_type_mode(self, type, mode):        
+    def set_type_mode(self, type: 'str', mode: 'str'):
         """
-        The methods sets both active detector type and mode.
+        The function sets both the active detector type and mode.
         
-        :param str type: New detector type. You can use DetectorType enumeration.
+        :param type: New detector type. You can use DetectorType enumeration.
         
-        :param str mode: New detector mode. You can use DetectorMode enumeration.
+        :param mode: New detector mode. You can use DetectorMode enumeration.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetTypeMode", signature= [DataType.STRING, DataType.STRING], parameters=[type, mode]) 
         if isinstance(type, str) and isinstance(mode, str):
@@ -82,14 +82,14 @@ class Detector(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def insert(self, settings = UndefinedParameter):        
+    def insert(self, settings: 'DetectorInsertSettings' = None):
         """
-        The method inserts the active detector.
+        The function inserts the active detector.
         
-        :param DetectorInsertSettings settings: The additional settings for the insert operation.
+        :param settings: The additional settings for the insert operation.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Insert", signature=[], parameters=[])
-        if settings is UndefinedParameter:
+        if settings is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -101,15 +101,15 @@ class Detector(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def retract(self):        
+    def retract(self):
         """
-        The method retracts the active detector.
+        The function retracts the active detector.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Retract", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def state(self) -> 'str':        
+    def state(self) -> 'str':
         """
         The current state of a retractable detector.
         """

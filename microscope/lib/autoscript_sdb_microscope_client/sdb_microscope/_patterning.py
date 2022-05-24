@@ -9,15 +9,15 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import StreamPatternDefinition, BitmapPatternDefinition 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .patterning._real_time_monitor import RealTimeMonitor
 from autoscript_sdb_microscope_client._dynamic_object_proxies import RectanglePattern, LinePattern, CirclePattern, CleaningCrossSectionPattern, RegularCrossSectionPattern, StreamPattern, BitmapPattern 
 from autoscript_sdb_microscope_client._dynamic_object_handles import RectanglePatternHandle, LinePatternHandle, CirclePatternHandle, CleaningCrossSectionPatternHandle, RegularCrossSectionPatternHandle, StreamPatternHandle, BitmapPatternHandle 
 
 
-class Patterning(object):    
+class Patterning(object):
     """
-    The object provides control and status of the microscope's patterning engine.
+    The object provides control and status of the microscope patterning engine.
     """
     __slots__ = ["__id", "__application_client", "__real_time_monitor"]
 
@@ -28,17 +28,17 @@ class Patterning(object):
         self.__real_time_monitor = RealTimeMonitor(self.__application_client)
 
     @property
-    def real_time_monitor(self) -> 'RealTimeMonitor':        
+    def real_time_monitor(self) -> 'RealTimeMonitor':
         """
-        The object provides control and status of the real time monitor.
+        The object provides control and status of the real time monitor (RTM).
         """
         return self.__real_time_monitor
 
-    def set_default_beam_type(self, beam_index):        
+    def set_default_beam_type(self, beam_index: 'int'):
         """
-        The method sets the default beam type to be used when creating new patterns.
+        The function sets a default beam type to use when creating new patterns.
         
-        :param int beam_index: Beam type to be used by default when creating new patterns. Use the BeamType enumeration to specify the proper beam index.
+        :param beam_index: Beam type to be used by default when creating new patterns. Use the BeamType enumeration to specify the proper beam index.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetDefaultBeamType", signature= [DataType.INT32], parameters=[beam_index]) 
         if isinstance(beam_index, int):
@@ -46,11 +46,11 @@ class Patterning(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def set_default_application_file(self, application_file):        
+    def set_default_application_file(self, application_file: 'str'):
         """
-        The method sets the default application file to be used when creating new patterns.
+        The function sets a default application file to use when creating new patterns.
         
-        :param str application_file: Name of the application file.
+        :param application_file: Name of the application file.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetDefaultApplicationFile", signature= [DataType.STRING], parameters=[application_file]) 
         if isinstance(application_file, str):
@@ -58,22 +58,21 @@ class Patterning(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def create_rectangle(self, center_x, center_y, width, height, depth) -> 'RectanglePattern':        
+    def create_rectangle(self, center_x: 'float', center_y: 'float', width: 'float', height: 'float', depth: 'float') -> 'RectanglePattern':
         """
-        The method creates a new rectangular pattern.
+        The function creates a rectangular pattern.
         
-        :param float center_x: X coordinate of the pattern center position.
+        :param center_x: X coordinate of the pattern center position.
         
-        :param float center_y: Y coordinate of the pattern center position.
+        :param center_y: Y coordinate of the pattern center position.
         
-        :param float width: The pattern width.
+        :param width: The pattern width.
         
-        :param float height: The pattern height.
+        :param height: The pattern height.
         
-        :param float depth: Depth of the pattern.
+        :param depth: Depth of the pattern.
         
         :return: The new rectangular pattern.
-        :rtype: RectanglePattern
         """
         call_request = CallRequest(object_id=self.__id, method_name="CreateRectangle", signature= [DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE], parameters=[center_x, center_y, width, height, depth]) 
         if isinstance(center_x, (int, float)) and isinstance(center_y, (int, float)) and isinstance(width, (int, float)) and isinstance(height, (int, float)) and isinstance(depth, (int, float)):
@@ -86,22 +85,21 @@ class Patterning(object):
         handle = call_response.result.value
         return RectanglePattern(self.__application_client, handle)
 
-    def create_line(self, start_x, start_y, end_x, end_y, depth) -> 'LinePattern':        
+    def create_line(self, start_x: 'float', start_y: 'float', end_x: 'float', end_y: 'float', depth: 'float') -> 'LinePattern':
         """
-        The method creates a new line pattern.
+        The function creates a line pattern.
         
-        :param float start_x: X coordinate of the pattern start position.
+        :param start_x: X coordinate of the pattern start position.
         
-        :param float start_y: Y coordinate of the pattern start position.
+        :param start_y: Y coordinate of the pattern start position.
         
-        :param float end_x: X coordinate of the pattern end position.
+        :param end_x: X coordinate of the pattern end position.
         
-        :param float end_y: Y coordinate of the pattern end position.
+        :param end_y: Y coordinate of the pattern end position.
         
-        :param float depth: Depth of the pattern.
+        :param depth: Depth of the pattern.
         
         :return: The new line pattern.
-        :rtype: LinePattern
         """
         call_request = CallRequest(object_id=self.__id, method_name="CreateLine", signature= [DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE], parameters=[start_x, start_y, end_x, end_y, depth]) 
         if isinstance(start_x, (int, float)) and isinstance(start_y, (int, float)) and isinstance(end_x, (int, float)) and isinstance(end_y, (int, float)) and isinstance(depth, (int, float)):
@@ -114,22 +112,21 @@ class Patterning(object):
         handle = call_response.result.value
         return LinePattern(self.__application_client, handle)
 
-    def create_circle(self, center_x, center_y, outer_diameter, inner_diameter, depth) -> 'CirclePattern':        
+    def create_circle(self, center_x: 'float', center_y: 'float', outer_diameter: 'float', inner_diameter: 'float', depth: 'float') -> 'CirclePattern':
         """
-        The method creates a new circular pattern.
+        The method creates a circular pattern.
         
-        :param float center_x: X coordinate of the pattern center position.
+        :param center_x: X coordinate of the pattern center position.
         
-        :param float center_y: Y coordinate of the pattern center position.
+        :param center_y: Y coordinate of the pattern center position.
         
-        :param float outer_diameter: Diameter of the circle.
+        :param outer_diameter: Diameter of the circle.
         
-        :param float inner_diameter: Diameter of the inner circle.
+        :param inner_diameter: Diameter of the inner circle.
         
-        :param float depth: Depth of the pattern.
+        :param depth: Depth of the pattern.
         
         :return: The new circular pattern.
-        :rtype: CirclePattern
         """
         call_request = CallRequest(object_id=self.__id, method_name="CreateCircle", signature= [DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE], parameters=[center_x, center_y, outer_diameter, inner_diameter, depth]) 
         if isinstance(center_x, (int, float)) and isinstance(center_y, (int, float)) and isinstance(outer_diameter, (int, float)) and isinstance(inner_diameter, (int, float)) and isinstance(depth, (int, float)):
@@ -142,22 +139,21 @@ class Patterning(object):
         handle = call_response.result.value
         return CirclePattern(self.__application_client, handle)
 
-    def create_cleaning_cross_section(self, center_x, center_y, width, height, depth) -> 'CleaningCrossSectionPattern':        
+    def create_cleaning_cross_section(self, center_x: 'float', center_y: 'float', width: 'float', height: 'float', depth: 'float') -> 'CleaningCrossSectionPattern':
         """
-        The method creates a new cleaning cross section pattern.
+        The function creates a cleaning cross section pattern.
         
-        :param float center_x: X coordinate of the pattern center position.
+        :param center_x: X coordinate of the pattern center position.
         
-        :param float center_y: Y coordinate of the pattern center position.
+        :param center_y: Y coordinate of the pattern center position.
         
-        :param float width: The pattern width.
+        :param width: The pattern width.
         
-        :param float height: The pattern height.
+        :param height: The pattern height.
         
-        :param float depth: Depth of the pattern.
+        :param depth: Depth of the pattern.
         
         :return: The new cleaning cross section pattern.
-        :rtype: CleaningCrossSectionPattern
         """
         call_request = CallRequest(object_id=self.__id, method_name="CreateCleaningCrossSection", signature= [DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE], parameters=[center_x, center_y, width, height, depth]) 
         if isinstance(center_x, (int, float)) and isinstance(center_y, (int, float)) and isinstance(width, (int, float)) and isinstance(height, (int, float)) and isinstance(depth, (int, float)):
@@ -170,22 +166,21 @@ class Patterning(object):
         handle = call_response.result.value
         return CleaningCrossSectionPattern(self.__application_client, handle)
 
-    def create_regular_cross_section(self, center_x, center_y, width, height, depth) -> 'RegularCrossSectionPattern':        
+    def create_regular_cross_section(self, center_x: 'float', center_y: 'float', width: 'float', height: 'float', depth: 'float') -> 'RegularCrossSectionPattern':
         """
         The method creates a new regular cross section pattern.
         
-        :param float center_x: X coordinate of the pattern center position.
+        :param center_x: X coordinate of the pattern center position.
         
-        :param float center_y: Y coordinate of the pattern center position.
+        :param center_y: Y coordinate of the pattern center position.
         
-        :param float width: The pattern width.
+        :param width: The pattern width.
         
-        :param float height: The pattern height.
+        :param height: The pattern height.
         
-        :param float depth: Depth of the pattern.
+        :param depth: Depth of the pattern.
         
         :return: The new regular cross section pattern.
-        :rtype: RegularCrossSectionPattern
         """
         call_request = CallRequest(object_id=self.__id, method_name="CreateRegularCrossSection", signature= [DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE], parameters=[center_x, center_y, width, height, depth]) 
         if isinstance(center_x, (int, float)) and isinstance(center_y, (int, float)) and isinstance(width, (int, float)) and isinstance(height, (int, float)) and isinstance(depth, (int, float)):
@@ -198,18 +193,17 @@ class Patterning(object):
         handle = call_response.result.value
         return RegularCrossSectionPattern(self.__application_client, handle)
 
-    def create_stream(self, center_x, center_y, stream_pattern_definition) -> 'StreamPattern':        
+    def create_stream(self, center_x: 'float', center_y: 'float', stream_pattern_definition: 'StreamPatternDefinition') -> 'StreamPattern':
         """
-        The method creates the stream file pattern.
+        The function creates a stream file pattern.
         
-        :param float center_x: X coordinate of the pattern center position.
+        :param center_x: X coordinate of the pattern center position.
         
-        :param float center_y: Y coordinate of the pattern center position.
+        :param center_y: Y coordinate of the pattern center position.
         
-        :param StreamPatternDefinition stream_pattern_definition: The stream pattern definition.
+        :param stream_pattern_definition: The stream pattern definition.
         
         :return: The new stream file pattern.
-        :rtype: StreamPattern
         """
         call_request = CallRequest(object_id=self.__id, method_name="CreateStream", signature= [DataType.DOUBLE, DataType.DOUBLE, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="StreamPatternDefinition")], parameters=[center_x, center_y, stream_pattern_definition]) 
         if isinstance(center_x, (int, float)) and isinstance(center_y, (int, float)) and isinstance(stream_pattern_definition, StreamPatternDefinition):
@@ -222,24 +216,23 @@ class Patterning(object):
         handle = call_response.result.value
         return StreamPattern(self.__application_client, handle)
 
-    def create_bitmap(self, center_x, center_y, width, height, depth, bitmap_pattern_definition) -> 'BitmapPattern':        
+    def create_bitmap(self, center_x: 'float', center_y: 'float', width: 'float', height: 'float', depth: 'float', bitmap_pattern_definition: 'BitmapPatternDefinition') -> 'BitmapPattern':
         """
-        The method creates the bitmap pattern.
+        The function creates a bitmap pattern.
         
-        :param float center_x: X coordinate of the pattern center position.
+        :param center_x: X coordinate of the pattern center position.
         
-        :param float center_y: Y coordinate of the pattern center position.
+        :param center_y: Y coordinate of the pattern center position.
         
-        :param float width: The pattern width.
+        :param width: The pattern width.
         
-        :param float height: The pattern height.
+        :param height: The pattern height.
         
-        :param float depth: Depth of the pattern.
+        :param depth: Depth of the pattern.
         
-        :param BitmapPatternDefinition bitmap_pattern_definition: The bitmap pattern definition.
+        :param bitmap_pattern_definition: The bitmap pattern definition.
         
         :return: The new bitmap pattern.
-        :rtype: BitmapPattern
         """
         call_request = CallRequest(object_id=self.__id, method_name="CreateBitmap", signature= [DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataType.DOUBLE, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="BitmapPatternDefinition")], parameters=[center_x, center_y, width, height, depth, bitmap_pattern_definition]) 
         if isinstance(center_x, (int, float)) and isinstance(center_y, (int, float)) and isinstance(width, (int, float)) and isinstance(height, (int, float)) and isinstance(depth, (int, float)) and isinstance(bitmap_pattern_definition, BitmapPatternDefinition):
@@ -252,19 +245,18 @@ class Patterning(object):
         handle = call_response.result.value
         return BitmapPattern(self.__application_client, handle)
 
-    def clear_patterns(self):        
+    def clear_patterns(self):
         """
         The method deletes all the existing patterns in the current view.
         """
         call_request = CallRequest(object_id=self.__id, method_name="ClearPatterns", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def list_all_application_files(self) -> 'List[str]':        
+    def list_all_application_files(self) -> 'List[str]':
         """
-        The method returns all application files available on the system.
+        The function returns all application files available on the system.
         
         :return: The list of all application files available on the system.
-        :rtype: list
         """
         call_request = CallRequest(object_id=self.__id, method_name="ListAllApplicationFiles", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -273,43 +265,43 @@ class Patterning(object):
 
         return call_response.result.value
 
-    def run(self):        
+    def run(self):
         """
-        The method runs patterning job synchronously (waits for the patterning end).
+        The function executes the patterning job synchronously, i.e. it waits for the patterning to end.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Run", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def resume(self):        
+    def resume(self):
         """
-        The method resumes paused patterning job.
+        The function resumes a paused patterning job.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Resume", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def start(self):        
+    def start(self):
         """
-        The method starts the patterning asynchronously.
+        The function starts the patterning asynchronously.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Start", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def stop(self):        
+    def stop(self):
         """
-        The method aborts running patterning job.
+        The function aborts a running patterning job.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Stop", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def pause(self):        
+    def pause(self):
         """
-        The method pauses running patterning job.
+        The function pauses a patterning job in progress.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Pause", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def mode(self) -> 'str':        
+    def mode(self) -> 'str':
         """
         Gets and sets the active patterning mode.
         """
@@ -321,7 +313,7 @@ class Patterning(object):
         return call_response.result.value
 
     @mode.setter
-    def mode(self, value):        
+    def mode(self, value: 'str'):
         """
         Gets and sets the active patterning mode.
         """
@@ -332,7 +324,7 @@ class Patterning(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def state(self) -> 'str':        
+    def state(self) -> 'str':
         """
         Gets the current state of the patterning engine.
         """

@@ -8,7 +8,7 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .specimen._compustage import Compustage
 from .specimen._manipulator import Manipulator
 from .specimen._stage import Stage
@@ -16,9 +16,9 @@ from .specimen._loadlock import LoadLock
 from .specimen._temperature_stage import TemperatureStage
 
 
-class Specimen(object):    
+class Specimen(object):
     """
-    The object provides control and status of the microscope's stages and manipulator.
+    The object provides control and status of the stage, compustage, temperature stage and manipulator.
     """
     __slots__ = ["__id", "__application_client", "__compustage", "__manipulator", "__stage", "__loadlock", "__temperature_stage"]
 
@@ -33,35 +33,35 @@ class Specimen(object):
         self.__temperature_stage = TemperatureStage(self.__application_client)
 
     @property
-    def compustage(self) -> 'Compustage':        
+    def compustage(self) -> 'Compustage':
         """
-        The object provides control and status of the microscope's compustage device.
+        The object provides control and status of the compustage device.
         """
         return self.__compustage
 
     @property
-    def manipulator(self) -> 'Manipulator':        
+    def manipulator(self) -> 'Manipulator':
         """
-        The object provides control and status of the microscope's manipulator device.
+        The object provides control and status of the manipulator device. The device is also referred to as EasyLift.
         """
         return self.__manipulator
 
     @property
-    def stage(self) -> 'Stage':        
+    def stage(self) -> 'Stage':
         """
-        The object provides control and status of the microscope's stage.
+        The object provides control and status of the bulk stage.
         """
         return self.__stage
 
     @property
-    def loadlock(self) -> 'LoadLock':        
+    def loadlock(self) -> 'LoadLock':
         """
-        The object provides control and status of the microscope's loadlock device.
+        The object provides control and status of the microscope LoadLock device.
         """
         return self.__loadlock
 
     @property
-    def temperature_stage(self) -> 'TemperatureStage':        
+    def temperature_stage(self) -> 'TemperatureStage':
         """
         The object provides control and status of the microscope temperature stage.
         """

@@ -9,10 +9,10 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import Limits 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class WorkingDistance(object):    
+class WorkingDistance(object):
     """
     The object provides control and status of the working distance.
     """
@@ -23,11 +23,11 @@ class WorkingDistance(object):
         self.__id = "SdbMicroscope.Beams.ElectronBeam.WorkingDistance"
 
 
-    def set_value_no_degauss(self, value):        
+    def set_value_no_degauss(self, value: 'float'):
         """
         Sets the value of the working distance with the automated Immersion lens degauss procedure disabled.
         
-        :param float value: New value of the working distance in meters.
+        :param value: New value of the working distance in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetValueNoDegauss", signature= [DataType.DOUBLE], parameters=[value]) 
         if isinstance(value, (int, float)):
@@ -36,7 +36,7 @@ class WorkingDistance(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def limits(self) -> 'Limits':        
+    def limits(self) -> 'Limits':
         """
         Retrieves the range of valid values.
         """
@@ -48,7 +48,7 @@ class WorkingDistance(object):
         return call_response.result.value
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         Gets or sets the value.
         """
@@ -60,7 +60,7 @@ class WorkingDistance(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'float'):
         """
         Gets or sets the value.
         """

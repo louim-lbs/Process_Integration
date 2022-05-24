@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class SuctionTubeVoltage(object):    
+class SuctionTubeVoltage(object):
     """
     The object provides control and status of the active detector suction tube voltage.
     """
@@ -23,7 +23,7 @@ class SuctionTubeVoltage(object):
 
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         Gets or sets the value of the detector suction tube voltage.
         """
@@ -35,7 +35,7 @@ class SuctionTubeVoltage(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'float'):
         """
         Gets or sets the value of the detector suction tube voltage.
         """

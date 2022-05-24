@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class ChamberPressure(object):    
+class ChamberPressure(object):
     """
     [OBSOLETE] The object provides status of the chamber pressure.
     """
@@ -23,7 +23,7 @@ class ChamberPressure(object):
 
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         [OBSOLETE] The property retrieves current chamber pressure.
         """

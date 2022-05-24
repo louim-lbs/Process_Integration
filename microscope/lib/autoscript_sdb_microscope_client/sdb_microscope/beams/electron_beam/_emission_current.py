@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class EmissionCurrent(object):    
+class EmissionCurrent(object):
     """
     The object provides control and status of the electron beam emission current.
     """
@@ -23,7 +23,7 @@ class EmissionCurrent(object):
 
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         The property returns the actual electron beam emission current.
         """

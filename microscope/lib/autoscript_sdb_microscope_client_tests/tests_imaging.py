@@ -8,6 +8,29 @@ import os
 import time
 import unittest
 
+'''
+Terminology:
+    - "Standard" resolution:      Preset from ScanningResolution enum, native to XT, all settings supported
+    - "Non-standard" resolution:  Any resolution outside ScanningResolution presets up to 65536x65536, requires "BigSnapshot" acquisition technique and has limited settings 
+    - "Large" resolution:         > 6k in X or Y, must be streamed to disk 
+    - "Small" resolution:         <= 6k, can be represented as object in memory
+
+Imaging situations:
+    A. grab_frame() with standard resolution -> STANDARD acquisition
+        a. Normal optics mode 
+        b. Cross over mode, specifying settings is not allowed
+    
+    B. grab_frame() with non-standard resolution
+        a. > 6k -> error
+        b. < 6k -> BIG SNAPSHOT acquisition (settings are limited)
+    
+    C. grab_frame_to_disk() with standard resolution -> STANDARD acquisition
+        - Returned image size is preview_resolution if specified in settings, otherwise original image resolution
+    
+    D. grab_frame_to_disk() with non-standard resolution -> BIG SNAPSHOT acquisition
+        - Returned image size is preview_resolution if specified in settings, otherwise default size 768x768 rescaled to match original aspect ratio
+'''
+
 
 class TestsImaging(unittest.TestCase):
     def setUp(self, host="localhost"):
@@ -16,28 +39,9 @@ class TestsImaging(unittest.TestCase):
         self.test_helper = TestHelper(self, self.microscope)
         self.microscope.imaging.set_active_view(1)
         self.microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
-        self.temporary_directory = tempfile.TemporaryDirectory()
 
     def tearDown(self):
-        self.temporary_directory.cleanup()
         pass
-
-    def __grab_and_load_image(self, bit_depth, filename, encoding):
-        file_path = os.path.join(self.temporary_directory.name, filename)
-        reduced_area = Rectangle(0.2, 0.1, 0.6, 0.4)
-
-        settings = GrabFrameSettings(reduced_area=reduced_area, bit_depth=bit_depth)
-        saved_image = self.microscope.imaging.grab_frame(settings)
-        saved_image.save(file_path)
-
-        loaded_image = AdornedImage.load(file_path)
-        self.__evaluate_loaded_adorned_image(saved_image, loaded_image, bit_depth, encoding)
-
-    def __evaluate_loaded_adorned_image(self, saved_image, loaded_image, bit_depth, encoding):
-        self.test_helper.assert_image(loaded_image, loaded_image.width, loaded_image.height, loaded_image.bit_depth, loaded_image.encoding)
-        self.assertEqual(saved_image.metadata.metadata_as_ini, loaded_image.metadata.metadata_as_ini)
-        self.assertAlmostEqual(saved_image.metadata.optics.scan_field_of_view.height, loaded_image.metadata.optics.scan_field_of_view.height)
-        self.assertAlmostEqual(saved_image.metadata.optics.scan_field_of_view.width, loaded_image.metadata.optics.scan_field_of_view.width)
 
     def test_switch_views(self):
         delay_between_switches = 0.5
@@ -60,13 +64,13 @@ class TestsImaging(unittest.TestCase):
         if microscope.beams.ion_beam.is_installed:
             available_imaging_devices.append(ImagingDevice.ION_BEAM)
 
-        if self.test_helper.is_ccd_installed():
+        if self.test_helper.is_ccd_installed:
             available_imaging_devices.append(ImagingDevice.CCD_CAMERA)
 
-        if self.test_helper.is_navcam_installed():
+        if self.test_helper.is_navcam_installed:
             available_imaging_devices.append(ImagingDevice.NAV_CAM)
 
-        if self.test_helper.is_optical_microscope_installed():
+        if self.test_helper.is_optical_microscope_installed:
             available_imaging_devices.append(ImagingDevice.OPTICAL_MICROSCOPE)
 
         for imaging_device in available_imaging_devices:
@@ -79,168 +83,6 @@ class TestsImaging(unittest.TestCase):
         print("Returning original imaging device...")
         microscope.imaging.set_active_device(backed_up_device)
         self.assertEqual(microscope.imaging.get_active_device(), backed_up_device)
-        print("Done.")
-
-    def test_start_stop_acquisition(self):
-        self.microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
-        self.microscope.imaging.start_acquisition()
-        time.sleep(1)
-        self.microscope.imaging.stop_acquisition()
-        print("Done.")
-
-    def test_grab_frame_with_no_parameters(self):
-        print("Grabbing frame...")
-        frame = self.microscope.imaging.grab_frame()
-
-        self.assertNotEqual(None, frame, "No image was returned.")
-        print("Done.")
-
-    def test_grab_frames_with_specific_bit_depth(self):
-        print("Grabbing 8-bit frame...")
-        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, dwell_time=1e-6, bit_depth=8)
-        frame8 = self.microscope.imaging.grab_frame(settings)
-        self.assertEqual(8, frame8.bit_depth)
-
-        print("Grabbing 16-bit frame...")
-        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, dwell_time=1e-6, bit_depth=16)
-        frame16 = self.microscope.imaging.grab_frame(settings)
-        self.assertEqual(16, frame16.bit_depth)
-
-        print("Done.")
-
-    def test_reduced_area_grab_frame(self):
-        reduced_area = Rectangle()
-        reduced_area.left = 0.2
-        reduced_area.top = 0.1
-        reduced_area.width = 0.6
-        reduced_area.height = 0.4
-
-        settings = GrabFrameSettings(resolution="1536x1024", dwell_time=1e-6, reduced_area=reduced_area)
-
-        print("Grabbing frame in reduced area...")
-        image = self.microscope.imaging.grab_frame(settings)
-
-        print("Scan area metadata from resulting image are " + str(image.metadata.scan_settings.scan_area))
-
-        # compares reduced area frame width with tolerance to overcome effects of different rounding on various systems
-        if abs(image.width - 921) > 3:
-            raise AssertionError("Reduced area frame width is much different than expected (%d != %d)" % (image.width, 921))
-
-        # compares reduced area frame height with tolerance to overcome effects of different rounding on various systems
-        if abs(image.height - 410) > 3:
-            raise AssertionError("Reduced area frame height is much different than expected (%d != %d)" % (image.height, 410))
-
-        print("Done.")
-
-    def test_reduced_area_grab_frame_without_resolution(self):
-        print("Preparing environment...")
-        self.microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
-        self.microscope.beams.electron_beam.scanning.resolution.value = ScanningResolution.PRESET_768X512
-        settings = GrabFrameSettings(reduced_area=Rectangle(0.5, 0.5, 1.0/4, 1.0/4))
-
-        print("Grabbing frame...")
-        frame = self.microscope.imaging.grab_frame(settings)
-
-        print("Checking result...")
-        self.assertEqual(768/4, frame.width)
-        self.assertEqual(512/4, frame.height)
-
-        print("Done.")
-
-    def test_image_template_match(self):
-        print("Locating template in image using HOG matcher...")
-        lenna = self.test_helper.provide_lenna_gray8()
-        face = self.test_helper.extract_lenna_face_region(lenna)
-        lenna_adorned_image = AdornedImage(lenna)
-        face_adorned_image = AdornedImage(face)
-
-        match = self.microscope.imaging.match_template(lenna_adorned_image, face_adorned_image)
-        self.assertAlmostEqual(300, match.center.x, places=0)
-        self.assertAlmostEqual(300, match.center.y, places=0)
-        self.assertGreater(match.score, 0.25)
-
-        print("Done.")
-
-    def test_grab_multiple_frames(self):
-        microscope = self.microscope
-
-        if self.test_helper.is_offline():
-            self.skipTest("Skipping for offline because beam (in)compatibility is not respected in offline mode.")
-            
-        print("Setting up view 1...")
-        primary_imaging_device = ImagingDevice.ELECTRON_BEAM
-        microscope.imaging.set_active_view(1)
-        microscope.imaging.set_active_device(primary_imaging_device)
-        available_detector_types = microscope.detector.type.available_values
-
-        print("Primary imaging device is", ImagingDevice.explain(primary_imaging_device))
-
-        if DetectorType.ETD in available_detector_types:
-            primary_detector_type = DetectorType.ETD
-        elif DetectorType.T1 in available_detector_types:
-            primary_detector_type = DetectorType.T1
-        else:
-            primary_detector_type = None
-            self.skipTest("Suitable primary detector not found, skipping the test.")
-
-        print("Primary detector is", primary_detector_type)
-
-        # Secondary detector must be compatible with primary (=must allow simultaneous acquisition)
-        if DetectorType.ICE in available_detector_types:
-            secondary_detector_type = DetectorType.ICE
-        elif DetectorType.CBS in available_detector_types:
-            secondary_detector_type = DetectorType.CBS
-        elif DetectorType.T2 in available_detector_types:
-            secondary_detector_type = DetectorType.T2
-        else:
-            secondary_detector_type = primary_detector_type
-
-        print("Secondary detector is", secondary_detector_type)
-
-        # Secondary imaging device must me incompatible with electron beam acquisition
-        if microscope.beams.ion_beam.is_installed:
-            incompatible_imaging_device = ImagingDevice.ION_BEAM
-        elif self.test_helper.is_ccd_installed():
-            incompatible_imaging_device = ImagingDevice.CCD_CAMERA
-        elif self.test_helper.is_navcam_installed():
-            incompatible_imaging_device = ImagingDevice.NAV_CAM
-        else:
-            incompatible_imaging_device = None
-            self.skipTest("Suitable secondary imaging device not found, skipping the test.")
-
-        print("Incompatible imaging device is", ImagingDevice.explain(incompatible_imaging_device))
-
-        # Set up views - 1 and 3 will be compatible, 2 and 4 incompatible
-        print("Setting up views...")
-        self.microscope.detector.type.value = primary_detector_type
-        self.microscope.imaging.set_active_view(2)
-        self.microscope.imaging.set_active_device(incompatible_imaging_device)
-        self.microscope.imaging.set_active_view(3)
-        self.microscope.imaging.set_active_device(primary_imaging_device)
-        self.microscope.detector.type.value = secondary_detector_type
-        self.microscope.imaging.set_active_view(4)
-        self.microscope.imaging.set_active_device(incompatible_imaging_device)
-        self.microscope.imaging.set_active_view(1)
-        print("Success.")
-
-        # Run test for resolution 768x512 and actual grab frame settings
-        print("Grabbing multiple frames at resolution 768x512...")
-        self.microscope.beams.electron_beam.scanning.resolution.value = "768x512"
-        images = self.microscope.imaging.grab_multiple_frames()
-        self.assertEqual(2, len(images))
-        self.assertEqual(images[0].metadata.detectors[0].detector_type, primary_detector_type)
-        self.assertEqual(images[1].metadata.detectors[0].detector_type, secondary_detector_type)
-        self.test_helper.assert_image(images[0], 768, 512)
-
-        # Run test for resolution 1536x1024 and grab frame settings supplied
-        print("Grabbing multiple frames at resolution 1536x1024...")
-        settings = GrabFrameSettings(resolution="1536x1024")
-        images = self.microscope.imaging.grab_multiple_frames(settings)
-        self.assertEqual(2, len(images))
-        self.assertEqual(images[0].metadata.detectors[0].detector_type, primary_detector_type)
-        self.assertEqual(images[1].metadata.detectors[0].detector_type, secondary_detector_type)
-        self.test_helper.assert_image(images[0], 1536, 1024)
-
         print("Done.")
 
     def test_switch_scanning_filters(self):
@@ -293,274 +135,358 @@ class TestsImaging(unittest.TestCase):
 
         print("Done.")
 
-    def test_crossover_grab_frame1(self):
+    def test_start_stop_acquisition(self):
+        self.microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
+        self.microscope.imaging.start_acquisition()
+        time.sleep(1)
+        self.microscope.imaging.stop_acquisition()
+        print("Done.")
+
+    def test_grab_frame_with_no_parameters(self):
+        print("Grabbing frame...")
+        frame = self.microscope.imaging.grab_frame()
+
+        self.assertNotEqual(None, frame, "No image was returned.")
+        print("Done.")
+
+    def test_grab_frame_with_specific_bit_depth(self):
+        if self.test_helper.is_offline:
+            self.skipTest("Not simulated in offline mode, skipping")
+
+        print("Grabbing 8-bit frame...")
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, dwell_time=1e-6, bit_depth=8)
+        frame8 = self.microscope.imaging.grab_frame(settings)
+        self.assertEqual(8, frame8.bit_depth)
+
+        print("Grabbing 16-bit frame...")
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, dwell_time=1e-6, bit_depth=16)
+        frame16 = self.microscope.imaging.grab_frame(settings)
+        self.assertEqual(16, frame16.bit_depth)
+
+        print("Done.")
+
+    def test_grab_frame_with_reduced_area(self):
+        print("Grabbing frame in reduced area...")
+
+        reduced_area = Rectangle()
+        reduced_area.left = 0.2
+        reduced_area.top = 0.1
+        reduced_area.width = 0.6
+        reduced_area.height = 0.4
+
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=1e-6, reduced_area=reduced_area)
+
+        image = self.microscope.imaging.grab_frame(settings)
+        print("Scan area metadata from resulting image are " + str(image.metadata.scan_settings.scan_area))
+
+        # Compare reduced area frame width with tolerance to overcome effects of different rounding on various systems
+        if abs(image.width - 921) > 3:
+            raise AssertionError("Reduced area frame width is much different than expected (%d != %d)" % (image.width, 921))
+
+        # Compare reduced area frame height with tolerance to overcome effects of different rounding on various systems
+        if abs(image.height - 410) > 3:
+            raise AssertionError("Reduced area frame height is much different than expected (%d != %d)" % (image.height, 410))
+
+        print("Grabbing frame in reduced area without specifying resolution...")
+        self.microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
+        self.microscope.beams.electron_beam.scanning.resolution.value = ScanningResolution.PRESET_768X512
+        settings = GrabFrameSettings(reduced_area=Rectangle(0.5, 0.5, 1.0 / 4, 1.0 / 4))
+        image = self.microscope.imaging.grab_frame(settings)
+        self.assertEqual(768 / 4, image.width)
+        self.assertEqual(512 / 4, image.height)
+        print("Done.")
+
+    def test_grab_frame_in_crossover(self):
         print("Setting mode to crossover...")
         self.microscope.beams.electron_beam.scanning.mode.set_crossover()
+        print("Success.")
 
         print("Grabbing a frame...")
         image = self.microscope.imaging.grab_frame()
         grabbed_in_crossover = image.metadata.optics.cross_over_on
 
         # TODO: have this fixed in XT
-        # mpav: temporarily skipped - this is a problem in XT, it was reported in January 2020
-        # reproduced on Helios by most probably also other systems (not tested)
-        # the problem is that the 1st image taken after cross over is activated does not have cross over mode noted in metadata
+        # mpav: Temporarily skipped - this is a problem in XT, it was reported in January 2020,
+        # reproduced on Helios by most probably also other systems (not tested).
+        # The problem is that the 1st image taken after cross over is activated does not have cross over mode noted in metadata.
         # self.assertTrue(grabbed_in_crossover)
+        print("Success.")
 
-        # turn off crossover mode - cleanup
-        self.microscope.beams.electron_beam.scanning.mode.set_full_frame()
-        print("Done.")
-
-    def test_crossover_grab_frame2(self):
-        raised = False
-
-        print("Creating GrabFrameSettings...")
-        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=1e-6,
-                                     reduced_area=Rectangle(0.40, 0.40, 0.2, 0.2))
-
-        print("Setting mode to crossover...")
-        self.microscope.beams.electron_beam.scanning.mode.set_crossover()
-
-        try:
-            print("Grabbing a frame with settings...")
+        print("Grabbing a frame with settings must throw...")
+        with self.assertRaisesRegex(ApplicationServerException, "specific settings"):
+            settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=1e-6, reduced_area=Rectangle(0.40, 0.40, 0.2, 0.2))
             image = self.microscope.imaging.grab_frame(settings)
-        except Exception:
-            print("Exception raised...")
-            raised = True
+        print("Success.")
 
-        if not raised:
-            raise AssertionError("Exception is not raised when grabbing a frame with settings in crossover mode, "
-                                 "although ApplicationServerException is expected.")
-
-        # turn off crossover mode - cleanup
+        # Turn off crossover mode - cleanup
+        print("Setting mode back to full frame...")
         self.microscope.beams.electron_beam.scanning.mode.set_full_frame()
         print("Done.")
 
-    def test_grab_frame_to_disk_raw(self):
-        if self.test_helper.is_system_version(6):
-            # XT 6 does not support big snapshot
-            print("Creating GrabFrameSettings...")
-            settings = GrabFrameSettings(resolution="10000x10000", dwell_time=50e-9)
-            file_path = os.path.join(self.temporary_directory.name, "raw_image.raw")
-
-            print("Trying to grab big image on XT 6, should throw...")
-            with self.assertRaises(ApiException):
-                preview = self.microscope.imaging.grab_frame_to_disk(file_path, ImageFileFormat.RAW, settings)
-            print("Done.")
-            return
-
-        print("Creating GrabFrameSettings...")
-        settings = GrabFrameSettings(resolution="10000x10000", dwell_time=50e-9)
-        file_path = os.path.join(self.temporary_directory.name, "raw_image.raw")
-
-        print("Grabbing big image...")
-        preview = self.microscope.imaging.grab_frame_to_disk(file_path, ImageFileFormat.RAW, settings)
-
-        print("Checking image file presence...")
-        file_exists = os.path.exists(file_path)
-        self.assertTrue(file_exists, "The image file is missing on the hard drive.")
-
-        expected_file_size = 100000000  # 100 MB = 10k x 10k image with 8 bit depth
-        print("Checking image file size...")
-        statinfo = os.stat(file_path)
-        self.assertEqual(expected_file_size, statinfo.st_size, "The image is expected to be 100 MB, because the resolution was 10K x 10K with 1 byte per pixel.")
-
-        expected_size = 768
-        print("Checking preview resolution...")
-        self.assertEqual(expected_size, preview.width)
-        self.assertEqual(expected_size, preview.height)
-        print("Done.")
-
-    def test_grab_frame_to_disk_tiff(self):
-        print("Creating GrabFrameSettings...")
-        settings = GrabFrameSettings(resolution="10000x10000", dwell_time=50e-9)
-        file_path = os.path.join(self.temporary_directory.name, "raw_image.tiff")
-
-        print("Grabbing big image...")
-        preview = self.microscope.imaging.grab_frame_to_disk(file_path, ImageFileFormat.TIFF, settings)
-
-        print("Checking image file presence...")
-        file_exists = os.path.exists(file_path)
-        self.assertTrue(file_exists, "The image file is missing on the hard drive.")
-
-        expected_file_size = 100000000  # 100 MB = 10k x 10k image with 8 bit depth
-        print("Checking image file size...")
-        statinfo = os.stat(file_path)
-        self.assertGreater(statinfo.st_size, expected_file_size, "The image is expected to be bigger than 100 MB, because the resolution was 10K x 10K with 1 byte per pixel and metadata has to be included.")
-
-        expected_size = 768
-        print("Checking preview resolution...")
-        self.assertEqual(expected_size, preview.width)
-        self.assertEqual(expected_size, preview.height)
-        print("Done.")
-
-    def test_grab_frame_with_reduced_area_to_disk_tiff(self):
-        print("Creating GrabFrameSettings...")
-        size = 0.25
-        settings = GrabFrameSettings(resolution="10000x10000", dwell_time=50e-9, reduced_area=Rectangle(0.3, 0.3, size, size))
-        file_path = os.path.join(self.temporary_directory.name, "raw_image.tiff")
-
-        print("Grabbing big image...")
-        preview = self.microscope.imaging.grab_frame_to_disk(file_path, ImageFileFormat.TIFF, settings)
-
-        print("Checking image file presence...")
-        file_exists = os.path.exists(file_path)
-        self.assertTrue(file_exists, "The image file is missing on the hard drive.")
-
-        expected_file_size = 100000000 * (pow(size, 2))  # 100MB = 10k x 10k image with 8 bit depth, but multiplied by square size
-        print("Checking image file size...")
-        statinfo = os.stat(file_path)
-        self.assertGreater(statinfo.st_size, expected_file_size, "The image is too small.")
-
-        expected_size = 768
-        print("Checking preview resolution...")
-        self.assertEqual(expected_size * size, preview.width)
-        self.assertEqual(expected_size * size, preview.height)
-        print("Done.")
-
-    def test_grab_frame_to_disk_with_16_bit(self):
-        print("Creating GrabFrameSettings...")
-        settings = GrabFrameSettings(resolution="10000x10000", dwell_time=50e-9, bit_depth=16)
-        file_path = os.path.join(self.temporary_directory.name, "raw_image.raw")
-
-        print("Grabbing big image...")
-        exception_thrown = False
-        try:
-            preview = self.microscope.imaging.grab_frame_to_disk(file_path, ImageFileFormat.RAW, settings)
-        except ApiException as ex:
-            exception_thrown = True
-            print("Exception thrown as expected.")
-
-        self.assertTrue(exception_thrown, "The BigImage shouldn't support 16 bit depth.")
-        print("Done.")
-
-    def test_grab_frame_to_disk_with_unknown_format(self):
-        print("Creating GrabFrameSettings...")
-        settings = GrabFrameSettings(resolution="10000x10000")
-        file_path = os.path.join(self.temporary_directory.name, "raw_image.raw")
-
-        print("Grabbing big image...")
-        exception_thrown = False
-        try:
-            preview = self.microscope.imaging.grab_frame_to_disk(file_path, "UNKN", settings)
-        except ApiException as ex:
-            exception_thrown = True
-            print("Exception thrown as expected.")
-
-        self.assertTrue(exception_thrown, "The BigImage shouldn't support unknown image formats.")
-        print("Done.")
-
-    def test_grab_big_snapshot(self):
-        print("Creating GrabFrameSettings...")
-        settings = GrabFrameSettings(resolution="1000x1000", dwell_time=50e-9)
-
-        print("Grabbing big image...")
-        image = self.microscope.imaging.grab_frame(settings)
-
-        print("Checking image parameters...")
-        self.assertEqual(1000, image.width)
-        self.assertEqual(1000, image.height)
-        self.assertEqual(8, image.bit_depth)
-        self.assertEqual(ImageDataEncoding.UNSIGNED, image.encoding)
-        print("Done.")
-
-    def test_grab_big_snapshot_with_reduced_area(self):
-        print("Creating GrabFrameSettings...")
-        settings = GrabFrameSettings(resolution="1000x1000", dwell_time=50e-9, reduced_area=Rectangle(0.4, 0.4, 0.2, 0.2))
-
-        print("Grabbing big image...")
-        image = self.microscope.imaging.grab_frame(settings)
-
-        print("Checking image parameters...")
-        self.assertEqual(200, image.width)
-        self.assertEqual(200, image.height)
-        self.assertEqual(8, image.bit_depth)
-        self.assertEqual(ImageDataEncoding.UNSIGNED, image.encoding)
-        print("Done.")
-
-    def test_imaging_with_nav_cam(self):
-        if not self.test_helper.is_navcam_installed():
-            self.skipTest("NavCam is not installed, skipping the test")
-
-        imaging = self.microscope.imaging
-
-        print("Setting up view 3 for NavCam acquisition...")
-        imaging.set_active_view(3)
-        backed_up_device = imaging.get_active_device()
-        imaging.set_active_device(ImagingDevice.NAV_CAM)
-        print("Success.")
-
-        print("Moving stage to NavCam position...")
-        # Changing sight beam is not yet on official API
-        self.microscope.service.autoscript.server.configuration.set_value("Positioning.SightBeam", "NavCam")
-        print("Success.")
-
-        print("Unpausing acquisition for 2 seconds...")
-        imaging.start_acquisition()
-        time.sleep(2)
-        imaging.stop_acquisition()
-        print("Success.")
-
-        print("Getting image...")
-        frame = imaging.get_image()
-        self.assertNotEqual(None, frame, "No image was returned.")
-        print("Success.")
-
-        print("Trying to grab_frame, which should throw an exception.")
-        with self.assertRaises(Exception):
-            imaging.grab_frame()
-        print("Exception thrown as expected.")
-
-        print("Moving back to primary sight position...")
-        self.microscope.service.autoscript.server.configuration.set_value("Positioning.SightBeam", "Primary")
-        print("Success.")
-
-        print("Restoring original ImagingDevice...")
-        imaging.set_active_device(backed_up_device)
-        imaging.set_active_view(1)
-        print("Done.")
-
-    def test_imaging_with_ccd(self):
-        imaging = self.microscope.imaging
-
-        if not self.test_helper.is_ccd_installed():
-            self.skipTest("CCD camera was not detected. Skipping the test.")
-
-        print("Backing up active ImagingDevice and settings it to CCD...")
-        imaging.set_active_view(4)
-        backed_up_device = imaging.get_active_device()
-        imaging.set_active_device(ImagingDevice.CCD_CAMERA)
-        print("Success.")
-
-        print("Unpausing acquisition for 2 seconds...")
-        imaging.start_acquisition()
-        time.sleep(2)
-        imaging.stop_acquisition()
-        print("Success.")
-
-        print("Getting image...")
-        frame = imaging.get_image()
-        self.assertNotEqual(None, frame, "No image was returned.")
-        print("Success.")
-
-        print("Trying to grab_frame, which should throw an exception.")
-        with self.assertRaises(Exception):
-            imaging.grab_frame()
-
-        print("Exception thrown as expected.")
-        print("Restoring ImagingDevice...")
-        imaging.set_active_device(backed_up_device)
-        imaging.set_active_view(1)
-        print("Done.")
-
-    def test_grab_and_load_image8(self):
+    def test_grab_frame_and_load_image(self):
         print("Grabbing, saving and loading image in 8 bit...")
         self.__grab_and_load_image(8, 'Test8.tif', ImageDataEncoding.UNSIGNED)
-        print("Done.")
-
-    def test_grab_and_load_image16(self):
+        print("Success.")
         print("Grabbing, saving and loading image in 16 bit...")
         self.__grab_and_load_image(16, 'Test16.tif', ImageDataEncoding.UNSIGNED)
+        print("Success.")
+
+    def test_grab_frame_with_advanced_scan_settings(self):
+        microscope = self.microscope
+
+        microscope.imaging.set_active_view(1)
+        microscope.imaging.set_active_device(imaging_device=ImagingDevice.ELECTRON_BEAM)
+
+        print("Grabbing image with 8 integrated frames...")
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_3072X2048, bit_depth=8, dwell_time=100e-9, frame_integration=4)
+        image = microscope.imaging.grab_frame(settings)
+        self.test_helper.assert_image(image, 3072, 2048, 8)
+        if not self.test_helper.is_offline:
+            self.test_helper.assert_string_contains(image.metadata.metadata_as_ini, "Integrate=4")
+        print("Success.")
+
+        print("Grabbing image with scan interlacing set to 4...")
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, bit_depth=8, dwell_time=100e-9, scan_interlacing=4)
+        image = microscope.imaging.grab_frame(settings)
+        self.test_helper.assert_image(image, 768, 512, 8)
+        if not self.test_helper.is_offline:
+            self.test_helper.assert_string_contains(image.metadata.metadata_as_ini, "ScanInterlacing=4")
+        print("Success.")
+
+        print("Grabbing image with scan interlacing set to 4...")
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, bit_depth=8, dwell_time=100e-9, line_integration=4)
+        image = microscope.imaging.grab_frame(settings)
+        self.test_helper.assert_image(image, 768, 512, 8)
+        if not self.test_helper.is_offline:
+            self.test_helper.assert_string_contains(image.metadata.metadata_as_ini, "LineIntegration=4")
+        print("Success.")
+
+    def test_grab_frame_with_drift_correction(self):
+        microscope = self.microscope
+
+        print("Grabbing image with 8 drift corrected frames in electrons...")
+        microscope.imaging.set_active_view(1)
+        microscope.imaging.set_active_device(imaging_device=ImagingDevice.ELECTRON_BEAM)
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, dwell_time=500e-9, frame_integration=8, drift_correction=True)
+        image = microscope.imaging.grab_frame(settings)
+        if not self.test_helper.is_offline:
+            self.test_helper.assert_image(image, 768, 512, 16)
+            self.test_helper.assert_string_contains(image.metadata.metadata_as_ini, "Integrate=8")
+        print("Success.")
+
+        if microscope.beams.ion_beam.is_installed:
+            print("Grabbing image with 12 drift corrected frames in ions...")
+            microscope.imaging.set_active_view(2)
+            microscope.imaging.set_active_device(imaging_device=ImagingDevice.ION_BEAM)
+            settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=200e-9, bit_depth=16, frame_integration=12, drift_correction=True)
+            image = microscope.imaging.grab_frame(settings)
+            if not self.test_helper.is_offline:
+                self.test_helper.assert_image(image, 1536, 1024, 16)
+                self.test_helper.assert_string_contains(image.metadata.metadata_as_ini, "Integrate=12")
+            microscope.imaging.set_active_view(1)
+            print("Success.")
+
+    def test_grab_frame_after_session_stopped(self):
+        # Taking an image can fail on some systems when initiated immediately after microscope session is started.
+        # Ending the session has inadvertent effect on microscope state - e.g. EDS pipeline gets disabled on systems with ChemiSEM.
+        print("Stopping session...")
+        self.microscope.service.autoscript.server.configuration.set_value("AutoScript.Session.Started", "False")
+        time.sleep(2)
+
+        print("Grabbing an image with resolution 1536x1024 and dwell time 1 ms...")
+        settings = GrabFrameSettings(resolution="1536x1024", dwell_time=1e-6)
+        image = self.microscope.imaging.grab_frame(settings)
+        print("Image grabbed successfully, image width is", image.width)
+
+    def test_grab_frame_to_disk_not_supported(self):
+        # Note this test is not located in the big snapshot group because the whole group is meant to be skipped where b.s. is not supported
+        print("On XT 6 big snapshot acquisition is not supported")
+
+        if self.test_helper.is_system_version(6):
+            file = "c:\\temp\\a.tmp"
+            settings = GrabFrameSettings(resolution="10000x10000", dwell_time=50e-9)
+
+            with self.assertRaisesRegex(ApplicationServerException, "not supported"):
+                preview = self.microscope.imaging.grab_frame_to_disk(file, ImageFileFormat.RAW, settings)
+            with self.assertRaisesRegex(ApplicationServerException, "not supported"):
+                preview = self.microscope.imaging.grab_frame_to_disk(file, ImageFileFormat.TIFF, settings)
+
+            settings = GrabFrameSettings(resolution="10000x10000", dwell_time=50e-9, reduced_area=Rectangle(0.3, 0.3, 0.2, 0.2))
+
+            with self.assertRaisesRegex(ApplicationServerException, "not supported"):
+                preview = self.microscope.imaging.grab_frame_to_disk(file, ImageFileFormat.RAW, settings)
+            with self.assertRaisesRegex(ApplicationServerException, "not supported"):
+                preview = self.microscope.imaging.grab_frame_to_disk(file, ImageFileFormat.TIFF, settings)
+
+        print("Done.")
+
+    def test_grab_frame_with_invalid_settings(self):
+        imaging = self.microscope.imaging
+
+        print("Grabbing frame with drift correction and not specified frame integration must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "frame_integration > 1"):
+            settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, drift_correction=True)
+            image = imaging.grab_frame(settings)
+        print("Success.")
+
+        print("Grabbing frame with drift correction and 8-bit depth must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "16-bit images"):
+            settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, bit_depth=8, frame_integration=16, drift_correction=True)
+            image = imaging.grab_frame(settings)
+        print("Success.")
+
+        print("Grabbing frame with drift correction and reduced area specified must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "requires full frame scanning"):
+            settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, frame_integration=2, drift_correction=True,
+                                         reduced_area=Rectangle(0.60, 0.60, 0.30, 0.30))
+            image = imaging.grab_frame(settings)
+        print("Success.")
+
+        print("Grabbing multiple frames with drift correction must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "not yet implemented"):
+            settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_768X512, frame_integration=2, drift_correction=True)
+            images = imaging.grab_multiple_frames(settings)
+        print("Success.")
+
+        print("Passing settings out of range must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "must be"):
+            settings = GrabFrameSettings(bit_depth=32)
+            image = imaging.grab_frame(settings)
+        with self.assertRaisesRegex(ApplicationServerException, "dwell"):
+            settings = GrabFrameSettings(dwell_time=-1)
+            image = imaging.grab_frame(settings)
+        with self.assertRaisesRegex(ApplicationServerException, "out of"):
+            settings = GrabFrameSettings(line_integration=0)
+            image = imaging.grab_frame(settings)
+        with self.assertRaisesRegex(ApplicationServerException, "out of"):
+            settings = GrabFrameSettings(scan_interlacing=-1)
+            image = imaging.grab_frame(settings)
+        with self.assertRaisesRegex(ApplicationServerException, "out of"):
+            settings = GrabFrameSettings(frame_integration=0)
+            image = imaging.grab_frame(settings)
+        print("Done.")
+
+        print("Passing too large resolution must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "Maximum"):
+            settings = GrabFrameSettings(resolution="65537x1000")
+            images = imaging.grab_frame(settings)
+        print("Success.")
+
+        print("Passing too small resolution must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "Minimum"):
+            settings = GrabFrameSettings(resolution="10x60")
+            images = imaging.grab_frame(settings)
+        print("Success.")
+
+        print("Passing resolution in incorrect format must throw")
+        with self.assertRaisesRegex(ApplicationServerException, "WIDTHxHEIGHT"):
+            settings = GrabFrameSettings(resolution="Abc")
+            images = imaging.grab_frame(settings)
+        print("Success.")
+
+    def test_grab_multiple_frames(self):
+        microscope = self.microscope
+
+        if self.test_helper.is_offline:
+            self.skipTest("Skipping for offline because beam (in)compatibility is not respected in offline mode.")
+            
+        print("Setting up view 1...")
+        primary_imaging_device = ImagingDevice.ELECTRON_BEAM
+        microscope.imaging.set_active_view(1)
+        microscope.imaging.set_active_device(primary_imaging_device)
+        available_detector_types = microscope.detector.type.available_values
+
+        print("Primary imaging device is", ImagingDevice.explain(primary_imaging_device))
+
+        if DetectorType.ETD in available_detector_types:
+            primary_detector_type = DetectorType.ETD
+        elif DetectorType.T1 in available_detector_types:
+            primary_detector_type = DetectorType.T1
+        else:
+            primary_detector_type = None
+            self.skipTest("Suitable primary detector not found, skipping the test.")
+
+        print("Primary detector is", primary_detector_type)
+
+        # Secondary detector must be compatible with primary (=must allow simultaneous acquisition)
+        if DetectorType.ICE in available_detector_types:
+            secondary_detector_type = DetectorType.ICE
+        elif DetectorType.CBS in available_detector_types:
+            secondary_detector_type = DetectorType.CBS
+        elif DetectorType.T2 in available_detector_types:
+            secondary_detector_type = DetectorType.T2
+        else:
+            secondary_detector_type = primary_detector_type
+
+        print("Secondary detector is", secondary_detector_type)
+
+        # Secondary imaging device must be incompatible with electron beam acquisition
+        if microscope.beams.ion_beam.is_installed:
+            incompatible_imaging_device = ImagingDevice.ION_BEAM
+        elif self.test_helper.is_ccd_installed:
+            incompatible_imaging_device = ImagingDevice.CCD_CAMERA
+        elif self.test_helper.is_navcam_installed:
+            incompatible_imaging_device = ImagingDevice.NAV_CAM
+        else:
+            incompatible_imaging_device = None
+            self.skipTest("Suitable secondary imaging device not found, skipping the test.")
+
+        print("Incompatible imaging device is", ImagingDevice.explain(incompatible_imaging_device))
+
+        # Set up views - 1 and 3 will be compatible, 2 and 4 incompatible
+        print("Setting up views...")
+        microscope.detector.type.value = primary_detector_type
+        microscope.imaging.set_active_view(2)
+        microscope.imaging.set_active_device(incompatible_imaging_device)
+        microscope.imaging.set_active_view(3)
+        microscope.imaging.set_active_device(primary_imaging_device)
+        microscope.detector.type.value = secondary_detector_type
+        microscope.imaging.set_active_view(4)
+        microscope.imaging.set_active_device(incompatible_imaging_device)
+        microscope.imaging.set_active_view(1)
+        print("Success.")
+
+        # Two views having ETD detectors in different modes would be incompatible
+        if primary_detector_type == DetectorType.ETD and secondary_detector_type == DetectorType.ETD:
+            print("Switching ETD to secondary electrons mode...")
+            microscope.imaging.set_active_view(3)
+            microscope.detector.mode.value = DetectorMode.SECONDARY_ELECTRONS
+            microscope.imaging.set_active_view(1)
+            microscope.detector.mode.value = DetectorMode.SECONDARY_ELECTRONS
+            print("Success.")
+
+        # Run test for resolution 768x512 and actual grab frame settings
+        print("Grabbing multiple frames at resolution 768x512...")
+        self.microscope.beams.electron_beam.scanning.resolution.value = "768x512"
+        images = self.microscope.imaging.grab_multiple_frames()
+        self.assertEqual(2, len(images))
+        self.assertEqual(images[0].metadata.detectors[0].detector_type, primary_detector_type)
+        self.assertEqual(images[1].metadata.detectors[0].detector_type, secondary_detector_type)
+        self.test_helper.assert_image(images[0], 768, 512)
+
+        # Run test for resolution 1536x1024 and grab frame settings supplied
+        print("Grabbing multiple frames at resolution 1536x1024...")
+        settings = GrabFrameSettings(resolution="1536x1024")
+        images = self.microscope.imaging.grab_multiple_frames(settings)
+        self.assertEqual(2, len(images))
+        self.assertEqual(images[0].metadata.detectors[0].detector_type, primary_detector_type)
+        self.assertEqual(images[1].metadata.detectors[0].detector_type, secondary_detector_type)
+        self.test_helper.assert_image(images[0], 1536, 1024)
+
+        print("Done.")
+
+    def test_match_image_template(self):
+        print("Locating template in image using HOG matcher...")
+        lenna = self.test_helper.provide_lenna_gray8()
+        face = self.test_helper.extract_lenna_face_region(lenna)
+        lenna_adorned_image = AdornedImage(lenna)
+        face_adorned_image = AdornedImage(face)
+
+        match = self.microscope.imaging.match_template(lenna_adorned_image, face_adorned_image)
+        self.assertAlmostEqual(300, match.center.x, places=0)
+        self.assertAlmostEqual(300, match.center.y, places=0)
+        self.assertGreater(match.score, 0.25)
+
         print("Done.")
 
     def test_set_image(self):
@@ -708,12 +634,22 @@ class TestsImaging(unittest.TestCase):
         self.assertEqual(image_grabbed.height, 4096)
         print("Step 7: Success.")
 
-    def test_grab_frame_after_start_session(self):
-        # Taking an image can fail on some systems when initiated immediately after microscope session is started.
-        # The C# wrapper of this test will run this function 40s after the previous test has finished.
-        # In this period, the AutoScript server will stop the microscope session with a built-in "clean up" mechanism.
-        # The grab_frame call below will start up the session again and test if the acquisition gets aborted.
-        print("Grabbing an image with resolution 1536x1024 and dwell time 1 ms...")
-        settings = GrabFrameSettings(resolution="1536x1024", dwell_time=1e-6)
-        image = self.microscope.imaging.grab_frame(settings)
-        print("Image grabbed successfully, image width is", image.width)
+    def __grab_and_load_image(self, bit_depth, filename, encoding):
+        temporary_directory = tempfile.TemporaryDirectory()
+        file_path = os.path.join(temporary_directory.name, filename)
+        reduced_area = Rectangle(0.2, 0.1, 0.6, 0.4)
+
+        settings = GrabFrameSettings(reduced_area=reduced_area, bit_depth=bit_depth)
+        saved_image = self.microscope.imaging.grab_frame(settings)
+        saved_image.save(file_path)
+
+        loaded_image = AdornedImage.load(file_path)
+        self.__evaluate_loaded_adorned_image(saved_image, loaded_image, bit_depth, encoding)
+        temporary_directory.cleanup()
+
+    def __evaluate_loaded_adorned_image(self, saved_image, loaded_image, bit_depth, encoding):
+        self.test_helper.assert_image(loaded_image, loaded_image.width, loaded_image.height, loaded_image.bit_depth, loaded_image.encoding)
+        self.assertEqual(saved_image.metadata.metadata_as_ini, loaded_image.metadata.metadata_as_ini)
+        self.assertAlmostEqual(saved_image.metadata.optics.scan_field_of_view.height, loaded_image.metadata.optics.scan_field_of_view.height)
+        self.assertAlmostEqual(saved_image.metadata.optics.scan_field_of_view.width, loaded_image.metadata.optics.scan_field_of_view.width)
+

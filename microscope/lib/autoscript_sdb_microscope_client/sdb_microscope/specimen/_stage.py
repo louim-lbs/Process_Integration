@@ -9,13 +9,13 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import StagePosition, MoveSettings 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .stage._safety_settings import SafetySettings
 
 
-class Stage(object):    
+class Stage(object):
     """
-    The object provides control and status of the microscope's stage.
+    The object provides control and status of the bulk stage.
     """
     __slots__ = ["__id", "__application_client", "__safety_settings"]
 
@@ -26,59 +26,59 @@ class Stage(object):
         self.__safety_settings = SafetySettings(self.__application_client)
 
     @property
-    def safety_settings(self) -> 'SafetySettings':        
+    def safety_settings(self) -> 'SafetySettings':
         """
         The object provides control and status of the stage safety settings.
         """
         return self.__safety_settings
 
-    def absolute_move(self, target_position, settings = UndefinedParameter):        
+    def absolute_move(self, target_position: 'StagePosition', settings: 'MoveSettings' = None):
         """
-        The method moves the stage to the specified position.
+        The function moves the stage to the specified position.
         
-        :param StagePosition target_position: The absolute position to which the stage should move.
+        :param target_position: The absolute position to which the stage should move.
         
-        :param MoveSettings settings: Additional move settings.
+        :param settings: Additional move settings.
         """
         call_request = CallRequest(object_id=self.__id, method_name="AbsoluteMove", signature=[], parameters=[])
-        if isinstance(target_position, StagePosition) and settings is UndefinedParameter:
-            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="StagePosition")]
-            call_request.parameters.values = [target_position]
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(target_position, StagePosition) and isinstance(settings, MoveSettings):
+        if isinstance(target_position, StagePosition) and isinstance(settings, MoveSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="StagePosition"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="MoveSettings")]
             call_request.parameters.values = [target_position, settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif isinstance(target_position, StagePosition) and settings is None:
+            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="StagePosition")]
+            call_request.parameters.values = [target_position]
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def relative_move(self, position_delta, settings = UndefinedParameter):        
+    def relative_move(self, position_delta: 'StagePosition', settings: 'MoveSettings' = None):
         """
-        The method moves the stage by the specified delta position.
+        The function moves the stage by the specified delta position.
         
-        :param StagePosition position_delta: The position by which the manipulator should move.
+        :param position_delta: The position by which the manipulator should move.
         
-        :param MoveSettings settings: Additional move settings.
+        :param settings: Additional move settings.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RelativeMove", signature=[], parameters=[])
-        if isinstance(position_delta, StagePosition) and settings is UndefinedParameter:
-            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="StagePosition")]
-            call_request.parameters.values = [position_delta]
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(position_delta, StagePosition) and isinstance(settings, MoveSettings):
+        if isinstance(position_delta, StagePosition) and isinstance(settings, MoveSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="StagePosition"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="MoveSettings")]
             call_request.parameters.values = [position_delta, settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif isinstance(position_delta, StagePosition) and settings is None:
+            call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="StagePosition")]
+            call_request.parameters.values = [position_delta]
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def home(self, axes = UndefinedParameter):        
+    def home(self, axes: Union['str', 'List[str]'] = None):
         """
-        The method homes the specified axis of the stage. If no axis is specified, the method homes all axis of the stage.
+        The function homes the specified axes of the stage. If no axis is specified, all axes of the stage will be homed.
         
-        :param Union[str, list] axes: The axes to be homed. You can use StageAxis enumeration to specify the value.
+        :param axes: The axes to be homed. You can use StageAxis enumeration to specify the value.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Home", signature=[], parameters=[])
         if isinstance(axes, str):
@@ -89,7 +89,7 @@ class Stage(object):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.LIST_PRIMARY_ID, template_argument=DataType.STRING)]
             call_request.parameters.values = [axes]
             call_response = self.__application_client._perform_call(call_request)
-        elif axes is UndefinedParameter:
+        elif axes is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -97,25 +97,25 @@ class Stage(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def link(self):        
+    def link(self):
         """
-        The method links the sample Z to the working distance.
+        The function links the sample Z to the working distance.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Link", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def unlink(self):        
+    def unlink(self):
         """
-        The method unlinks the sample Z from the working distance.
+        The function unlinks the sample Z from the working distance.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Unlink", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def set_default_coordinate_system(self, coordinate_system):        
+    def set_default_coordinate_system(self, coordinate_system: 'str'):
         """
-        The method sets the default coordinate system of the stage. Enumeration CoordinateSystem can be used.
+        The function sets the default coordinate system of the stage. Maps to Enumeration CoordinateSystem.
         
-        :param str coordinate_system: 
+        :param coordinate_system: 
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetDefaultCoordinateSystem", signature= [DataType.STRING], parameters=[coordinate_system]) 
         if isinstance(coordinate_system, str):
@@ -123,8 +123,20 @@ class Stage(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
+    def move_to_device(self, imaging_device: 'int'):
+        """
+        Move the stage to a position under an imaging device. In that position imaging with the device is allowed.
+        
+        :param imaging_device: Imaging device to move under. You can use ImagingDevice enumeration to select the device.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="MoveToDevice", signature= [DataType.INT32], parameters=[imaging_device]) 
+        if isinstance(imaging_device, int):
+            call_response = self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
     @property
-    def current_position(self) -> 'StagePosition':        
+    def current_position(self) -> 'StagePosition':
         """
         The property retrieves current stage position.
         """
@@ -136,7 +148,7 @@ class Stage(object):
         return call_response.result.value
 
     @property
-    def is_homed(self) -> 'bool':        
+    def is_homed(self) -> 'bool':
         """
         The property returns if the stage is homed or not.
         """
@@ -148,7 +160,7 @@ class Stage(object):
         return call_response.result.value
 
     @property
-    def is_linked(self) -> 'bool':        
+    def is_linked(self) -> 'bool':
         """
         The property returns true if the stage Z is linked to the free working distance.
         """
@@ -160,7 +172,7 @@ class Stage(object):
         return call_response.result.value
 
     @property
-    def is_installed(self) -> 'bool':        
+    def is_installed(self) -> 'bool':
         """
         Returns true if the microscope is equipped with the bulk stage.
         """

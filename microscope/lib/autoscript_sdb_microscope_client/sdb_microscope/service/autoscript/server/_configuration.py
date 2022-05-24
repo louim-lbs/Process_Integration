@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class Configuration(object):    
+class Configuration(object):
     """
     This object provides access to the AutoScript server configuration.
     """
@@ -22,13 +22,13 @@ class Configuration(object):
         self.__id = "SdbMicroscope.Service.AutoScript.Server.Configuration"
 
 
-    def set_value(self, key, value):        
+    def set_value(self, key: 'str', value: 'str'):
         """
         Sets AutoScript server configuration value.
         
-        :param str key: Key identifying configuration value to set.
+        :param key: Key identifying configuration value to set.
         
-        :param str value: Value to be set.
+        :param value: Value to be set.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetValue", signature= [DataType.STRING, DataType.STRING], parameters=[key, value]) 
         if isinstance(key, str) and isinstance(value, str):
@@ -36,14 +36,13 @@ class Configuration(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def get_value(self, key) -> 'str':        
+    def get_value(self, key: 'str') -> 'str':
         """
         Gets AutoScript server configuration value.
         
-        :param str key: Key identifying configuration value to query.
+        :param key: Key identifying configuration value to query.
         
         :return: Configuration value as string.
-        :rtype: str
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetValue", signature= [DataType.STRING], parameters=[key]) 
         if isinstance(key, str):

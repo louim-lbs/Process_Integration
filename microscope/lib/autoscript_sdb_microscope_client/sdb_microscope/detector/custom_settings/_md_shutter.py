@@ -8,12 +8,12 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class MdShutter(object):    
+class MdShutter(object):
     """
-    The object represents a Mirror Detector Shutter.
+    The object representing Mirror Detector Shutter.
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -22,22 +22,22 @@ class MdShutter(object):
         self.__id = "SdbMicroscope.Detector.CustomSettings.MdShutter"
 
 
-    def insert(self):        
+    def insert(self):
         """
-        Insert the Mirror Detector Shutter if possible.
+        Inserts the Mirror Detector Shutter if possible.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Insert", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def retract(self):        
+    def retract(self):
         """
-        Retract the Mirror Detector Shutter if possible.
+        Retracts the Mirror Detector Shutter if possible.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Retract", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def is_needed(self) -> 'bool':        
+    def is_needed(self) -> 'bool':
         """
         Determines whether the Mirror Detector Shutter is needed.
         """

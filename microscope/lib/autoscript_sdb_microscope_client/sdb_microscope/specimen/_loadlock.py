@@ -8,12 +8,12 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class LoadLock(object):    
+class LoadLock(object):
     """
-    The object provides control and status of the microscope's loadlock device.
+    The object provides control and status of the microscope LoadLock device.
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -22,24 +22,24 @@ class LoadLock(object):
         self.__id = "SdbMicroscope.Specimen.LoadLock"
 
 
-    def load(self):        
+    def load(self):
         """
-        Load the SDB LoadLock.
+        Loads the LoadLock.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Load", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def unload(self):        
+    def unload(self):
         """
-        Unload the SDB LoadLock.
+        Unloads the LoadLock.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Unload", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def state(self) -> 'str':        
+    def state(self) -> 'str':
         """
-        The current state of the SDB LoadLock.
+        Returns the current state of the LoadLock.
         """
         call_request = CallRequest(object_id=self.__id, method_name="State_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -49,9 +49,9 @@ class LoadLock(object):
         return call_response.result.value
 
     @property
-    def is_installed(self) -> 'bool':        
+    def is_installed(self) -> 'bool':
         """
-        Is SDB LoadLock present on the system?
+        Return True if the LoadLock is present on the microscope.
         """
         call_request = CallRequest(object_id=self.__id, method_name="IsInstalled_GET")
         call_response = self.__application_client._perform_call(call_request)

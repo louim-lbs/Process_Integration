@@ -8,12 +8,12 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class ScanningFilter(object):    
+class ScanningFilter(object):
     """
-    The object provides control of the microscope's scanning filter.
+    The object provides control of the microscope scanning filter.
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -23,9 +23,9 @@ class ScanningFilter(object):
 
 
     @property
-    def type(self) -> 'int':        
+    def type(self) -> 'int':
         """
-        Gets and sets active scanning filter type.
+        Gets or sets the active scanning filter type.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Type_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -35,9 +35,9 @@ class ScanningFilter(object):
         return call_response.result.value
 
     @type.setter
-    def type(self, value):        
+    def type(self, value: 'int'):
         """
-        Gets and sets active scanning filter type.
+        Gets or sets the active scanning filter type.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Type_SET", signature=[DataType.INT32], parameters=[value])
         if isinstance(value, int):
@@ -46,9 +46,9 @@ class ScanningFilter(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def number_of_frames(self) -> 'int':        
+    def number_of_frames(self) -> 'int':
         """
-        Gets and sets current number of frames.
+        Gets or sets the number of frames for the active scanning filter.
         """
         call_request = CallRequest(object_id=self.__id, method_name="NumberOfFrames_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -58,9 +58,9 @@ class ScanningFilter(object):
         return call_response.result.value
 
     @number_of_frames.setter
-    def number_of_frames(self, value):        
+    def number_of_frames(self, value: 'int'):
         """
-        Gets and sets current number of frames.
+        Gets or sets the number of frames for the active scanning filter.
         """
         call_request = CallRequest(object_id=self.__id, method_name="NumberOfFrames_SET", signature=[DataType.INT32], parameters=[value])
         if isinstance(value, int):

@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class Mode(object):    
+class Mode(object):
     """
     The group provides control of the active detector mode.
     """
@@ -23,7 +23,7 @@ class Mode(object):
 
 
     @property
-    def available_values(self) -> 'List[str]':        
+    def available_values(self) -> 'List[str]':
         """
         Retrieves valid detector modes for the active detector type.
         """
@@ -35,7 +35,7 @@ class Mode(object):
         return call_response.result.value
 
     @property
-    def value(self) -> 'str':        
+    def value(self) -> 'str':
         """
         Gets or sets the active detector mode.
         """
@@ -47,7 +47,7 @@ class Mode(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'str'):
         """
         Gets or sets the active detector mode.
         """

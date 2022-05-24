@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class Resolution(object):    
+class Resolution(object):
     """
     The object provides control and status of scanning resolution.
     """
@@ -23,7 +23,7 @@ class Resolution(object):
 
 
     @property
-    def available_values(self) -> 'List[str]':        
+    def available_values(self) -> 'List[str]':
         """
         The list of valid resolutions.
         """
@@ -35,9 +35,9 @@ class Resolution(object):
         return call_response.result.value
 
     @property
-    def value(self) -> 'str':        
+    def value(self) -> 'str':
         """
-        Gets or sets the current scanning resolution for the acquisition.
+        Gets or sets the scanning resolution for the image acquisition.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Value_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -47,9 +47,9 @@ class Resolution(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'str'):
         """
-        Gets or sets the current scanning resolution for the acquisition.
+        Gets or sets the scanning resolution for the image acquisition.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Value_SET", signature=[DataType.STRING], parameters=[value])
         if isinstance(value, str):

@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class SpecimenCurrent(object):    
+class SpecimenCurrent(object):
     """
     The object provides control and status of the specimen current.
     """
@@ -23,7 +23,7 @@ class SpecimenCurrent(object):
 
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         The property retrieves current specimen current.
         """
@@ -35,7 +35,7 @@ class SpecimenCurrent(object):
         return call_response.result.value
 
     @property
-    def is_valid(self) -> 'bool':        
+    def is_valid(self) -> 'bool':
         """
         The property retrieves whether current specimen current is valid.
         """

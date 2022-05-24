@@ -9,12 +9,12 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import GetRtmPositionSettings, RtmPositionSet, GetRtmDataSettings, RtmDataSet 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class RealTimeMonitor(object):    
+class RealTimeMonitor(object):
     """
-    The object provides control and status of the real time monitor.
+    The object provides control and status of the real time monitor (RTM).
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -23,38 +23,37 @@ class RealTimeMonitor(object):
         self.__id = "SdbMicroscope.Patterning.RealTimeMonitor"
 
 
-    def start(self):        
+    def start(self):
         """
-        The method starts the real time monitoring process.
+        The function starts the real time monitoring process.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Start", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def stop(self):        
+    def stop(self):
         """
-        The method stops the real time monitoring process.
+        The function stops the real time monitoring process.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Stop", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def restart(self):        
+    def restart(self):
         """
-        The method restart the real time monitoring process.
+        The function restarts the real time monitoring process.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Restart", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def get_positions(self, settings = UndefinedParameter) -> 'List[RtmPositionSet]':        
+    def get_positions(self, settings: 'GetRtmPositionSettings' = None) -> 'List[RtmPositionSet]':
         """
-        The method retrieves pattern point positions.
+        The function retrieves pattern point positions.
         
-        :param GetRtmPositionSettings settings: The settings structure.
+        :param settings: The settings structure.
         
         :return: The list of patterns with the appropriate pattern point positions.
-        :rtype: list
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetPositions", signature=[], parameters=[])
-        if settings is UndefinedParameter:
+        if settings is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -70,17 +69,16 @@ class RealTimeMonitor(object):
 
         return call_response.result.value
 
-    def get_data(self, settings = UndefinedParameter) -> 'List[RtmDataSet]':        
+    def get_data(self, settings: 'GetRtmDataSettings' = None) -> 'List[RtmDataSet]':
         """
-        The method retrieves pattern point grey scale values.
+        The function retrieves pattern points grey scale values.
         
-        :param GetRtmDataSettings settings: The settings structure.
+        :param settings: The settings where pattern IDs and other options can be specified.
         
         :return: The list of patterns with the appropriate pattern point grey scale values.
-        :rtype: list
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetData", signature=[], parameters=[])
-        if settings is UndefinedParameter:
+        if settings is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -97,9 +95,9 @@ class RealTimeMonitor(object):
         return call_response.result.value
 
     @property
-    def mode(self) -> 'int':        
+    def mode(self) -> 'int':
         """
-        Gets or sets the active RTM resolution mode.
+        Gets or sets the active RTM resolution mode. Maps to RtmMode enumeration.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Mode_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -109,9 +107,9 @@ class RealTimeMonitor(object):
         return call_response.result.value
 
     @mode.setter
-    def mode(self, value):        
+    def mode(self, value: 'int'):
         """
-        Gets or sets the active RTM resolution mode.
+        Gets or sets the active RTM resolution mode. Maps to RtmMode enumeration.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Mode_SET", signature=[DataType.INT32], parameters=[value])
         if isinstance(value, int):

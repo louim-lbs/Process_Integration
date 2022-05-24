@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class DynamicFocus(object):    
+class DynamicFocus(object):
     """
     The object provides control and status of the dynamic focus.
     """
@@ -22,14 +22,14 @@ class DynamicFocus(object):
         self.__id = "SdbMicroscope.Beams.ElectronBeam.AngularCorrection.DynamicFocus"
 
 
-    def turn_on(self):        
+    def turn_on(self):
         """
         Turns the dynamic focus on.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnOn", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def turn_off(self):        
+    def turn_off(self):
         """
         Turns the dynamic focus off.
         """
@@ -37,9 +37,9 @@ class DynamicFocus(object):
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def is_on(self) -> 'bool':        
+    def is_on(self) -> 'bool':
         """
-        Returns the on/off state of the dynamic focus.
+        Returns True if the dynamic focus is turned on.
         """
         call_request = CallRequest(object_id=self.__id, method_name="IsOn_GET")
         call_response = self.__application_client._perform_call(call_request)

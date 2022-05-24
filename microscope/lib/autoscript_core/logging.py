@@ -33,7 +33,7 @@ class LogDomain:
 
 class Logger:
     def log_event(self, message, severity, category=thermoscientific_logging.Category.DEVELOPER1):
-        raise NotImplementedError()  # recommended way to simulate abstract methods
+        raise NotImplementedError()  # Recommended way to simulate abstract methods
 
     def log_error(self, message):
         extended_message = message
@@ -148,7 +148,7 @@ class Logging:
         if platform.system() != "Windows":
             return
 
-        # quits immediately if application client logging is already established (e.g., when multiple clients are used in a single script)
+        # Quits immediately if application client logging is already established (e.g., when multiple clients are used in a single script)
         is_application_client_logging_established = Logging.__is_logger_registered_for_domain(LogDomain.APPLICATION_CLIENT)
         if is_application_client_logging_established:
             return
@@ -170,7 +170,7 @@ class Logging:
 
         try:
             orc_log_file_path = log_file_helper.generate_log_file_path("ORC")
-            orc_infra_logger = InfraLogger("ORC", orc_log_file_path)
+            orc_infra_logger = InfraLogger("AutoScript.Client.ORC", orc_log_file_path)
             Logging.register_logger(LogDomain.ORC, orc_infra_logger)
             base_logger.log_notification("ORC INFRA log writer was successfully initialized.\r\n\r\nLog file path: " + orc_log_file_path)
         except:
@@ -178,7 +178,7 @@ class Logging:
 
         try:
             application_client_log_file_path = log_file_helper.generate_log_file_path()
-            application_client_infra_logger = InfraLogger("ApplicationClient", application_client_log_file_path)
+            application_client_infra_logger = InfraLogger("AutoScript.Client", application_client_log_file_path)
             Logging.register_logger(LogDomain.APPLICATION_CLIENT, application_client_infra_logger)
             base_logger.log_notification("Application client INFRA log writer was successfully initialized.\r\n\r\nLog file path: " + application_client_log_file_path)
         except:
@@ -253,18 +253,17 @@ class LogFileHelper:
         log_file_name_pattern = self.application_prefix + "*.log"
 
         try:
-            timestamp_component_position = len(self.application_prefix) + 1  # one character is added for underscore
+            timestamp_component_position = len(self.application_prefix) + 1  # One character is added for underscore
             timestamp_component_length = len(self.TIMESTAMP_FORMAT)
 
             log_file_names = [f for f in os.listdir(self.log_file_location) if fnmatch.fnmatch(f, log_file_name_pattern)]
+            current_timestamp = datetime.datetime.now()
 
             for log_file_name in log_file_names:
                 try:
                     timestamp_component = log_file_name[timestamp_component_position:(timestamp_component_position + timestamp_component_length)]
 
                     log_file_timestamp = datetime.datetime.strptime(timestamp_component, self.TIMESTAMP_FORMAT)
-                    current_timestamp = datetime.datetime.now()
-
                     log_file_age = (current_timestamp - log_file_timestamp)
 
                     if log_file_age.days > age_threshold_in_days:
@@ -275,12 +274,12 @@ class LogFileHelper:
 
                     long_running_operation = LogFileHelper.update_and_report_long_running_operation(long_running_operation, operation_begin)
 
-            # check if there is still more then max_file_count files, if it is, remove the extra files
+            # Check if there is still more then max_file_count files, if it is, remove the extra files
             log_file_names = [f for f in os.listdir(self.log_file_location) if fnmatch.fnmatch(f, log_file_name_pattern)]
 
             if len(log_file_names) > max_file_count:
-                log_file_names.sort()  # just to be sure the old ones are at the beginning of the list
-                log_file_names = log_file_names[:len(log_file_names)-max_file_count]  # take just the files to be removed
+                log_file_names.sort()  # Just to be sure the old ones are at the beginning of the list
+                log_file_names = log_file_names[:len(log_file_names)-max_file_count]  # Take just the files to be removed
 
                 for log_file_name in log_file_names:
                     try:

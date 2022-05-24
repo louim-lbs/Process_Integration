@@ -156,29 +156,29 @@ class TestsDetector(unittest.TestCase):
         print("Done.")
 
     def test_insert_retract_detectors(self):
-        if self.test_helper.is_system([SystemFamily.QUANTA, SystemFamily.PRISMA]):
-            # On Quanta, Quanta FEG and Prisma ABS and CBS are not retractable.
-            # Not sure if this is always the case or if we just have test configurations modulated with non retractable versions.
-            self.skipTest("ABS and CBS re not retractable, skipping")
+        print("Looking for retractable detectors...")
+        detectors_to_test = []
+        available_detectors = self.microscope.detector.type.available_values
 
-        suitable_retractable_detectors = [DetectorType.ABS, DetectorType.CBS]
-        available_retractable_detectors = self.microscope.detector.type.available_values
-        retractable_detectors_to_test = set(suitable_retractable_detectors).intersection(available_retractable_detectors)
+        if DetectorType.ABS in available_detectors and self.test_helper.is_detector_retractable(DetectorType.ABS):
+            if self.test_helper.is_system_version(10):
+                # Helios G3 does support CBS, but not yet ABS.
+                print("ABS is present, but not yet supported in SAL, removing from tests")
+            else:
+                detectors_to_test.append(DetectorType.ABS)
 
-        if self.test_helper.is_system_version(10):
-            # Helios G3 does support CBS, but not yet ABS.
-            print("ABS is present, but not yet supported in SAL, removing from tests")
-            retractable_detectors_to_test.remove(DetectorType.ABS)
+        if DetectorType.CBS in available_detectors and self.test_helper.is_detector_retractable(DetectorType.CBS):
+            detectors_to_test.append(DetectorType.CBS)
 
-        if len(retractable_detectors_to_test) == 0:
+        if len(detectors_to_test) == 0:
             self.skipTest("No retractable detector found, skipping")
 
-        print("Retractable detectors found:", retractable_detectors_to_test)
+        print("Retractable detectors found:", detectors_to_test)
         print("Linking Z to WD...")
         self.__link_z_to_fwd()
         print("Success.")
 
-        for detector in retractable_detectors_to_test:
+        for detector in detectors_to_test:
             self.__insert_retract_detector(detector)
 
         print("Done.")
@@ -204,111 +204,141 @@ class TestsDetector(unittest.TestCase):
         print("Done.")
 
     def test_tld_set_custom_settings(self):
-        self.microscope.detector.set_type_mode(DetectorType.TLD, DetectorMode.CUSTOM)
+        detector = self.microscope.detector
 
-        self.microscope.detector.custom_settings.suction_tube_voltage.value = 100
-        self.assertEqual(100, self.microscope.detector.custom_settings.suction_tube_voltage.value)
+        if DetectorType.TLD not in detector.type.available_values:
+            self.skipTest("TLD not installed, skipping")
+
+        if self.test_helper.is_offline:
+            self.skipTest("Not simulated in offline mode, skipping")
+
+        detector.set_type_mode(DetectorType.TLD, DetectorMode.CUSTOM)
+
+        detector.custom_settings.suction_tube_voltage.value = 100
+        self.assertEqual(detector.custom_settings.suction_tube_voltage.value, 100)
 
         # On XT 6.x systems (NNS, Quanta, Quanta FEG, Versa3D) the TLD detector doesn't (yet) have the mirror voltage parameter
         if self.xt_major_version > 6:
-            self.microscope.detector.custom_settings.mirror_voltage.value = -25
-            self.assertEqual(-25, self.microscope.detector.custom_settings.mirror_voltage.value)
+            detector.custom_settings.mirror_voltage.value = -25
+            self.assertEqual(detector.custom_settings.mirror_voltage.value, -25)
 
         print("Done.")
 
     def test_ice_set_custom_settings(self):
-        self.microscope.detector.set_type_mode(DetectorType.ICE, DetectorMode.CUSTOM)
+        detector = self.microscope.detector
 
-        self.microscope.detector.custom_settings.grid_voltage.value = 300
-        self.assertEqual(300, self.microscope.detector.custom_settings.grid_voltage.value)
+        if DetectorType.ICE not in detector.type.available_values:
+            self.skipTest("ICE not installed, skipping")
 
-        self.microscope.detector.custom_settings.converter_voltage.value = -600
-        self.assertEqual(-600, self.microscope.detector.custom_settings.converter_voltage.value)
+        if self.test_helper.is_offline:
+            self.skipTest("Not simulated in offline mode, skipping")
+
+        detector.set_type_mode(DetectorType.ICE, DetectorMode.CUSTOM)
+
+        detector.custom_settings.grid_voltage.value = 300
+        self.assertEqual(detector.custom_settings.grid_voltage.value, 300)
+
+        detector.custom_settings.converter_voltage.value = -600
+        self.assertEqual(detector.custom_settings.converter_voltage.value, -600)
+
         print("Done.")
 
     def test_stem3_set_custom_settings(self):
         microscope = self.microscope
+        detector = microscope.detector
 
         print("Setting up view 1...")
         microscope.imaging.set_active_view(1)
         microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
+        print("Success.")
 
-        if DetectorType.STEM3 not in microscope.detector.type.available_values:
+        if DetectorType.STEM3 not in detector.type.available_values:
             self.skipTest("STEM3 not installed, skipping")
 
         print("Switching to STEM3 detector...")
-        microscope.detector.type.value = DetectorType.STEM3
+        detector.type.value = DetectorType.STEM3
+        print("Success.")
 
-        if DetectorMode.CUSTOM not in microscope.detector.mode.available_values:
-            self.skipTest("STEM3 does not have Custom mode, skipping the test")
+        if DetectorMode.CUSTOM not in detector.mode.available_values:
+            self.skipTest("STEM3 does not support Custom mode, skipping the test")
 
         print("Switching STEM3 to custom mode...")
-        microscope.detector.mode.value = DetectorMode.CUSTOM
+        detector.mode.value = DetectorMode.CUSTOM
+        print("Success.")
 
+        print("Applying segment settings #1...")
         segment_settings1 = {'Angular1': SegmentPolarity.POSITIVE, 'Angular4': SegmentPolarity.NEUTRAL}
-
-        print("Applying segment settings...")
         self.__configure_segments(segment_settings1)
         self.__assert_segment_configuration(segment_settings1)
+        print("Success.")
 
+        print("Applying segment settings #2...")
         segment_settings2 = {'Angular1': SegmentPolarity.NEUTRAL, 'Angular4': SegmentPolarity.POSITIVE}
-
-        print("Applying segment settings...")
         self.__configure_segments(segment_settings2)
         self.__assert_segment_configuration(segment_settings2)
-
-        print("Done.")
+        print("Success.")
 
     def test_stem3_list_segments(self):
         microscope = self.microscope
+        detector = microscope.detector
 
         print("Setting up view 1...")
         microscope.imaging.set_active_view(1)
         microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
+        print("Success.")
 
-        if DetectorType.STEM3 not in microscope.detector.type.available_values:
-            self.skipTest("STEM3 not installed, skipping")
-
-        print("Getting STEM3 segment names...")
-        microscope.detector.type.value = DetectorType.STEM3
-        available_segments = self.microscope.detector.custom_settings.list_all_segments()
-        self.assertSequenceEqual(available_segments, ['Angular0', 'Angular1', 'Angular2', 'Angular3', 'Angular4', 'Angular5'])
-        print("Done.")
-
-    def test_stem3_reset_segments(self):
-        microscope = self.microscope
-
-        print("Setting up view 1...")
-        microscope.imaging.set_active_view(1)
-        microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
-
-        if DetectorType.STEM3 not in microscope.detector.type.available_values:
+        if DetectorType.STEM3 not in detector.type.available_values:
             self.skipTest("STEM3 not installed, skipping")
 
         print("Switching to STEM3 detector...")
-        microscope.detector.type.value = DetectorType.STEM3
+        detector.type.value = DetectorType.STEM3
         print("Success.")
 
-        if DetectorMode.CUSTOM not in microscope.detector.mode.available_values:
+        if DetectorMode.CUSTOM not in detector.mode.available_values:
+            self.skipTest("STEM3 does not support Custom mode, skipping the test")
+
+        print("Getting STEM3 segment names...")
+        available_segments = detector.custom_settings.list_all_segments()
+        self.assertSequenceEqual(available_segments, ['Angular0', 'Angular1', 'Angular2', 'Angular3', 'Angular4', 'Angular5'])
+        print("Success.")
+
+    def test_stem3_reset_segments(self):
+        microscope = self.microscope
+        detector = microscope.detector
+
+        print("Setting up view 1...")
+        microscope.imaging.set_active_view(1)
+        microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
+        print("Success.")
+
+        if DetectorType.STEM3 not in detector.type.available_values:
+            self.skipTest("STEM3 not installed, skipping")
+
+        print("Switching to STEM3 detector...")
+        detector.type.value = DetectorType.STEM3
+        print("Success.")
+
+        if DetectorMode.CUSTOM not in detector.mode.available_values:
             self.skipTest("STEM3 does not support Custom mode, skipping the test")
 
         print("Setting mode to Custom...")
-        microscope.detector.mode.value = DetectorMode.CUSTOM
+        detector.mode.value = DetectorMode.CUSTOM
         print("Success.")
 
-        print("Setting all available segments' polarity to positive...")
-        segments = microscope.detector.custom_settings.list_all_segments()
+        print("Setting polarity of all segments to positive...")
+        segments = detector.custom_settings.list_all_segments()
         for segment in segments:
-            microscope.detector.custom_settings.set_segment_polarity(segment, 1)
-
+            detector.custom_settings.set_segment_polarity(segment, 1)
+            if detector.custom_settings.get_segment_polarity(segment) != 1:
+                raise Exception(f"Failed to set segment {segment} to positive polarity")
         print("Success.")
+
         print("Attempting to reset segments...")
-        self.microscope.detector.custom_settings.reset_segments()
+        detector.custom_settings.reset_segments()
         for segment in segments:
-            if self.microscope.detector.custom_settings.get_segment_polarity(segment) != 0:
+            if detector.custom_settings.get_segment_polarity(segment) != 0:
                 raise Exception("Not all segments are reset on Stem3 detector after reset_segments() has finished.")
-
-        print("Done.")
+        print("Success.")
 
     def test_stem3_plus_identification(self):
         """
@@ -375,7 +405,7 @@ class TestsDetector(unittest.TestCase):
         self.assertTrue(all_segments_reset, "Not all segments are reset on Stem3+ detector after reset_segments() has finished.")
         print("Done.")
 
-    def test_stem3_plus_set_segments_in_custom_modes(self):
+    def test_stem3_plus_set_segments_in_custom_mode(self):
         if "STEM3" not in self.microscope.detector.type.available_values:
             self.skipTest("STEM3 not installed, skipping")
 
@@ -387,7 +417,7 @@ class TestsDetector(unittest.TestCase):
         self.__set_custom_mode_and_segment_polarity(DetectorMode.CUSTOM3, DetectorSegment.ANGULAR_0)
         print("Done.")
 
-    def test_stem4_set_segments_in_custom_modes(self):
+    def test_stem4_set_segments_in_custom_mode(self):
         if "STEM4" not in self.microscope.detector.type.available_values:
             self.skipTest("STEM4 not installed, skipping")
 
@@ -551,16 +581,23 @@ class TestsDetector(unittest.TestCase):
         print("Done.")
 
     def test_reset_segments_on_unsupported_detector_type(self):
+        microscope = self.microscope
+        if DetectorType.ETD not in microscope.detector.type.available_values:
+            self.skipTest("ETD detector is not installed, skipping the test")
+
         print("Setting ETD detector type and SE mode...")
-        self.microscope.detector.set_type_mode(DetectorType.ETD, DetectorMode.SECONDARY_ELECTRONS)
+        microscope.detector.set_type_mode(DetectorType.ETD, DetectorMode.SECONDARY_ELECTRONS)
 
         print("Attempting to reset segments, this should throw...")
-        with self.assertRaises(Exception):
-            self.microscope.detector.custom_settings.reset_segments()
+        with self.assertRaises(ApplicationServerException):
+            microscope.detector.custom_settings.reset_segments()
 
         print("Done.")
 
     def test_md_shutter_is_needed(self):
+        if not self.test_helper.is_mirror_detector_shutter_installed:
+            self.skipTest("Mirror detector shutter not installed, skipping")
+
         print("Determining if MD shutter is needed...")
         self.__link_z_to_fwd()
         is_needed = self.microscope.detector.custom_settings.md_shutter.is_needed
@@ -568,6 +605,9 @@ class TestsDetector(unittest.TestCase):
         print("Done.")
 
     def test_md_shutter_insert_retract(self):
+        if not self.test_helper.is_mirror_detector_shutter_installed:
+            self.skipTest("Mirror detector shutter not installed, skipping")
+
         print("Inserting and retracting MD shutter...")
         self.__link_z_to_fwd()
         self.test_helper.test_insert_retract_device(self.microscope.detector.custom_settings.md_shutter, "Shutter detector")

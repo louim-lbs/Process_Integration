@@ -28,29 +28,29 @@ class TestsAutoFunctions(unittest.TestCase):
         print("Running standard auto contrast brightness with settings...")
         self.microscope.auto_functions.run_auto_cb(RunAutoCbSettings(0.2, 0.8))
 
-        print("Running standard auto contrast brightness with improper settings...")
-        try:
-            raised = False
-            self.microscope.auto_functions.run_auto_cb(settings=RunAutoCbSettings(black_target=0.8))
-        except Exception:
-            raised = True
-            print("Exception raised as expected")
+        if not self.test_helper.is_offline:
+            print("Running standard auto contrast brightness with improper settings...")
+            with self.assertRaises(ApplicationServerException):
+                self.microscope.auto_functions.run_auto_cb(settings=RunAutoCbSettings(black_target=0.8))
 
-        if not raised:
-            raise AssertionError("Exception was not raised although it was expected")
         print("Done.")
 
     def test_run_max_contrast_auto_cb(self):
+        microscope = self.microscope
+
+        microscope.imaging.set_active_view(1)
+        microscope.imaging.set_active_view(ImagingDevice.ELECTRON_BEAM)
+
         # Switch reduce area scan settings to 8-bit depth.
         # If it was set to 16-bit by previous tests, the MaxContrast AF will hang up XT (almost all from 12.x onwards).
-        # TODO: This should be handled by the AF itself
+        # TODO: This should be handled by the AF itself (AST-587)
         print("Settings reduce area bit depth to 8...")
         settings = GrabFrameSettings(reduced_area=Rectangle(0.2, 0.2, 0.6, 0.6), bit_depth=8)
-        self.microscope.imaging.grab_frame(settings)
+        microscope.imaging.grab_frame(settings)
         print("Done.")
 
         print("Running max contrast auto contrast brightness...")
-        self.microscope.auto_functions.run_auto_cb(RunAutoCbSettings(method="MaxContrast"))
+        microscope.auto_functions.run_auto_cb(RunAutoCbSettings(method="MaxContrast"))
         print("Done.")
 
     def test_run_standard_auto_focus(self):
@@ -80,7 +80,9 @@ class TestsAutoFunctions(unittest.TestCase):
     def test_run_ong_et_al_auto_stigmator(self):
         print("Running Ong et al. auto stigmator...")
 
-        if not self.test_helper.is_system([SystemFamily.TENEO, SystemFamily.SCIOS, SystemFamily.SCIOS_2, SystemFamily.APREO, SystemFamily.AQUILOS, SystemFamily.QUATTRO]):
+        if not self.test_helper.is_system([SystemFamily.TENEO, SystemFamily.SCIOS, SystemFamily.SCIOS_2, SystemFamily.APREO, SystemFamily.AQUILOS,
+                                           SystemFamily.QUATTRO, SystemFamily.HELIOS, SystemFamily.HELIOS_1200, SystemFamily.HELIOS_PFIB_HYDRA,
+                                           SystemFamily.PLUTO, SystemFamily.VERIOS]):
             self.skipTest(f"Not supported on {self.test_helper.get_system_name()}, skipping")
 
         self.microscope.auto_functions.run_auto_stigmator(RunAutoStigmatorSettings(method="OngEtAl"))

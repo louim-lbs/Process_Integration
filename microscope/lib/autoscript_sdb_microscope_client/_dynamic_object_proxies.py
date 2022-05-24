@@ -8,15 +8,15 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import Point, Limits, Limits2d, Variant 
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from ._dynamic_object_handles import *
 
 
-class RectanglePattern(object):    
+class RectanglePattern(object):
     """
     The pattern of a rectangular shape.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -28,9 +28,8 @@ class RectanglePattern(object):
     def _handle(self):
         return self.__handle
 
-
     @property
-    def application_file(self) -> 'str':        
+    def application_file(self) -> 'str':
         """
         Name of the application file.
         """
@@ -42,7 +41,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @application_file.setter
-    def application_file(self, value):        
+    def application_file(self, value: 'str'):
         """
         Name of the application file.
         """
@@ -53,7 +52,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def beam_type(self) -> 'int':        
+    def beam_type(self) -> 'int':
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -65,7 +64,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @beam_type.setter
-    def beam_type(self, value):        
+    def beam_type(self, value: 'int'):
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -76,7 +75,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def rotation(self) -> 'float':        
+    def rotation(self) -> 'float':
         """
         Pattern rotation angle.
         """
@@ -88,7 +87,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @rotation.setter
-    def rotation(self, value):        
+    def rotation(self, value: 'float'):
         """
         Pattern rotation angle.
         """
@@ -99,7 +98,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_type(self) -> 'str':        
+    def gas_type(self) -> 'str':
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -111,7 +110,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @gas_type.setter
-    def gas_type(self, value):        
+    def gas_type(self, value: 'str'):
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -122,7 +121,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_flow(self) -> 'List[float]':        
+    def gas_flow(self) -> 'List[float]':
         """
         Sets the custom gas flow for the pattern.
         """
@@ -134,7 +133,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @gas_flow.setter
-    def gas_flow(self, value):        
+    def gas_flow(self, value: 'List[float]'):
         """
         Sets the custom gas flow for the pattern.
         """
@@ -145,7 +144,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def id(self) -> 'int':        
+    def id(self) -> 'int':
         """
         A unique pattern identifier.
         """
@@ -157,7 +156,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @property
-    def defocus(self) -> 'float':        
+    def defocus(self) -> 'float':
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -169,7 +168,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @defocus.setter
-    def defocus(self, value):        
+    def defocus(self, value: 'float'):
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -180,7 +179,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pass_count(self) -> 'int':        
+    def pass_count(self) -> 'int':
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -192,7 +191,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @pass_count.setter
-    def pass_count(self, value):        
+    def pass_count(self, value: 'int'):
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -203,7 +202,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def refresh_time(self) -> 'float':        
+    def refresh_time(self) -> 'float':
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -215,7 +214,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @refresh_time.setter
-    def refresh_time(self, value):        
+    def refresh_time(self, value: 'float'):
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -226,9 +225,9 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def volume_per_dose(self) -> 'float':        
+    def volume_per_dose(self) -> 'float':
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -238,9 +237,9 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @volume_per_dose.setter
-    def volume_per_dose(self, value):        
+    def volume_per_dose(self, value: 'float'):
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -249,7 +248,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def blur(self) -> 'float':        
+    def blur(self) -> 'float':
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -261,7 +260,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @blur.setter
-    def blur(self, value):        
+    def blur(self, value: 'float'):
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -272,9 +271,9 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def interaction_diameter(self) -> 'float':        
+    def interaction_diameter(self) -> 'float':
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -284,9 +283,9 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @interaction_diameter.setter
-    def interaction_diameter(self, value):        
+    def interaction_diameter(self, value: 'float'):
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -295,7 +294,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def enabled(self) -> 'bool':        
+    def enabled(self) -> 'bool':
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -307,7 +306,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @enabled.setter
-    def enabled(self, value):        
+    def enabled(self, value: 'bool'):
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -318,9 +317,9 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dose(self) -> 'float':        
+    def dose(self) -> 'float':
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -330,9 +329,9 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @dose.setter
-    def dose(self, value):        
+    def dose(self, value: 'float'):
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -341,7 +340,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'float':
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -353,7 +352,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'float'):
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -364,7 +363,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def time(self) -> 'float':        
+    def time(self) -> 'float':
         """
         The time required to process the pattern.
         """
@@ -376,7 +375,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @time.setter
-    def time(self, value):        
+    def time(self, value: 'float'):
         """
         The time required to process the pattern.
         """
@@ -387,7 +386,30 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_x(self) -> 'float':        
+    def is_exclusion_zone(self) -> 'bool':
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.BOOL:
+            raise TypeError("Incompatible type: rectangle_pattern.is_exclusion_zone was expecting bool, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @is_exclusion_zone.setter
+    def is_exclusion_zone(self, value: 'bool'):
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RectanglePattern"), DataType.BOOL], parameters=[self.__handle, value])
+        if isinstance(value, bool):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def center_x(self) -> 'float':
         """
         X coordinate of the pattern center position.
         """
@@ -399,7 +421,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @center_x.setter
-    def center_x(self, value):        
+    def center_x(self, value: 'float'):
         """
         X coordinate of the pattern center position.
         """
@@ -410,7 +432,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_y(self) -> 'float':        
+    def center_y(self) -> 'float':
         """
         Y coordinate of the pattern center position.
         """
@@ -422,7 +444,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @center_y.setter
-    def center_y(self, value):        
+    def center_y(self, value: 'float'):
         """
         Y coordinate of the pattern center position.
         """
@@ -433,7 +455,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def width(self) -> 'float':        
+    def width(self) -> 'float':
         """
         The pattern width.
         """
@@ -445,7 +467,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @width.setter
-    def width(self, value):        
+    def width(self, value: 'float'):
         """
         The pattern width.
         """
@@ -456,7 +478,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def height(self) -> 'float':        
+    def height(self) -> 'float':
         """
         The pattern height.
         """
@@ -468,7 +490,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @height.setter
-    def height(self, value):        
+    def height(self, value: 'float'):
         """
         The pattern height.
         """
@@ -479,7 +501,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def depth(self) -> 'float':        
+    def depth(self) -> 'float':
         """
         Depth of the pattern.
         """
@@ -491,7 +513,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @depth.setter
-    def depth(self, value):        
+    def depth(self, value: 'float'):
         """
         Depth of the pattern.
         """
@@ -502,7 +524,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_direction(self) -> 'str':        
+    def scan_direction(self) -> 'str':
         """
         Direction of a movement of a scan.
         """
@@ -514,7 +536,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @scan_direction.setter
-    def scan_direction(self, value):        
+    def scan_direction(self, value: 'str'):
         """
         Direction of a movement of a scan.
         """
@@ -525,7 +547,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_type(self) -> 'str':        
+    def scan_type(self) -> 'str':
         """
         Scanning strategy used while patterning.
         """
@@ -537,7 +559,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @scan_type.setter
-    def scan_type(self, value):        
+    def scan_type(self, value: 'str'):
         """
         Scanning strategy used while patterning.
         """
@@ -548,7 +570,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_x(self) -> 'float':        
+    def overlap_x(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -560,7 +582,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @overlap_x.setter
-    def overlap_x(self, value):        
+    def overlap_x(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -571,7 +593,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_y(self) -> 'float':        
+    def overlap_y(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -583,7 +605,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @overlap_y.setter
-    def overlap_y(self, value):        
+    def overlap_y(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -594,7 +616,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_x(self) -> 'float':        
+    def pitch_x(self) -> 'float':
         """
         Sets the pitch X between two spots.
         """
@@ -606,7 +628,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @pitch_x.setter
-    def pitch_x(self, value):        
+    def pitch_x(self, value: 'float'):
         """
         Sets the pitch X between two spots.
         """
@@ -617,7 +639,7 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_y(self) -> 'float':        
+    def pitch_y(self) -> 'float':
         """
         Sets the pitch Y between two spots.
         """
@@ -629,7 +651,7 @@ class RectanglePattern(object):
         return call_response.result.value
 
     @pitch_y.setter
-    def pitch_y(self, value):        
+    def pitch_y(self, value: 'float'):
         """
         Sets the pitch Y between two spots.
         """
@@ -640,11 +662,10 @@ class RectanglePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-class LinePattern(object):    
+class LinePattern(object):
     """
     The line shaped pattern.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -656,9 +677,8 @@ class LinePattern(object):
     def _handle(self):
         return self.__handle
 
-
     @property
-    def application_file(self) -> 'str':        
+    def application_file(self) -> 'str':
         """
         Name of the application file.
         """
@@ -670,7 +690,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @application_file.setter
-    def application_file(self, value):        
+    def application_file(self, value: 'str'):
         """
         Name of the application file.
         """
@@ -681,7 +701,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def beam_type(self) -> 'int':        
+    def beam_type(self) -> 'int':
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -693,7 +713,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @beam_type.setter
-    def beam_type(self, value):        
+    def beam_type(self, value: 'int'):
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -704,7 +724,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def rotation(self) -> 'float':        
+    def rotation(self) -> 'float':
         """
         Pattern rotation angle.
         """
@@ -716,7 +736,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @rotation.setter
-    def rotation(self, value):        
+    def rotation(self, value: 'float'):
         """
         Pattern rotation angle.
         """
@@ -727,7 +747,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_type(self) -> 'str':        
+    def gas_type(self) -> 'str':
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -739,7 +759,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @gas_type.setter
-    def gas_type(self, value):        
+    def gas_type(self, value: 'str'):
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -750,7 +770,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_flow(self) -> 'List[float]':        
+    def gas_flow(self) -> 'List[float]':
         """
         Sets the custom gas flow for the pattern.
         """
@@ -762,7 +782,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @gas_flow.setter
-    def gas_flow(self, value):        
+    def gas_flow(self, value: 'List[float]'):
         """
         Sets the custom gas flow for the pattern.
         """
@@ -773,7 +793,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def id(self) -> 'int':        
+    def id(self) -> 'int':
         """
         A unique pattern identifier.
         """
@@ -785,7 +805,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @property
-    def defocus(self) -> 'float':        
+    def defocus(self) -> 'float':
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -797,7 +817,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @defocus.setter
-    def defocus(self, value):        
+    def defocus(self, value: 'float'):
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -808,7 +828,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pass_count(self) -> 'int':        
+    def pass_count(self) -> 'int':
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -820,7 +840,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @pass_count.setter
-    def pass_count(self, value):        
+    def pass_count(self, value: 'int'):
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -831,7 +851,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def refresh_time(self) -> 'float':        
+    def refresh_time(self) -> 'float':
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -843,7 +863,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @refresh_time.setter
-    def refresh_time(self, value):        
+    def refresh_time(self, value: 'float'):
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -854,9 +874,9 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def volume_per_dose(self) -> 'float':        
+    def volume_per_dose(self) -> 'float':
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -866,9 +886,9 @@ class LinePattern(object):
         return call_response.result.value
 
     @volume_per_dose.setter
-    def volume_per_dose(self, value):        
+    def volume_per_dose(self, value: 'float'):
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -877,7 +897,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def blur(self) -> 'float':        
+    def blur(self) -> 'float':
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -889,7 +909,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @blur.setter
-    def blur(self, value):        
+    def blur(self, value: 'float'):
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -900,9 +920,9 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def interaction_diameter(self) -> 'float':        
+    def interaction_diameter(self) -> 'float':
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -912,9 +932,9 @@ class LinePattern(object):
         return call_response.result.value
 
     @interaction_diameter.setter
-    def interaction_diameter(self, value):        
+    def interaction_diameter(self, value: 'float'):
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -923,7 +943,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def enabled(self) -> 'bool':        
+    def enabled(self) -> 'bool':
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -935,7 +955,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @enabled.setter
-    def enabled(self, value):        
+    def enabled(self, value: 'bool'):
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -946,9 +966,9 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dose(self) -> 'float':        
+    def dose(self) -> 'float':
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -958,9 +978,9 @@ class LinePattern(object):
         return call_response.result.value
 
     @dose.setter
-    def dose(self, value):        
+    def dose(self, value: 'float'):
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -969,7 +989,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'float':
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -981,7 +1001,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'float'):
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -992,7 +1012,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def time(self) -> 'float':        
+    def time(self) -> 'float':
         """
         The time required to process the pattern.
         """
@@ -1004,7 +1024,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @time.setter
-    def time(self, value):        
+    def time(self, value: 'float'):
         """
         The time required to process the pattern.
         """
@@ -1015,7 +1035,30 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def length(self) -> 'float':        
+    def is_exclusion_zone(self) -> 'bool':
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.BOOL:
+            raise TypeError("Incompatible type: line_pattern.is_exclusion_zone was expecting bool, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @is_exclusion_zone.setter
+    def is_exclusion_zone(self, value: 'bool'):
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "LinePattern"), DataType.BOOL], parameters=[self.__handle, value])
+        if isinstance(value, bool):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def length(self) -> 'float':
         """
         Sets the length of the pattern.
         """
@@ -1027,7 +1070,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @length.setter
-    def length(self, value):        
+    def length(self, value: 'float'):
         """
         Sets the length of the pattern.
         """
@@ -1038,7 +1081,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap(self) -> 'float':        
+    def overlap(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -1050,7 +1093,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @overlap.setter
-    def overlap(self, value):        
+    def overlap(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -1061,7 +1104,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch(self) -> 'float':        
+    def pitch(self) -> 'float':
         """
         Sets the pitch between two spots.
         """
@@ -1073,7 +1116,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @pitch.setter
-    def pitch(self, value):        
+    def pitch(self, value: 'float'):
         """
         Sets the pitch between two spots.
         """
@@ -1084,7 +1127,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def start_x(self) -> 'float':        
+    def start_x(self) -> 'float':
         """
         X coordinate of the pattern start position.
         """
@@ -1096,7 +1139,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @start_x.setter
-    def start_x(self, value):        
+    def start_x(self, value: 'float'):
         """
         X coordinate of the pattern start position.
         """
@@ -1107,7 +1150,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def start_y(self) -> 'float':        
+    def start_y(self) -> 'float':
         """
         Y coordinate of the pattern start position.
         """
@@ -1119,7 +1162,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @start_y.setter
-    def start_y(self, value):        
+    def start_y(self, value: 'float'):
         """
         Y coordinate of the pattern start position.
         """
@@ -1130,7 +1173,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def end_x(self) -> 'float':        
+    def end_x(self) -> 'float':
         """
         X coordinate of the pattern end position.
         """
@@ -1142,7 +1185,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @end_x.setter
-    def end_x(self, value):        
+    def end_x(self, value: 'float'):
         """
         X coordinate of the pattern end position.
         """
@@ -1153,7 +1196,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def end_y(self) -> 'float':        
+    def end_y(self) -> 'float':
         """
         Y coordinate of the pattern end position.
         """
@@ -1165,7 +1208,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @end_y.setter
-    def end_y(self, value):        
+    def end_y(self, value: 'float'):
         """
         Y coordinate of the pattern end position.
         """
@@ -1176,7 +1219,7 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def depth(self) -> 'float':        
+    def depth(self) -> 'float':
         """
         Depth of the pattern.
         """
@@ -1188,7 +1231,7 @@ class LinePattern(object):
         return call_response.result.value
 
     @depth.setter
-    def depth(self, value):        
+    def depth(self, value: 'float'):
         """
         Depth of the pattern.
         """
@@ -1199,11 +1242,10 @@ class LinePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-class CirclePattern(object):    
+class CirclePattern(object):
     """
     The circular pattern (may be also a ring).
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -1215,9 +1257,8 @@ class CirclePattern(object):
     def _handle(self):
         return self.__handle
 
-
     @property
-    def application_file(self) -> 'str':        
+    def application_file(self) -> 'str':
         """
         Name of the application file.
         """
@@ -1229,7 +1270,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @application_file.setter
-    def application_file(self, value):        
+    def application_file(self, value: 'str'):
         """
         Name of the application file.
         """
@@ -1240,7 +1281,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def beam_type(self) -> 'int':        
+    def beam_type(self) -> 'int':
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -1252,7 +1293,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @beam_type.setter
-    def beam_type(self, value):        
+    def beam_type(self, value: 'int'):
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -1263,7 +1304,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def rotation(self) -> 'float':        
+    def rotation(self) -> 'float':
         """
         Pattern rotation angle.
         """
@@ -1275,7 +1316,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @rotation.setter
-    def rotation(self, value):        
+    def rotation(self, value: 'float'):
         """
         Pattern rotation angle.
         """
@@ -1286,7 +1327,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_type(self) -> 'str':        
+    def gas_type(self) -> 'str':
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -1298,7 +1339,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @gas_type.setter
-    def gas_type(self, value):        
+    def gas_type(self, value: 'str'):
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -1309,7 +1350,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_flow(self) -> 'List[float]':        
+    def gas_flow(self) -> 'List[float]':
         """
         Sets the custom gas flow for the pattern.
         """
@@ -1321,7 +1362,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @gas_flow.setter
-    def gas_flow(self, value):        
+    def gas_flow(self, value: 'List[float]'):
         """
         Sets the custom gas flow for the pattern.
         """
@@ -1332,7 +1373,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def id(self) -> 'int':        
+    def id(self) -> 'int':
         """
         A unique pattern identifier.
         """
@@ -1344,7 +1385,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @property
-    def defocus(self) -> 'float':        
+    def defocus(self) -> 'float':
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -1356,7 +1397,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @defocus.setter
-    def defocus(self, value):        
+    def defocus(self, value: 'float'):
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -1367,7 +1408,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pass_count(self) -> 'int':        
+    def pass_count(self) -> 'int':
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -1379,7 +1420,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @pass_count.setter
-    def pass_count(self, value):        
+    def pass_count(self, value: 'int'):
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -1390,7 +1431,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def refresh_time(self) -> 'float':        
+    def refresh_time(self) -> 'float':
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -1402,7 +1443,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @refresh_time.setter
-    def refresh_time(self, value):        
+    def refresh_time(self, value: 'float'):
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -1413,9 +1454,9 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def volume_per_dose(self) -> 'float':        
+    def volume_per_dose(self) -> 'float':
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -1425,9 +1466,9 @@ class CirclePattern(object):
         return call_response.result.value
 
     @volume_per_dose.setter
-    def volume_per_dose(self, value):        
+    def volume_per_dose(self, value: 'float'):
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -1436,7 +1477,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def blur(self) -> 'float':        
+    def blur(self) -> 'float':
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -1448,7 +1489,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @blur.setter
-    def blur(self, value):        
+    def blur(self, value: 'float'):
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -1459,9 +1500,9 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def interaction_diameter(self) -> 'float':        
+    def interaction_diameter(self) -> 'float':
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -1471,9 +1512,9 @@ class CirclePattern(object):
         return call_response.result.value
 
     @interaction_diameter.setter
-    def interaction_diameter(self, value):        
+    def interaction_diameter(self, value: 'float'):
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -1482,7 +1523,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def enabled(self) -> 'bool':        
+    def enabled(self) -> 'bool':
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -1494,7 +1535,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @enabled.setter
-    def enabled(self, value):        
+    def enabled(self, value: 'bool'):
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -1505,9 +1546,9 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dose(self) -> 'float':        
+    def dose(self) -> 'float':
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -1517,9 +1558,9 @@ class CirclePattern(object):
         return call_response.result.value
 
     @dose.setter
-    def dose(self, value):        
+    def dose(self, value: 'float'):
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -1528,7 +1569,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'float':
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -1540,7 +1581,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'float'):
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -1551,7 +1592,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def time(self) -> 'float':        
+    def time(self) -> 'float':
         """
         The time required to process the pattern.
         """
@@ -1563,7 +1604,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @time.setter
-    def time(self, value):        
+    def time(self, value: 'float'):
         """
         The time required to process the pattern.
         """
@@ -1574,7 +1615,30 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_direction(self) -> 'str':        
+    def is_exclusion_zone(self) -> 'bool':
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.BOOL:
+            raise TypeError("Incompatible type: circle_pattern.is_exclusion_zone was expecting bool, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @is_exclusion_zone.setter
+    def is_exclusion_zone(self, value: 'bool'):
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CirclePattern"), DataType.BOOL], parameters=[self.__handle, value])
+        if isinstance(value, bool):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def scan_direction(self) -> 'str':
         """
         Direction of a movement of a scan.
         """
@@ -1586,7 +1650,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @scan_direction.setter
-    def scan_direction(self, value):        
+    def scan_direction(self, value: 'str'):
         """
         Direction of a movement of a scan.
         """
@@ -1597,7 +1661,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_type(self) -> 'str':        
+    def scan_type(self) -> 'str':
         """
         Scanning strategy used while patterning.
         """
@@ -1609,7 +1673,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @scan_type.setter
-    def scan_type(self, value):        
+    def scan_type(self, value: 'str'):
         """
         Scanning strategy used while patterning.
         """
@@ -1620,7 +1684,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def inner_diameter(self) -> 'float':        
+    def inner_diameter(self) -> 'float':
         """
         Diameter of the inner circle.
         """
@@ -1632,7 +1696,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @inner_diameter.setter
-    def inner_diameter(self, value):        
+    def inner_diameter(self, value: 'float'):
         """
         Diameter of the inner circle.
         """
@@ -1643,7 +1707,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def outer_diameter(self) -> 'float':        
+    def outer_diameter(self) -> 'float':
         """
         Diameter of the circle.
         """
@@ -1655,7 +1719,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @outer_diameter.setter
-    def outer_diameter(self, value):        
+    def outer_diameter(self, value: 'float'):
         """
         Diameter of the circle.
         """
@@ -1666,7 +1730,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_x(self) -> 'float':        
+    def center_x(self) -> 'float':
         """
         X coordinate of the pattern center position.
         """
@@ -1678,7 +1742,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @center_x.setter
-    def center_x(self, value):        
+    def center_x(self, value: 'float'):
         """
         X coordinate of the pattern center position.
         """
@@ -1689,7 +1753,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_y(self) -> 'float':        
+    def center_y(self) -> 'float':
         """
         Y coordinate of the pattern center position.
         """
@@ -1701,7 +1765,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @center_y.setter
-    def center_y(self, value):        
+    def center_y(self, value: 'float'):
         """
         Y coordinate of the pattern center position.
         """
@@ -1712,7 +1776,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_r(self) -> 'float':        
+    def overlap_r(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -1724,7 +1788,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @overlap_r.setter
-    def overlap_r(self, value):        
+    def overlap_r(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -1735,7 +1799,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_t(self) -> 'float':        
+    def overlap_t(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -1747,7 +1811,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @overlap_t.setter
-    def overlap_t(self, value):        
+    def overlap_t(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -1758,7 +1822,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_r(self) -> 'float':        
+    def pitch_r(self) -> 'float':
         """
         Sets the pitch R between two spots.
         """
@@ -1770,7 +1834,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @pitch_r.setter
-    def pitch_r(self, value):        
+    def pitch_r(self, value: 'float'):
         """
         Sets the pitch R between two spots.
         """
@@ -1781,7 +1845,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_t(self) -> 'float':        
+    def pitch_t(self) -> 'float':
         """
         Sets the pitch T between two spots.
         """
@@ -1793,7 +1857,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @pitch_t.setter
-    def pitch_t(self, value):        
+    def pitch_t(self, value: 'float'):
         """
         Sets the pitch T between two spots.
         """
@@ -1804,7 +1868,7 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def depth(self) -> 'float':        
+    def depth(self) -> 'float':
         """
         Depth of the pattern.
         """
@@ -1816,7 +1880,7 @@ class CirclePattern(object):
         return call_response.result.value
 
     @depth.setter
-    def depth(self, value):        
+    def depth(self, value: 'float'):
         """
         Depth of the pattern.
         """
@@ -1827,11 +1891,10 @@ class CirclePattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-class CleaningCrossSectionPattern(object):    
+class CleaningCrossSectionPattern(object):
     """
     The cleaning cross section pattern type.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -1843,9 +1906,8 @@ class CleaningCrossSectionPattern(object):
     def _handle(self):
         return self.__handle
 
-
     @property
-    def application_file(self) -> 'str':        
+    def application_file(self) -> 'str':
         """
         Name of the application file.
         """
@@ -1857,7 +1919,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @application_file.setter
-    def application_file(self, value):        
+    def application_file(self, value: 'str'):
         """
         Name of the application file.
         """
@@ -1868,7 +1930,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def beam_type(self) -> 'int':        
+    def beam_type(self) -> 'int':
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -1880,7 +1942,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @beam_type.setter
-    def beam_type(self, value):        
+    def beam_type(self, value: 'int'):
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -1891,7 +1953,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def rotation(self) -> 'float':        
+    def rotation(self) -> 'float':
         """
         Pattern rotation angle.
         """
@@ -1903,7 +1965,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @rotation.setter
-    def rotation(self, value):        
+    def rotation(self, value: 'float'):
         """
         Pattern rotation angle.
         """
@@ -1914,7 +1976,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_type(self) -> 'str':        
+    def gas_type(self) -> 'str':
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -1926,7 +1988,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @gas_type.setter
-    def gas_type(self, value):        
+    def gas_type(self, value: 'str'):
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -1937,7 +1999,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_flow(self) -> 'List[float]':        
+    def gas_flow(self) -> 'List[float]':
         """
         Sets the custom gas flow for the pattern.
         """
@@ -1949,7 +2011,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @gas_flow.setter
-    def gas_flow(self, value):        
+    def gas_flow(self, value: 'List[float]'):
         """
         Sets the custom gas flow for the pattern.
         """
@@ -1960,7 +2022,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def id(self) -> 'int':        
+    def id(self) -> 'int':
         """
         A unique pattern identifier.
         """
@@ -1972,7 +2034,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @property
-    def defocus(self) -> 'float':        
+    def defocus(self) -> 'float':
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -1984,7 +2046,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @defocus.setter
-    def defocus(self, value):        
+    def defocus(self, value: 'float'):
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -1995,7 +2057,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pass_count(self) -> 'int':        
+    def pass_count(self) -> 'int':
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -2007,7 +2069,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @pass_count.setter
-    def pass_count(self, value):        
+    def pass_count(self, value: 'int'):
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -2018,7 +2080,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def refresh_time(self) -> 'float':        
+    def refresh_time(self) -> 'float':
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -2030,7 +2092,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @refresh_time.setter
-    def refresh_time(self, value):        
+    def refresh_time(self, value: 'float'):
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -2041,9 +2103,9 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def volume_per_dose(self) -> 'float':        
+    def volume_per_dose(self) -> 'float':
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -2053,9 +2115,9 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @volume_per_dose.setter
-    def volume_per_dose(self, value):        
+    def volume_per_dose(self, value: 'float'):
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -2064,7 +2126,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def blur(self) -> 'float':        
+    def blur(self) -> 'float':
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -2076,7 +2138,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @blur.setter
-    def blur(self, value):        
+    def blur(self, value: 'float'):
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -2087,9 +2149,9 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def interaction_diameter(self) -> 'float':        
+    def interaction_diameter(self) -> 'float':
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -2099,9 +2161,9 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @interaction_diameter.setter
-    def interaction_diameter(self, value):        
+    def interaction_diameter(self, value: 'float'):
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -2110,7 +2172,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def enabled(self) -> 'bool':        
+    def enabled(self) -> 'bool':
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -2122,7 +2184,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @enabled.setter
-    def enabled(self, value):        
+    def enabled(self, value: 'bool'):
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -2133,9 +2195,9 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dose(self) -> 'float':        
+    def dose(self) -> 'float':
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -2145,9 +2207,9 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @dose.setter
-    def dose(self, value):        
+    def dose(self, value: 'float'):
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -2156,7 +2218,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'float':
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -2168,7 +2230,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'float'):
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -2179,7 +2241,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def time(self) -> 'float':        
+    def time(self) -> 'float':
         """
         The time required to process the pattern.
         """
@@ -2191,7 +2253,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @time.setter
-    def time(self, value):        
+    def time(self, value: 'float'):
         """
         The time required to process the pattern.
         """
@@ -2202,7 +2264,30 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_x(self) -> 'float':        
+    def is_exclusion_zone(self) -> 'bool':
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.BOOL:
+            raise TypeError("Incompatible type: cleaning_cross_section_pattern.is_exclusion_zone was expecting bool, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @is_exclusion_zone.setter
+    def is_exclusion_zone(self, value: 'bool'):
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "CleaningCrossSectionPattern"), DataType.BOOL], parameters=[self.__handle, value])
+        if isinstance(value, bool):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def center_x(self) -> 'float':
         """
         X coordinate of the pattern center position.
         """
@@ -2214,7 +2299,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @center_x.setter
-    def center_x(self, value):        
+    def center_x(self, value: 'float'):
         """
         X coordinate of the pattern center position.
         """
@@ -2225,7 +2310,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_y(self) -> 'float':        
+    def center_y(self) -> 'float':
         """
         Y coordinate of the pattern center position.
         """
@@ -2237,7 +2322,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @center_y.setter
-    def center_y(self, value):        
+    def center_y(self, value: 'float'):
         """
         Y coordinate of the pattern center position.
         """
@@ -2248,7 +2333,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def width(self) -> 'float':        
+    def width(self) -> 'float':
         """
         The pattern width.
         """
@@ -2260,7 +2345,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @width.setter
-    def width(self, value):        
+    def width(self, value: 'float'):
         """
         The pattern width.
         """
@@ -2271,7 +2356,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def height(self) -> 'float':        
+    def height(self) -> 'float':
         """
         The pattern height.
         """
@@ -2283,7 +2368,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @height.setter
-    def height(self, value):        
+    def height(self, value: 'float'):
         """
         The pattern height.
         """
@@ -2294,7 +2379,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def depth(self) -> 'float':        
+    def depth(self) -> 'float':
         """
         Depth of the pattern.
         """
@@ -2306,7 +2391,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @depth.setter
-    def depth(self, value):        
+    def depth(self, value: 'float'):
         """
         Depth of the pattern.
         """
@@ -2317,7 +2402,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_direction(self) -> 'str':        
+    def scan_direction(self) -> 'str':
         """
         Direction of a movement of a scan.
         """
@@ -2329,7 +2414,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @scan_direction.setter
-    def scan_direction(self, value):        
+    def scan_direction(self, value: 'str'):
         """
         Direction of a movement of a scan.
         """
@@ -2340,7 +2425,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_type(self) -> 'str':        
+    def scan_type(self) -> 'str':
         """
         Scanning strategy used while patterning.
         """
@@ -2352,7 +2437,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @scan_type.setter
-    def scan_type(self, value):        
+    def scan_type(self, value: 'str'):
         """
         Scanning strategy used while patterning.
         """
@@ -2363,7 +2448,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_x(self) -> 'float':        
+    def overlap_x(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -2375,7 +2460,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @overlap_x.setter
-    def overlap_x(self, value):        
+    def overlap_x(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -2386,7 +2471,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_y(self) -> 'float':        
+    def overlap_y(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -2398,7 +2483,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @overlap_y.setter
-    def overlap_y(self, value):        
+    def overlap_y(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -2409,7 +2494,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_x(self) -> 'float':        
+    def pitch_x(self) -> 'float':
         """
         Sets the pitch X between two spots.
         """
@@ -2421,7 +2506,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @pitch_x.setter
-    def pitch_x(self, value):        
+    def pitch_x(self, value: 'float'):
         """
         Sets the pitch X between two spots.
         """
@@ -2432,7 +2517,7 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_y(self) -> 'float':        
+    def pitch_y(self) -> 'float':
         """
         Sets the pitch Y between two spots.
         """
@@ -2444,7 +2529,7 @@ class CleaningCrossSectionPattern(object):
         return call_response.result.value
 
     @pitch_y.setter
-    def pitch_y(self, value):        
+    def pitch_y(self, value: 'float'):
         """
         Sets the pitch Y between two spots.
         """
@@ -2455,11 +2540,10 @@ class CleaningCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-class RegularCrossSectionPattern(object):    
+class RegularCrossSectionPattern(object):
     """
     The regular cross section pattern type.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -2471,9 +2555,8 @@ class RegularCrossSectionPattern(object):
     def _handle(self):
         return self.__handle
 
-
     @property
-    def application_file(self) -> 'str':        
+    def application_file(self) -> 'str':
         """
         Name of the application file.
         """
@@ -2485,7 +2568,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @application_file.setter
-    def application_file(self, value):        
+    def application_file(self, value: 'str'):
         """
         Name of the application file.
         """
@@ -2496,7 +2579,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def beam_type(self) -> 'int':        
+    def beam_type(self) -> 'int':
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -2508,7 +2591,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @beam_type.setter
-    def beam_type(self, value):        
+    def beam_type(self, value: 'int'):
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -2519,7 +2602,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def rotation(self) -> 'float':        
+    def rotation(self) -> 'float':
         """
         Pattern rotation angle.
         """
@@ -2531,7 +2614,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @rotation.setter
-    def rotation(self, value):        
+    def rotation(self, value: 'float'):
         """
         Pattern rotation angle.
         """
@@ -2542,7 +2625,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_type(self) -> 'str':        
+    def gas_type(self) -> 'str':
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -2554,7 +2637,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @gas_type.setter
-    def gas_type(self, value):        
+    def gas_type(self, value: 'str'):
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -2565,7 +2648,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_flow(self) -> 'List[float]':        
+    def gas_flow(self) -> 'List[float]':
         """
         Sets the custom gas flow for the pattern.
         """
@@ -2577,7 +2660,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @gas_flow.setter
-    def gas_flow(self, value):        
+    def gas_flow(self, value: 'List[float]'):
         """
         Sets the custom gas flow for the pattern.
         """
@@ -2588,7 +2671,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def id(self) -> 'int':        
+    def id(self) -> 'int':
         """
         A unique pattern identifier.
         """
@@ -2600,7 +2683,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @property
-    def defocus(self) -> 'float':        
+    def defocus(self) -> 'float':
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -2612,7 +2695,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @defocus.setter
-    def defocus(self, value):        
+    def defocus(self, value: 'float'):
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -2623,7 +2706,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pass_count(self) -> 'int':        
+    def pass_count(self) -> 'int':
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -2635,7 +2718,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @pass_count.setter
-    def pass_count(self, value):        
+    def pass_count(self, value: 'int'):
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -2646,7 +2729,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def refresh_time(self) -> 'float':        
+    def refresh_time(self) -> 'float':
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -2658,7 +2741,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @refresh_time.setter
-    def refresh_time(self, value):        
+    def refresh_time(self, value: 'float'):
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -2669,9 +2752,9 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def volume_per_dose(self) -> 'float':        
+    def volume_per_dose(self) -> 'float':
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -2681,9 +2764,9 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @volume_per_dose.setter
-    def volume_per_dose(self, value):        
+    def volume_per_dose(self, value: 'float'):
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -2692,7 +2775,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def blur(self) -> 'float':        
+    def blur(self) -> 'float':
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -2704,7 +2787,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @blur.setter
-    def blur(self, value):        
+    def blur(self, value: 'float'):
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -2715,9 +2798,9 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def interaction_diameter(self) -> 'float':        
+    def interaction_diameter(self) -> 'float':
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -2727,9 +2810,9 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @interaction_diameter.setter
-    def interaction_diameter(self, value):        
+    def interaction_diameter(self, value: 'float'):
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -2738,7 +2821,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def enabled(self) -> 'bool':        
+    def enabled(self) -> 'bool':
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -2750,7 +2833,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @enabled.setter
-    def enabled(self, value):        
+    def enabled(self, value: 'bool'):
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -2761,9 +2844,9 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dose(self) -> 'float':        
+    def dose(self) -> 'float':
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -2773,9 +2856,9 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @dose.setter
-    def dose(self, value):        
+    def dose(self, value: 'float'):
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -2784,7 +2867,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'float':
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -2796,7 +2879,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'float'):
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -2807,7 +2890,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def time(self) -> 'float':        
+    def time(self) -> 'float':
         """
         The time required to process the pattern.
         """
@@ -2819,7 +2902,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @time.setter
-    def time(self, value):        
+    def time(self, value: 'float'):
         """
         The time required to process the pattern.
         """
@@ -2830,7 +2913,30 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_x(self) -> 'float':        
+    def is_exclusion_zone(self) -> 'bool':
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.BOOL:
+            raise TypeError("Incompatible type: regular_cross_section_pattern.is_exclusion_zone was expecting bool, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @is_exclusion_zone.setter
+    def is_exclusion_zone(self, value: 'bool'):
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern"), DataType.BOOL], parameters=[self.__handle, value])
+        if isinstance(value, bool):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def center_x(self) -> 'float':
         """
         X coordinate of the pattern center position.
         """
@@ -2842,7 +2948,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @center_x.setter
-    def center_x(self, value):        
+    def center_x(self, value: 'float'):
         """
         X coordinate of the pattern center position.
         """
@@ -2853,7 +2959,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_y(self) -> 'float':        
+    def center_y(self) -> 'float':
         """
         Y coordinate of the pattern center position.
         """
@@ -2865,7 +2971,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @center_y.setter
-    def center_y(self, value):        
+    def center_y(self, value: 'float'):
         """
         Y coordinate of the pattern center position.
         """
@@ -2876,7 +2982,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def width(self) -> 'float':        
+    def width(self) -> 'float':
         """
         The pattern width.
         """
@@ -2888,7 +2994,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @width.setter
-    def width(self, value):        
+    def width(self, value: 'float'):
         """
         The pattern width.
         """
@@ -2899,7 +3005,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def height(self) -> 'float':        
+    def height(self) -> 'float':
         """
         The pattern height.
         """
@@ -2911,7 +3017,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @height.setter
-    def height(self, value):        
+    def height(self, value: 'float'):
         """
         The pattern height.
         """
@@ -2922,7 +3028,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def depth(self) -> 'float':        
+    def depth(self) -> 'float':
         """
         Depth of the pattern.
         """
@@ -2934,7 +3040,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @depth.setter
-    def depth(self, value):        
+    def depth(self, value: 'float'):
         """
         Depth of the pattern.
         """
@@ -2945,7 +3051,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_direction(self) -> 'str':        
+    def scan_direction(self) -> 'str':
         """
         Direction of a movement of a scan.
         """
@@ -2957,7 +3063,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @scan_direction.setter
-    def scan_direction(self, value):        
+    def scan_direction(self, value: 'str'):
         """
         Direction of a movement of a scan.
         """
@@ -2968,7 +3074,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_type(self) -> 'str':        
+    def scan_type(self) -> 'str':
         """
         Scanning strategy used while patterning.
         """
@@ -2980,7 +3086,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @scan_type.setter
-    def scan_type(self, value):        
+    def scan_type(self, value: 'str'):
         """
         Scanning strategy used while patterning.
         """
@@ -2991,7 +3097,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_x(self) -> 'float':        
+    def overlap_x(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -3003,7 +3109,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @overlap_x.setter
-    def overlap_x(self, value):        
+    def overlap_x(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -3014,7 +3120,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def overlap_y(self) -> 'float':        
+    def overlap_y(self) -> 'float':
         """
         Sets the beam diameter overlap.
         """
@@ -3026,7 +3132,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @overlap_y.setter
-    def overlap_y(self, value):        
+    def overlap_y(self, value: 'float'):
         """
         Sets the beam diameter overlap.
         """
@@ -3037,7 +3143,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_x(self) -> 'float':        
+    def pitch_x(self) -> 'float':
         """
         Sets the pitch X between two spots.
         """
@@ -3049,7 +3155,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @pitch_x.setter
-    def pitch_x(self, value):        
+    def pitch_x(self, value: 'float'):
         """
         Sets the pitch X between two spots.
         """
@@ -3060,7 +3166,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pitch_y(self) -> 'float':        
+    def pitch_y(self) -> 'float':
         """
         Sets the pitch Y between two spots.
         """
@@ -3072,7 +3178,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @pitch_y.setter
-    def pitch_y(self, value):        
+    def pitch_y(self, value: 'float'):
         """
         Sets the pitch Y between two spots.
         """
@@ -3083,7 +3189,7 @@ class RegularCrossSectionPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_ratio(self) -> 'float':        
+    def scan_ratio(self) -> 'float':
         """
         Gets or sets the ratio between the dose delivered at the first line and the dose delivered at the last line of the pattern.
         """
@@ -3095,7 +3201,7 @@ class RegularCrossSectionPattern(object):
         return call_response.result.value
 
     @scan_ratio.setter
-    def scan_ratio(self, value):        
+    def scan_ratio(self, value: 'float'):
         """
         Gets or sets the ratio between the dose delivered at the first line and the dose delivered at the last line of the pattern.
         """
@@ -3105,12 +3211,57 @@ class RegularCrossSectionPattern(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
+    @property
+    def scan_method(self) -> 'int':
+        """
+        Scanning method used while patterning. You can use RegularCrossSectionScanMethod enumeration to specify the value.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="ScanMethod_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.INT32:
+            raise TypeError("Incompatible type: regular_cross_section_pattern.scan_method was expecting int, but server returned different object type: " + repr(call_response.result.data_type))
 
-class StreamPattern(object):    
+        return call_response.result.value
+
+    @scan_method.setter
+    def scan_method(self, value: 'int'):
+        """
+        Scanning method used while patterning. You can use RegularCrossSectionScanMethod enumeration to specify the value.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="ScanMethod_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern"), DataType.INT32], parameters=[self.__handle, value])
+        if isinstance(value, int):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def multi_scan_pass_count(self) -> 'int':
+        """
+        Number of passes (scans) to be performed over the pattern area for the multi-scan method.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="MultiScanPassCount_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.INT32:
+            raise TypeError("Incompatible type: regular_cross_section_pattern.multi_scan_pass_count was expecting int, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @multi_scan_pass_count.setter
+    def multi_scan_pass_count(self, value: 'int'):
+        """
+        Number of passes (scans) to be performed over the pattern area for the multi-scan method.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="MultiScanPassCount_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "RegularCrossSectionPattern"), DataType.INT32], parameters=[self.__handle, value])
+        if isinstance(value, int):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+
+class StreamPattern(object):
     """
     The stream file pattern type.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -3122,9 +3273,8 @@ class StreamPattern(object):
     def _handle(self):
         return self.__handle
 
-
     @property
-    def application_file(self) -> 'str':        
+    def application_file(self) -> 'str':
         """
         Name of the application file.
         """
@@ -3136,7 +3286,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @application_file.setter
-    def application_file(self, value):        
+    def application_file(self, value: 'str'):
         """
         Name of the application file.
         """
@@ -3147,7 +3297,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def beam_type(self) -> 'int':        
+    def beam_type(self) -> 'int':
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -3159,7 +3309,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @beam_type.setter
-    def beam_type(self, value):        
+    def beam_type(self, value: 'int'):
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -3170,7 +3320,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def rotation(self) -> 'float':        
+    def rotation(self) -> 'float':
         """
         Pattern rotation angle.
         """
@@ -3182,7 +3332,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @rotation.setter
-    def rotation(self, value):        
+    def rotation(self, value: 'float'):
         """
         Pattern rotation angle.
         """
@@ -3193,7 +3343,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_type(self) -> 'str':        
+    def gas_type(self) -> 'str':
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -3205,7 +3355,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @gas_type.setter
-    def gas_type(self, value):        
+    def gas_type(self, value: 'str'):
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -3216,7 +3366,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_flow(self) -> 'List[float]':        
+    def gas_flow(self) -> 'List[float]':
         """
         Sets the custom gas flow for the pattern.
         """
@@ -3228,7 +3378,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @gas_flow.setter
-    def gas_flow(self, value):        
+    def gas_flow(self, value: 'List[float]'):
         """
         Sets the custom gas flow for the pattern.
         """
@@ -3239,7 +3389,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def id(self) -> 'int':        
+    def id(self) -> 'int':
         """
         A unique pattern identifier.
         """
@@ -3251,7 +3401,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @property
-    def defocus(self) -> 'float':        
+    def defocus(self) -> 'float':
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -3263,7 +3413,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @defocus.setter
-    def defocus(self, value):        
+    def defocus(self, value: 'float'):
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -3274,7 +3424,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pass_count(self) -> 'int':        
+    def pass_count(self) -> 'int':
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -3286,7 +3436,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @pass_count.setter
-    def pass_count(self, value):        
+    def pass_count(self, value: 'int'):
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -3297,7 +3447,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def refresh_time(self) -> 'float':        
+    def refresh_time(self) -> 'float':
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -3309,7 +3459,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @refresh_time.setter
-    def refresh_time(self, value):        
+    def refresh_time(self, value: 'float'):
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -3320,9 +3470,9 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def volume_per_dose(self) -> 'float':        
+    def volume_per_dose(self) -> 'float':
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "StreamPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -3332,9 +3482,9 @@ class StreamPattern(object):
         return call_response.result.value
 
     @volume_per_dose.setter
-    def volume_per_dose(self, value):        
+    def volume_per_dose(self, value: 'float'):
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "StreamPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -3343,7 +3493,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def blur(self) -> 'float':        
+    def blur(self) -> 'float':
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -3355,7 +3505,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @blur.setter
-    def blur(self, value):        
+    def blur(self, value: 'float'):
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -3366,9 +3516,9 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def interaction_diameter(self) -> 'float':        
+    def interaction_diameter(self) -> 'float':
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "StreamPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -3378,9 +3528,9 @@ class StreamPattern(object):
         return call_response.result.value
 
     @interaction_diameter.setter
-    def interaction_diameter(self, value):        
+    def interaction_diameter(self, value: 'float'):
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "StreamPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -3389,7 +3539,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def enabled(self) -> 'bool':        
+    def enabled(self) -> 'bool':
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -3401,7 +3551,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @enabled.setter
-    def enabled(self, value):        
+    def enabled(self, value: 'bool'):
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -3412,9 +3562,9 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dose(self) -> 'float':        
+    def dose(self) -> 'float':
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "StreamPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -3424,9 +3574,9 @@ class StreamPattern(object):
         return call_response.result.value
 
     @dose.setter
-    def dose(self, value):        
+    def dose(self, value: 'float'):
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "StreamPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -3435,7 +3585,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_x(self) -> 'float':        
+    def center_x(self) -> 'float':
         """
         X coordinate of the pattern center position.
         """
@@ -3447,7 +3597,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @center_x.setter
-    def center_x(self, value):        
+    def center_x(self, value: 'float'):
         """
         X coordinate of the pattern center position.
         """
@@ -3458,7 +3608,7 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_y(self) -> 'float':        
+    def center_y(self) -> 'float':
         """
         Y coordinate of the pattern center position.
         """
@@ -3470,7 +3620,7 @@ class StreamPattern(object):
         return call_response.result.value
 
     @center_y.setter
-    def center_y(self, value):        
+    def center_y(self, value: 'float'):
         """
         Y coordinate of the pattern center position.
         """
@@ -3481,11 +3631,10 @@ class StreamPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-class BitmapPattern(object):    
+class BitmapPattern(object):
     """
     The bitmap pattern type.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -3497,9 +3646,8 @@ class BitmapPattern(object):
     def _handle(self):
         return self.__handle
 
-
     @property
-    def application_file(self) -> 'str':        
+    def application_file(self) -> 'str':
         """
         Name of the application file.
         """
@@ -3511,7 +3659,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @application_file.setter
-    def application_file(self, value):        
+    def application_file(self, value: 'str'):
         """
         Name of the application file.
         """
@@ -3522,7 +3670,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def beam_type(self) -> 'int':        
+    def beam_type(self) -> 'int':
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -3534,7 +3682,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @beam_type.setter
-    def beam_type(self, value):        
+    def beam_type(self, value: 'int'):
         """
         The beam (either electron or ion) used for patterning.
         """
@@ -3545,7 +3693,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def rotation(self) -> 'float':        
+    def rotation(self) -> 'float':
         """
         Pattern rotation angle.
         """
@@ -3557,7 +3705,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @rotation.setter
-    def rotation(self, value):        
+    def rotation(self, value: 'float'):
         """
         Pattern rotation angle.
         """
@@ -3568,7 +3716,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_type(self) -> 'str':        
+    def gas_type(self) -> 'str':
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -3580,7 +3728,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @gas_type.setter
-    def gas_type(self, value):        
+    def gas_type(self, value: 'str'):
         """
         The name of the gas that must be used to pattern this shape (or empty string if no gas is to be used).
         """
@@ -3591,7 +3739,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def gas_flow(self) -> 'List[float]':        
+    def gas_flow(self) -> 'List[float]':
         """
         Sets the custom gas flow for the pattern.
         """
@@ -3603,7 +3751,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @gas_flow.setter
-    def gas_flow(self, value):        
+    def gas_flow(self, value: 'List[float]'):
         """
         Sets the custom gas flow for the pattern.
         """
@@ -3614,7 +3762,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def id(self) -> 'int':        
+    def id(self) -> 'int':
         """
         A unique pattern identifier.
         """
@@ -3626,7 +3774,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @property
-    def defocus(self) -> 'float':        
+    def defocus(self) -> 'float':
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -3638,7 +3786,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @defocus.setter
-    def defocus(self, value):        
+    def defocus(self, value: 'float'):
         """
         The defocus (WD change) of the beam. It allows focusing above (negative value) or below (positive value) the sample surface.
         """
@@ -3649,7 +3797,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def pass_count(self) -> 'int':        
+    def pass_count(self) -> 'int':
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -3661,7 +3809,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @pass_count.setter
-    def pass_count(self, value):        
+    def pass_count(self, value: 'int'):
         """
         Number of passes (scans) to be performed over the pattern area.
         """
@@ -3672,7 +3820,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def refresh_time(self) -> 'float':        
+    def refresh_time(self) -> 'float':
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -3684,7 +3832,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @refresh_time.setter
-    def refresh_time(self, value):        
+    def refresh_time(self, value: 'float'):
         """
         The minimum loop time that must at least elapse before the next pass, so that the adsorbed gas can be refreshed.
         """
@@ -3695,9 +3843,9 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def volume_per_dose(self) -> 'float':        
+    def volume_per_dose(self) -> 'float':
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -3707,9 +3855,9 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @volume_per_dose.setter
-    def volume_per_dose(self, value):        
+    def volume_per_dose(self, value: 'float'):
         """
-        The volume of material that is removed per charge.
+        The volume of material that is removed per charge in mm³/nC.
         """
         call_request = CallRequest(object_id=self.__id, method_name="VolumePerDose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -3718,7 +3866,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def blur(self) -> 'float':        
+    def blur(self) -> 'float':
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -3730,7 +3878,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @blur.setter
-    def blur(self, value):        
+    def blur(self, value: 'float'):
         """
         Like Defocus, but specifying the additional diameter of the blurred spot.
         """
@@ -3741,9 +3889,9 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def interaction_diameter(self) -> 'float':        
+    def interaction_diameter(self) -> 'float':
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -3753,9 +3901,9 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @interaction_diameter.setter
-    def interaction_diameter(self, value):        
+    def interaction_diameter(self, value: 'float'):
         """
-        The interaction diameter for an infinitely small beam.
+        The interaction diameter for an infinitely small beam in meters.
         """
         call_request = CallRequest(object_id=self.__id, method_name="InteractionDiameter_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -3764,7 +3912,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def enabled(self) -> 'bool':        
+    def enabled(self) -> 'bool':
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -3776,7 +3924,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @enabled.setter
-    def enabled(self, value):        
+    def enabled(self, value: 'bool'):
         """
         If set to False, the pattern is removed from the patterning job.
         """
@@ -3787,9 +3935,9 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dose(self) -> 'float':        
+    def dose(self) -> 'float':
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern")], parameters=[self.__handle])
         call_response = self.__application_client._perform_call(call_request)
@@ -3799,9 +3947,9 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @dose.setter
-    def dose(self, value):        
+    def dose(self, value: 'float'):
         """
-        Defines the charge dose per area.
+        Defines the charge dose per area in C/µm².
         """
         call_request = CallRequest(object_id=self.__id, method_name="Dose_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern"), DataType.DOUBLE], parameters=[self.__handle, value])
         if isinstance(value, (int, float)):
@@ -3810,7 +3958,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'float':
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -3822,7 +3970,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'float'):
         """
         The time the beam spends on a single pixel per pass (rounded to a multiple of 25 ns).
         """
@@ -3833,7 +3981,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def time(self) -> 'float':        
+    def time(self) -> 'float':
         """
         The time required to process the pattern.
         """
@@ -3845,7 +3993,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @time.setter
-    def time(self, value):        
+    def time(self, value: 'float'):
         """
         The time required to process the pattern.
         """
@@ -3856,7 +4004,30 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_x(self) -> 'float':        
+    def is_exclusion_zone(self) -> 'bool':
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_GET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern")], parameters=[self.__handle])
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataType.BOOL:
+            raise TypeError("Incompatible type: bitmap_pattern.is_exclusion_zone was expecting bool, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @is_exclusion_zone.setter
+    def is_exclusion_zone(self, value: 'bool'):
+        """
+        If set to True, the pattern area is not to be processed.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="IsExclusionZone_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "BitmapPattern"), DataType.BOOL], parameters=[self.__handle, value])
+        if isinstance(value, bool):
+            self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def center_x(self) -> 'float':
         """
         X coordinate of the pattern center position.
         """
@@ -3868,7 +4039,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @center_x.setter
-    def center_x(self, value):        
+    def center_x(self, value: 'float'):
         """
         X coordinate of the pattern center position.
         """
@@ -3879,7 +4050,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def center_y(self) -> 'float':        
+    def center_y(self) -> 'float':
         """
         Y coordinate of the pattern center position.
         """
@@ -3891,7 +4062,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @center_y.setter
-    def center_y(self, value):        
+    def center_y(self, value: 'float'):
         """
         Y coordinate of the pattern center position.
         """
@@ -3902,7 +4073,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def width(self) -> 'float':        
+    def width(self) -> 'float':
         """
         The pattern width.
         """
@@ -3914,7 +4085,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @width.setter
-    def width(self, value):        
+    def width(self, value: 'float'):
         """
         The pattern width.
         """
@@ -3925,7 +4096,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def height(self) -> 'float':        
+    def height(self) -> 'float':
         """
         The pattern height.
         """
@@ -3937,7 +4108,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @height.setter
-    def height(self, value):        
+    def height(self, value: 'float'):
         """
         The pattern height.
         """
@@ -3948,7 +4119,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def depth(self) -> 'float':        
+    def depth(self) -> 'float':
         """
         Depth of the pattern.
         """
@@ -3960,7 +4131,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @depth.setter
-    def depth(self, value):        
+    def depth(self, value: 'float'):
         """
         Depth of the pattern.
         """
@@ -3971,7 +4142,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_direction(self) -> 'str':        
+    def scan_direction(self) -> 'str':
         """
         Direction of a movement of a scan.
         """
@@ -3983,7 +4154,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @scan_direction.setter
-    def scan_direction(self, value):        
+    def scan_direction(self, value: 'str'):
         """
         Direction of a movement of a scan.
         """
@@ -3994,7 +4165,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def scan_type(self) -> 'str':        
+    def scan_type(self) -> 'str':
         """
         Scanning strategy used while patterning.
         """
@@ -4006,7 +4177,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @scan_type.setter
-    def scan_type(self, value):        
+    def scan_type(self, value: 'str'):
         """
         Scanning strategy used while patterning.
         """
@@ -4017,7 +4188,7 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def fix_aspect_ratio(self) -> 'bool':        
+    def fix_aspect_ratio(self) -> 'bool':
         """
         When set to true the aspect ratio is fixed, while the false value means width and height may be changed independently.
         """
@@ -4029,7 +4200,7 @@ class BitmapPattern(object):
         return call_response.result.value
 
     @fix_aspect_ratio.setter
-    def fix_aspect_ratio(self, value):        
+    def fix_aspect_ratio(self, value: 'bool'):
         """
         When set to true the aspect ratio is fixed, while the false value means width and height may be changed independently.
         """
@@ -4040,11 +4211,10 @@ class BitmapPattern(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-class GisPort(object):    
+class GisPort(object):
     """
     The object represents a single Gas Injection System port.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -4056,55 +4226,53 @@ class GisPort(object):
     def _handle(self):
         return self.__handle
 
-
-    def insert(self):        
+    def insert(self):
         """
         Insert GIS needle if retracted.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Insert", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "GisPort")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def retract(self):        
+    def retract(self):
         """
         Retract GIS needle if inserted.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Retract", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "GisPort")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def open(self):        
+    def open(self):
         """
         Opens the GIS port.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Open", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "GisPort")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def close(self):        
+    def close(self):
         """
         Closes the GIS port.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Close", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "GisPort")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def turn_heater_on(self):        
+    def turn_heater_on(self):
         """
         Turn GIS heater on.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnHeaterOn", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "GisPort")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def turn_heater_off(self):        
+    def turn_heater_off(self):
         """
         Turn GIS heater off.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnHeaterOff", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "GisPort")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def get_temperature(self) -> 'float':        
+    def get_temperature(self) -> 'float':
         """
         Get GIS port gas temperature in Kelvins.
         
         :return: Gas temperature.
-        :rtype: float
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetTemperature", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "GisPort")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -4114,11 +4282,10 @@ class GisPort(object):
         return call_response.result.value
 
 
-class Multichem(object):    
+class Multichem(object):
     """
     The object represents whole MultiChem device.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -4130,15 +4297,14 @@ class Multichem(object):
     def _handle(self):
         return self.__handle
 
-
-    def insert(self, position = UndefinedParameter):        
+    def insert(self, position: 'str' = None):
         """
         Insert MultiChem needle to one of predefined positions.
         
-        :param str position: Name of a MultiChem insert position.
+        :param position: Name of a MultiChem insert position.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Insert", signature=[], parameters=[])
-        if position is UndefinedParameter:
+        if position is None:
             call_request.parameters.data_types = [DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem")]
             call_request.parameters.values = [self.__handle]
             call_response = self.__application_client._perform_call(call_request)
@@ -4150,32 +4316,32 @@ class Multichem(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def retract(self):        
+    def retract(self):
         """
         Retract MultiChem needle if inserted.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Retract", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def open(self):        
+    def open(self):
         """
         Opens the MultiChem.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Open", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def close(self):        
+    def close(self):
         """
         Closes the MultiChem.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Close", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def turn_heater_on(self, gas_name):        
+    def turn_heater_on(self, gas_name: 'str'):
         """
         Turn MultiChem heater on for selected gas.
         
-        :param str gas_name: Name of the selected gas.
+        :param gas_name: Name of the selected gas.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnHeaterOn", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem"), DataType.STRING], parameters=[self.__handle, gas_name]) 
         if isinstance(gas_name, str):
@@ -4183,11 +4349,11 @@ class Multichem(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def turn_heater_off(self, gas_name):        
+    def turn_heater_off(self, gas_name: 'str'):
         """
         Turn MultiChem heater off for selected gas.
         
-        :param str gas_name: Name of the selected gas.
+        :param gas_name: Name of the selected gas.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnHeaterOff", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem"), DataType.STRING], parameters=[self.__handle, gas_name]) 
         if isinstance(gas_name, str):
@@ -4195,14 +4361,13 @@ class Multichem(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def get_temperature(self, gas_name) -> 'float':        
+    def get_temperature(self, gas_name: 'str') -> 'float':
         """
         Get temperature of selected gas in the MultiChem in Kelvins.
         
-        :param str gas_name: Name of the selected gas.
+        :param gas_name: Name of the selected gas.
         
         :return: Gas temperature.
-        :rtype: float
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetTemperature", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem"), DataType.STRING], parameters=[self.__handle, gas_name]) 
         if isinstance(gas_name, str):
@@ -4214,12 +4379,11 @@ class Multichem(object):
 
         return call_response.result.value
 
-    def list_all_gases(self) -> 'List[str]':        
+    def list_all_gases(self) -> 'List[str]':
         """
         Lists all gases in the MultiChem.
         
         :return: List of gas names.
-        :rtype: list
         """
         call_request = CallRequest(object_id=self.__id, method_name="ListAllGases", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "Multichem")], parameters=[self.__handle]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -4229,11 +4393,10 @@ class Multichem(object):
         return call_response.result.value
 
 
-class ControlItem(object):    
+class ControlItem(object):
     """
     This object represents instrument server ControlItem.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -4244,7 +4407,6 @@ class ControlItem(object):
     @property
     def _handle(self):
         return self.__handle
-
 
     @property
     def is_controllable(self) -> 'bool':
@@ -4265,7 +4427,7 @@ class ControlItem(object):
         return call_response.result.value
 
     @target_value.setter
-    def target_value(self, value):
+    def target_value(self, value: 'Variant'):
         value = Variant.create_from(value)
         call_request = CallRequest(object_id=self.__id, method_name="TargetValue_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "ControlItem"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Variant")], parameters=[self.__handle, value])
         if isinstance(value, Variant):
@@ -4283,7 +4445,7 @@ class ControlItem(object):
         return call_response.result.value
 
     @actual_value.setter
-    def actual_value(self, value):
+    def actual_value(self, value: 'Variant'):
         value = Variant.create_from(value)
         call_request = CallRequest(object_id=self.__id, method_name="ActualValue_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "ControlItem"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Variant")], parameters=[self.__handle, value])
         if isinstance(value, Variant):
@@ -4301,11 +4463,10 @@ class ControlItem(object):
         return call_response.result.value
 
 
-class ControlItemPair(object):    
+class ControlItemPair(object):
     """
     This object represents instrument server ControlItemPair.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -4316,7 +4477,6 @@ class ControlItemPair(object):
     @property
     def _handle(self):
         return self.__handle
-
 
     @property
     def is_controllable(self) -> 'bool':
@@ -4337,7 +4497,7 @@ class ControlItemPair(object):
         return call_response.result.value
 
     @target_value.setter
-    def target_value(self, value):
+    def target_value(self, value: 'Point'):
         value = Point.create_from(value)
         call_request = CallRequest(object_id=self.__id, method_name="TargetValue_SET", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "ControlItemPair"), DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Point")], parameters=[self.__handle, value])
         if isinstance(value, Point):
@@ -4364,11 +4524,10 @@ class ControlItemPair(object):
         return call_response.result.value
 
 
-class ServerAction(object):    
+class ServerAction(object):
     """
     This object represents instrument server startable action.
     """
-
     __slots__ = ["__id", "__application_client", "__handle"]
 
     def __init__(self, application_client, handle):
@@ -4379,7 +4538,6 @@ class ServerAction(object):
     @property
     def _handle(self):
         return self.__handle
-
 
     def start(self):
         call_request = CallRequest(object_id=self.__id, method_name="Start", signature=[DataTypeDefinition(DataType.DYNAMIC_OBJECT_HANDLE_PRIMARY_ID, "ServerAction")], parameters=[self.__handle]) 

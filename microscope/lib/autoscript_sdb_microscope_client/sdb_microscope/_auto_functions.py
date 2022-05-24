@@ -9,12 +9,12 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import RunAutoSourceTiltSettings, RunAutoCbSettings, RunAutoFocusSettings, RunAutoLensAlignmentSettings, RunAutoStigmatorCenteringSettings, RunAutoStigmatorSettings 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class AutoFunctions(object):    
+class AutoFunctions(object):
     """
-    The object provides control of the microscope's auto functions.
+    The object provides control of the microscope auto functions.
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -23,115 +23,115 @@ class AutoFunctions(object):
         self.__id = "SdbMicroscope.AutoFunctions"
 
 
-    def run_auto_source_tilt(self, settings = UndefinedParameter):        
+    def run_auto_source_tilt(self, settings: 'RunAutoSourceTiltSettings' = None):
         """
-        Performs routine to automatically adjust source tilt.
+        Runs a routine that automatically adjusts the source tilt in the active view.
         
-        :param RunAutoSourceTiltSettings settings: Settings for the automatic source tilt adjustment routine.
+        :param settings: Settings for the automatic source tilt adjustment routine.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RunAutoSourceTilt", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, RunAutoSourceTiltSettings):
+        if isinstance(settings, RunAutoSourceTiltSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="RunAutoSourceTiltSettings")]
             call_request.parameters.values = [settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def run_auto_cb(self, settings = UndefinedParameter):        
+    def run_auto_cb(self, settings: 'RunAutoCbSettings' = None):
         """
-        Performs routine to automatically adjust contrast and brightness of the active detector in the active view.
+        Runs a routine that automatically optimizes contrast and brightness of the active detector in the active view.
         
-        :param RunAutoCbSettings settings: Settings for the automatic brightness and contrast adjustment routine.
+        :param settings: Settings for the automatic brightness and contrast adjustment routine.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RunAutoCb", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, RunAutoCbSettings):
+        if isinstance(settings, RunAutoCbSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="RunAutoCbSettings")]
             call_request.parameters.values = [settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def run_auto_focus(self, settings = UndefinedParameter):        
+    def run_auto_focus(self, settings: 'RunAutoFocusSettings' = None):
         """
-        Performs routine to focus automatically.
+        Runs the automatic focus routine in the active view.
         
-        :param RunAutoFocusSettings settings: Settings for the automatic focus routine.
+        :param settings: Settings for the automatic focus routine.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RunAutoFocus", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, RunAutoFocusSettings):
+        if isinstance(settings, RunAutoFocusSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="RunAutoFocusSettings")]
             call_request.parameters.values = [settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def run_auto_lens_alignment(self, settings = UndefinedParameter):        
+    def run_auto_lens_alignment(self, settings: 'RunAutoLensAlignmentSettings' = None):
         """
-        Performs routine to automatically adjust lens alignment.
+        Runs a routine that automatically adjusts the lens alignment in the active view.
         
-        :param RunAutoLensAlignmentSettings settings: Settings for the automatic lens alignment adjustment routine.
+        :param settings: Settings for the automatic lens alignment adjustment routine.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RunAutoLensAlignment", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, RunAutoLensAlignmentSettings):
+        if isinstance(settings, RunAutoLensAlignmentSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="RunAutoLensAlignmentSettings")]
             call_request.parameters.values = [settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def run_auto_stigmator_centering(self, settings = UndefinedParameter):        
+    def run_auto_stigmator_centering(self, settings: 'RunAutoStigmatorCenteringSettings' = None):
         """
-        Performs routine to automatically adjust stigmator centering.
+        Runs a routine that automatically optimizes stigmator centering in the active view.
         
-        :param RunAutoStigmatorCenteringSettings settings: Settings for the automatic stigmator centering adjustment routine.
+        :param settings: Settings for the automatic stigmator centering adjustment routine.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RunAutoStigmatorCentering", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, RunAutoStigmatorCenteringSettings):
+        if isinstance(settings, RunAutoStigmatorCenteringSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="RunAutoStigmatorCenteringSettings")]
             call_request.parameters.values = [settings]
             call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
+            call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def run_auto_stigmator(self, settings = UndefinedParameter):        
+    def run_auto_stigmator(self, settings: 'RunAutoStigmatorSettings' = None):
         """
-        Performs routine to automatically adjust stigmator.
+        Runs a routine that automatically optimizes stigmator in the active view.
         
-        :param RunAutoStigmatorSettings settings: Settings for the automatic stigmator adjustment routine.
+        :param settings: Settings for the automatic stigmator adjustment routine.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RunAutoStigmator", signature=[], parameters=[])
-        if settings is UndefinedParameter:
-            call_request.parameters.data_types = []
-            call_request.parameters.values = []
-            call_response = self.__application_client._perform_call(call_request)
-        elif isinstance(settings, RunAutoStigmatorSettings):
+        if isinstance(settings, RunAutoStigmatorSettings):
             call_request.parameters.data_types = [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="RunAutoStigmatorSettings")]
             call_request.parameters.values = [settings]
+            call_response = self.__application_client._perform_call(call_request)
+        elif settings is None:
+            call_request.parameters.data_types = []
+            call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")

@@ -9,10 +9,10 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import Point, Limits2d 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class LensAlignment(object):    
+class LensAlignment(object):
     """
     The object provides control and status of the electron beam lens alignment.
     """
@@ -24,7 +24,7 @@ class LensAlignment(object):
 
 
     @property
-    def limits(self) -> 'Limits2d':        
+    def limits(self) -> 'Limits2d':
         """
         Retrieves the range of valid values.
         """
@@ -36,7 +36,7 @@ class LensAlignment(object):
         return call_response.result.value
 
     @property
-    def value(self) -> 'Point':        
+    def value(self) -> 'Point':
         """
         Gets or sets the value.
         """
@@ -48,7 +48,7 @@ class LensAlignment(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'Point'):
         """
         Gets or sets the value.
         """

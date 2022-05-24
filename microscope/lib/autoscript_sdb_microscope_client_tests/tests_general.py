@@ -85,13 +85,11 @@ class TestsGeneral(unittest.TestCase):
             microscope.detector.type.value = basic_detector_types[0]
             print("Active detector type is now %s" % microscope.detector.type.value)
 
-        # Adjust active detector contrast
         print("Adjusting active detector contrast...")
         microscope.detector.contrast.value = 0.75
         print("Active detector contrast is now %.2f%%" % (microscope.detector.contrast.value * 100))
 
         if microscope.specimen.stage.is_installed:
-            # Ensure that bulk stage is homed
             print("Checking whether bulk stage is homed...")
             print("Bulk stage is %s" % ("homed" if microscope.specimen.stage.is_homed else "not homed"))
             if not microscope.specimen.stage.is_homed:
@@ -99,20 +97,17 @@ class TestsGeneral(unittest.TestCase):
                 microscope.specimen.stage.home()
                 print("Bulk stage is now %s" % ("homed" if microscope.specimen.stage.is_homed else "not homed"))
 
-            # Move bulk stage to absolute coordinates of X=2mm, Y=1mm, Z=4mm, R=0deg
             print("Moving bulk stage to absolute coordinates of X=2mm, Y=1mm, Z=4mm, R=0deg...")
             position = StagePosition(x=0.002, y=0.001, z=0.004, r=0)
             microscope.specimen.stage.absolute_move(position)
             print("Bulk stage position is now %s" % microscope.specimen.stage.current_position)
 
-            # Rotate bulk stage compucentrically by 10 degrees
             print("Rotating bulk stage compucentrically by 10deg...")
             settings = MoveSettings(rotate_compucentric=True)
             position = StagePosition(r=math.radians(10))
             microscope.specimen.stage.relative_move(position, settings)
             print("Bulk stage position is now %s" % microscope.specimen.stage.current_position)
 
-        # Start live acquisition
         print("Starting live acquisition...")
         microscope.imaging.start_acquisition()
 

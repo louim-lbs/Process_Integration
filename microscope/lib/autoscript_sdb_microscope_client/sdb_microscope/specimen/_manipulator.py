@@ -9,12 +9,12 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import ManipulatorPosition 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class Manipulator(object):    
+class Manipulator(object):
     """
-    The object provides control and status of the microscope's manipulator device.
+    The object provides control and status of the manipulator device. The device is also referred to as EasyLift.
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -23,11 +23,11 @@ class Manipulator(object):
         self.__id = "SdbMicroscope.Specimen.Manipulator"
 
 
-    def absolute_move(self, target_position):        
+    def absolute_move(self, target_position: 'ManipulatorPosition'):
         """
-        The method moves the manipulator to the specified position.
+        The function moves the manipulator to the specified position.
         
-        :param ManipulatorPosition target_position: The absolute position to which the manipulator should move.
+        :param target_position: The absolute position to which the manipulator should move.
         """
         call_request = CallRequest(object_id=self.__id, method_name="AbsoluteMove", signature= [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="ManipulatorPosition")], parameters=[target_position]) 
         if isinstance(target_position, ManipulatorPosition):
@@ -35,11 +35,11 @@ class Manipulator(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def relative_move(self, position_delta):        
+    def relative_move(self, position_delta: 'ManipulatorPosition'):
         """
-        The method moves the manipulator by the specified delta position.
+        The function moves the manipulator by the specified delta position.
         
-        :param ManipulatorPosition position_delta: The position by which the manipulator should move.
+        :param position_delta: The position by which the manipulator should move.
         """
         call_request = CallRequest(object_id=self.__id, method_name="RelativeMove", signature= [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="ManipulatorPosition")], parameters=[position_delta]) 
         if isinstance(position_delta, ManipulatorPosition):
@@ -47,24 +47,36 @@ class Manipulator(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def insert(self):        
+    def insert(self):
         """
-        The method inserts the manipulator.
+        The function inserts the manipulator.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Insert", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def retract(self):        
+    def retract(self):
         """
-        The method retracts the manipulator.
+        The function retracts the manipulator.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Retract", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    @property
-    def is_installed(self) -> 'bool':        
+    def set_default_coordinate_system(self, coordinate_system: 'str'):
         """
-        Tells whether manipulator is installed on the system.
+        The function sets the default coordinate system of the manipulator. Subsequent absolute_move() and relative_move() calls will use this system.
+        
+        :param coordinate_system: New default manipulator coordinate system. Maps to ManipulatorCoordinateSystem enumeration.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="SetDefaultCoordinateSystem", signature= [DataType.STRING], parameters=[coordinate_system]) 
+        if isinstance(coordinate_system, str):
+            call_response = self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
+    @property
+    def is_installed(self) -> 'bool':
+        """
+        Tells whether the manipulator device is installed on the microscope.
         """
         call_request = CallRequest(object_id=self.__id, method_name="IsInstalled_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -74,7 +86,7 @@ class Manipulator(object):
         return call_response.result.value
 
     @property
-    def current_position(self) -> 'ManipulatorPosition':        
+    def current_position(self) -> 'ManipulatorPosition':
         """
         The property retrieves the current manipulator position.
         """

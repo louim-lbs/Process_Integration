@@ -8,14 +8,14 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from autoscript_sdb_microscope_client._dynamic_object_proxies import GisPort, Multichem 
 from autoscript_sdb_microscope_client._dynamic_object_handles import GisPortHandle, MultichemHandle 
 
 
-class Gas(object):    
+class Gas(object):
     """
-    The object provides control of the microscope's gas systems.
+    The object provides control of the gas injection system (GIS).
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -24,14 +24,13 @@ class Gas(object):
         self.__id = "SdbMicroscope.Gas"
 
 
-    def get_gis_port(self, gas_name) -> 'GisPort':        
+    def get_gis_port(self, gas_name: 'str') -> 'GisPort':
         """
-        The method finds GIS port using the specified name.
+        The function finds a GIS port with the specified gas.
         
-        :param str gas_name: Name of the gas present in the GIS port.
+        :param gas_name: Name of the gas to look for.
         
-        :return: The object provides control of the GIS port.
-        :rtype: GisPort
+        :return: An object representing the GIS port.
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetGisPort", signature= [DataType.STRING], parameters=[gas_name]) 
         if isinstance(gas_name, str):
@@ -44,12 +43,11 @@ class Gas(object):
         handle = call_response.result.value
         return GisPort(self.__application_client, handle)
 
-    def get_multichem(self) -> 'Multichem':        
+    def get_multichem(self) -> 'Multichem':
         """
-        The method gets the MultiChem object.
+        The function returns an object representing the MultiChem device.
         
-        :return: The object provides control of the MultiChem.
-        :rtype: Multichem
+        :return: The object which provides control functions on the MultiChem device.
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetMultichem", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
@@ -59,12 +57,11 @@ class Gas(object):
         handle = call_response.result.value
         return Multichem(self.__application_client, handle)
 
-    def list_all_gis_ports(self) -> 'List[str]':        
+    def list_all_gis_ports(self) -> 'List[str]':
         """
-        This method returns list of gases for all GIS ports installed on the system.
+        The function returns a list of gases for all GIS ports installed on the system.
         
-        :return: List of gases for all GIS ports installed on the system.
-        :rtype: list
+        :return: List of available gases.
         """
         call_request = CallRequest(object_id=self.__id, method_name="ListAllGisPorts", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)

@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class Mode(object):    
+class Mode(object):
     """
     The object provides control and status of the scanning mode.
     """
@@ -22,27 +22,27 @@ class Mode(object):
         self.__id = "SdbMicroscope.Beams.IonBeam.Scanning.Mode"
 
 
-    def set_full_frame(self):        
+    def set_full_frame(self):
         """
         The method activates full frame scanning mode.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetFullFrame", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def set_reduced_area(self, left = UndefinedParameter, top = UndefinedParameter, width = UndefinedParameter, height = UndefinedParameter):        
+    def set_reduced_area(self, left: 'float' = None, top: 'float' = None, width: 'float' = None, height: 'float' = None):
         """
         The method activates reduced area scanning mode.
         
-        :param float left: Left side of the rectangular area. The coordinate is in the range [0, 1].
+        :param left: Left side of the rectangular area. The coordinate is in the range [0, 1].
         
-        :param float top: Top side of the rectangular area. The coordinate is in the range [0, 1].
+        :param top: Top side of the rectangular area. The coordinate is in the range [0, 1].
         
-        :param float width: Width of the rectangular area. The valid range is [0, 1], where 1 means full width of the view.
+        :param width: Width of the rectangular area. The valid range is [0, 1], where 1 means full width of the view.
         
-        :param float height: Height of the rectangular area. The valid range is [0, 1], where 1 means full height of the view.
+        :param height: Height of the rectangular area. The valid range is [0, 1], where 1 means full height of the view.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetReducedArea", signature=[], parameters=[])
-        if left is UndefinedParameter and top is UndefinedParameter and width is UndefinedParameter and height is UndefinedParameter:
+        if left is None and top is None and width is None and height is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -54,16 +54,16 @@ class Mode(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def set_spot(self, x = UndefinedParameter, y = UndefinedParameter):        
+    def set_spot(self, x: 'float' = None, y: 'float' = None):
         """
         The method activates spot scanning mode.
         
-        :param float x: X coordinate of the spot. The valid range of the coordinate is [0, 1].
+        :param x: X coordinate of the spot. The valid range of the coordinate is [0, 1].
         
-        :param float y: Y coordinate of the spot. The valid range of the coordinate is [0, 1].
+        :param y: Y coordinate of the spot. The valid range of the coordinate is [0, 1].
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetSpot", signature=[], parameters=[])
-        if x is UndefinedParameter and y is UndefinedParameter:
+        if x is None and y is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -75,14 +75,14 @@ class Mode(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def set_line(self, y = UndefinedParameter):        
+    def set_line(self, y: 'float' = None):
         """
         The method activates line scanning mode.
         
-        :param float y: Position of the line in a view. Valid values are in range [0, 1], where 0 represents top of the view and 1 represents bottom of the view.
+        :param y: Position of the line in a view. Valid values are in range [0, 1], where 0 represents top of the view and 1 represents bottom of the view.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SetLine", signature=[], parameters=[])
-        if y is UndefinedParameter:
+        if y is None:
             call_request.parameters.data_types = []
             call_request.parameters.values = []
             call_response = self.__application_client._perform_call(call_request)
@@ -94,7 +94,7 @@ class Mode(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
 
-    def set_external(self):        
+    def set_external(self):
         """
         The method activates external control of the scanning system, such as beam control from an EDX X-ray system.
         """
@@ -102,7 +102,7 @@ class Mode(object):
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def value(self) -> 'int':        
+    def value(self) -> 'int':
         """
         Retrieves current beam scanning mode.
         """

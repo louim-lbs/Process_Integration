@@ -8,7 +8,7 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .ion_beam._high_voltage import HighVoltage
 from .ion_beam._beam_shift import BeamShift
 from .ion_beam._horizontal_field_width import HorizontalFieldWidth
@@ -19,9 +19,9 @@ from .ion_beam._beam_current import BeamCurrent
 from .ion_beam._source import Source
 
 
-class IonBeam(object):    
+class IonBeam(object):
     """
-    The object provides control and status of the microscope's ion beam.
+    The object provides control and status of the ion beam.
     """
     __slots__ = ["__id", "__application_client", "__high_voltage", "__beam_shift", "__horizontal_field_width", "__stigmator", "__scanning", "__working_distance", "__beam_current", "__source"]
 
@@ -39,83 +39,83 @@ class IonBeam(object):
         self.__source = Source(self.__application_client)
 
     @property
-    def high_voltage(self) -> 'HighVoltage':        
+    def high_voltage(self) -> 'HighVoltage':
         """
         The object provides control and status of the high tension voltage.
         """
         return self.__high_voltage
 
     @property
-    def beam_shift(self) -> 'BeamShift':        
+    def beam_shift(self) -> 'BeamShift':
         """
         The object provides control and status of beam shift.
         """
         return self.__beam_shift
 
     @property
-    def horizontal_field_width(self) -> 'HorizontalFieldWidth':        
+    def horizontal_field_width(self) -> 'HorizontalFieldWidth':
         """
         The object provides control and status of the horizontal field width.
         """
         return self.__horizontal_field_width
 
     @property
-    def stigmator(self) -> 'Stigmator':        
+    def stigmator(self) -> 'Stigmator':
         """
         The object provides control and status of stigmator. It can be used to correct image astigmatism.
         """
         return self.__stigmator
 
     @property
-    def scanning(self) -> 'Scanning':        
+    def scanning(self) -> 'Scanning':
         """
         The object scanning provides control and status of the scanning properties of the beam.
         """
         return self.__scanning
 
     @property
-    def working_distance(self) -> 'WorkingDistance':        
+    def working_distance(self) -> 'WorkingDistance':
         """
         The object provides control and status of the working distance.
         """
         return self.__working_distance
 
     @property
-    def beam_current(self) -> 'BeamCurrent':        
+    def beam_current(self) -> 'BeamCurrent':
         """
         The object provides control and status of the ion beam current.
         """
         return self.__beam_current
 
     @property
-    def source(self) -> 'Source':        
+    def source(self) -> 'Source':
         """
         The object provides control and status of the ion beam source.
         """
         return self.__source
 
-    def turn_on(self):        
+    def turn_on(self):
         """
         The method turns the beam on.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnOn", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def turn_off(self):        
+    def turn_off(self):
         """
         The method turns the beam off.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnOff", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def blank(self):        
+    def blank(self):
         """
         Blanks the beam.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Blank", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def unblank(self):        
+    def unblank(self):
         """
         Unblanks the beam.
         """
@@ -123,7 +123,7 @@ class IonBeam(object):
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def is_on(self) -> 'bool':        
+    def is_on(self) -> 'bool':
         """
         Retrieves current state of the beam.
         """
@@ -135,7 +135,7 @@ class IonBeam(object):
         return call_response.result.value
 
     @property
-    def is_blanked(self) -> 'bool':        
+    def is_blanked(self) -> 'bool':
         """
         Gets the current blank state of the beam.
         """
@@ -147,9 +147,9 @@ class IonBeam(object):
         return call_response.result.value
 
     @property
-    def is_installed(self) -> 'bool':        
+    def is_installed(self) -> 'bool':
         """
-        Tells whether ion beam is installed on the system.
+        Tells whether the ion beam is installed on the system.
         """
         call_request = CallRequest(object_id=self.__id, method_name="IsInstalled_GET")
         call_response = self.__application_client._perform_call(call_request)

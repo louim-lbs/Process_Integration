@@ -6,21 +6,23 @@
 # </auto-generated>
 # --------------------------------------------------------------------------------------------------
 
-from typing import List, Union
+from typing import List, Union, Optional, TYPE_CHECKING
 from autoscript_core.serialization import StructureBase
 from autoscript_core.common import DataType, DataTypeDefinition
-import autoscript_sdb_microscope_client.structures
+
+if TYPE_CHECKING:
+    import autoscript_sdb_microscope_client.structures as structures
 
 
-class Point(StructureBase):    
+class Point(StructureBase):
     """
     The structure representing a 2D point.
     
-    :param float x: The X coordinate of a point.
+    :param x: The X coordinate of a point.
     
-    :param float y: The Y coordinate of a point.
+    :param y: The Y coordinate of a point.
     """
-    def __init__(self, x=0.0, y=0.0):
+    def __init__(self, x: 'float' = 0.0, y: 'float' = 0.0):
         super(Point, self).__init__("Point")
 
         self._init_item(1, DataType.DOUBLE, x, False)
@@ -30,14 +32,14 @@ class Point(StructureBase):
         return self._has_item(1)
 
     @property
-    def x(self) -> 'float':        
+    def x(self) -> 'float':
         """
         The X coordinate of a point.
         """
         return self._get_item(1)
 
     @x.setter
-    def x(self, value):        
+    def x(self, value: 'float'):
         """
         The X coordinate of a point.
         """
@@ -47,34 +49,33 @@ class Point(StructureBase):
         return self._has_item(2)
 
     @property
-    def y(self) -> 'float':        
+    def y(self) -> 'float':
         """
         The Y coordinate of a point.
         """
         return self._get_item(2)
 
     @y.setter
-    def y(self, value):        
+    def y(self, value: 'float'):
         """
         The Y coordinate of a point.
         """
         self._set_item(2, value)
 
 
-
-class Rectangle(StructureBase):    
+class Rectangle(StructureBase):
     """
     The structure representing a rectangular shape.
     
-    :param float left: The left side of a rectangle.
+    :param left: The left side of a rectangle.
     
-    :param float top: The top side of a rectangle.
+    :param top: The top side of a rectangle.
     
-    :param float width: The width of a rectangle.
+    :param width: The width of a rectangle.
     
-    :param float height: The height of a rectangle.
+    :param height: The height of a rectangle.
     """
-    def __init__(self, left=0.0, top=0.0, width=0.0, height=0.0):
+    def __init__(self, left: 'float' = 0.0, top: 'float' = 0.0, width: 'float' = 0.0, height: 'float' = 0.0):
         super(Rectangle, self).__init__("Rectangle")
 
         self._init_item(1, DataType.DOUBLE, left, False)
@@ -86,14 +87,14 @@ class Rectangle(StructureBase):
         return self._has_item(1)
 
     @property
-    def left(self) -> 'float':        
+    def left(self) -> 'float':
         """
         The left side of a rectangle.
         """
         return self._get_item(1)
 
     @left.setter
-    def left(self, value):        
+    def left(self, value: 'float'):
         """
         The left side of a rectangle.
         """
@@ -103,14 +104,14 @@ class Rectangle(StructureBase):
         return self._has_item(2)
 
     @property
-    def top(self) -> 'float':        
+    def top(self) -> 'float':
         """
         The top side of a rectangle.
         """
         return self._get_item(2)
 
     @top.setter
-    def top(self, value):        
+    def top(self, value: 'float'):
         """
         The top side of a rectangle.
         """
@@ -120,14 +121,14 @@ class Rectangle(StructureBase):
         return self._has_item(3)
 
     @property
-    def width(self) -> 'float':        
+    def width(self) -> 'float':
         """
         The width of a rectangle.
         """
         return self._get_item(3)
 
     @width.setter
-    def width(self, value):        
+    def width(self, value: 'float'):
         """
         The width of a rectangle.
         """
@@ -137,30 +138,29 @@ class Rectangle(StructureBase):
         return self._has_item(4)
 
     @property
-    def height(self) -> 'float':        
+    def height(self) -> 'float':
         """
         The height of a rectangle.
         """
         return self._get_item(4)
 
     @height.setter
-    def height(self, value):        
+    def height(self, value: 'float'):
         """
         The height of a rectangle.
         """
         self._set_item(4, value)
 
 
-
-class Limits(StructureBase):    
+class Limits(StructureBase):
     """
     The structure representing limits of a scalar quantity.
     
-    :param float min: Minimal value.
+    :param min: Minimal value.
     
-    :param float max: Maximal value.
+    :param max: Maximal value.
     """
-    def __init__(self, min=0.0, max=0.0):
+    def __init__(self, min: 'float' = 0.0, max: 'float' = 0.0):
         super(Limits, self).__init__("Limits")
 
         self._init_item(1, DataType.DOUBLE, min, False)
@@ -170,14 +170,14 @@ class Limits(StructureBase):
         return self._has_item(1)
 
     @property
-    def min(self) -> 'float':        
+    def min(self) -> 'float':
         """
         Minimal value.
         """
         return self._get_item(1)
 
     @min.setter
-    def min(self, value):        
+    def min(self, value: 'float'):
         """
         Minimal value.
         """
@@ -187,30 +187,29 @@ class Limits(StructureBase):
         return self._has_item(2)
 
     @property
-    def max(self) -> 'float':        
+    def max(self) -> 'float':
         """
         Maximal value.
         """
         return self._get_item(2)
 
     @max.setter
-    def max(self, value):        
+    def max(self, value: 'float'):
         """
         Maximal value.
         """
         self._set_item(2, value)
 
 
-
-class Limits2d(StructureBase):    
+class Limits2d(StructureBase):
     """
     The structure representing limits of a 2D quantity.
     
-    :param Limits limits_x: Limits in X direction.
+    :param limits_x: Limits in X direction.
     
-    :param Limits limits_y: Limits in Y direction.
+    :param limits_y: Limits in Y direction.
     """
-    def __init__(self, limits_x=None, limits_y=None):
+    def __init__(self, limits_x: 'structures.Limits' = None, limits_y: 'structures.Limits' = None):
         super(Limits2d, self).__init__("Limits2d")
 
         self._init_item(1, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Limits"), limits_x, False)
@@ -220,14 +219,14 @@ class Limits2d(StructureBase):
         return self._has_item(1)
 
     @property
-    def limits_x(self) -> 'Limits':        
+    def limits_x(self) -> 'structures.Limits':
         """
         Limits in X direction.
         """
         return self._get_item(1)
 
     @limits_x.setter
-    def limits_x(self, value):        
+    def limits_x(self, value: 'structures.Limits'):
         """
         Limits in X direction.
         """
@@ -237,40 +236,43 @@ class Limits2d(StructureBase):
         return self._has_item(2)
 
     @property
-    def limits_y(self) -> 'Limits':        
+    def limits_y(self) -> 'structures.Limits':
         """
         Limits in Y direction.
         """
         return self._get_item(2)
 
     @limits_y.setter
-    def limits_y(self, value):        
+    def limits_y(self, value: 'structures.Limits'):
         """
         Limits in Y direction.
         """
         self._set_item(2, value)
 
 
-
-class GrabFrameSettings(StructureBase):    
+class GrabFrameSettings(StructureBase):
     """
     The structure representing additional settings for a grab frame action.
     
-    :param str resolution: The resolution of the image. You can use ScanningResolution enumeration to access few preset resolutions.
+    :param resolution: Image size in pixels. You can use ScanningResolution enumeration to access standard resolution presets.
     
-    :param float dwell_time: The time the beam spends on a single pixel.
+    :param dwell_time: The time the beam scans a single pixel.
     
-    :param int bit_depth: The number of bits representing one pixel. It can be either 8 or 16 bits for grayscale and 24 for RGB.
+    :param bit_depth: The number of bits representing one pixel. It can be either 8 or 16 bits for grayscale images or 24 for RGB images.
     
-    :param Rectangle reduced_area: The rectangular area which should be grabbed specified in reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+    :param reduced_area: The rectangular area which should be scanned specified in the reduced area coordinate system. In this system point [0,0] corresponds to the upper left image corner and point [1, 1] to the lower right image corner.
     
-    :param int line_integration: If the number is > 1, each line scan is repeated several times (from 2 to 255) before proceeding to the next line. Signal data collected from these passes are integrated and shown as an actual image line. The default is 1.
+    :param line_integration: If the number is > 1, each line scan is repeated several times (from 2 to 255) before proceeding to the next line. Signal data collected from these passes are integrated and shown as an actual image line. The default is 1.
     
-    :param int scan_interlacing: If the number is > 1, scanning splits an imaging area into blocks defined by the number of lines (from 2 to 8). In the first instance, the first line of each block is scanned, then the second one, etc. This imaging method significantly reduces sample charging. The default is 1.
+    :param scan_interlacing: If the number is > 1, scanning splits an imaging area into blocks defined by the number of lines (from 2 to 8). In the first instance, the first line of each block is scanned, then the second one, etc. This imaging method significantly reduces sample charging. The default is 1.
     
-    :param str preview_resolution: The resolution of the preview image. This property is applied only for large images (any side is longer than maximum predefined resolution side). In that case only preview is returned.
+    :param preview_resolution: Preview image resolution. This property is only considered for the grab_frame_to_disk() function.
+    
+    :param frame_integration: If the number is > 1, integration filter is switched on during image acquisition with specified number of frames.
+    
+    :param drift_correction: Enables to correct image drifting when integration filter is active. Requires frame_inegration parameter be specified and > 1.
     """
-    def __init__(self, resolution=None, dwell_time=None, bit_depth=None, reduced_area=None, line_integration=None, scan_interlacing=None, preview_resolution=None):
+    def __init__(self, resolution: 'str' = None, dwell_time: 'float' = None, bit_depth: 'int' = None, reduced_area: 'structures.Rectangle' = None, line_integration: 'int' = None, scan_interlacing: 'int' = None, preview_resolution: 'str' = None, frame_integration: 'int' = None, drift_correction: 'bool' = None):
         super(GrabFrameSettings, self).__init__("GrabFrameSettings")
 
         self._init_item(6, DataType.STRING, resolution, True)
@@ -280,21 +282,23 @@ class GrabFrameSettings(StructureBase):
         self._init_item(3, DataType.INT32, line_integration, True)
         self._init_item(5, DataType.INT32, scan_interlacing, True)
         self._init_item(8, DataType.STRING, preview_resolution, True)
+        self._init_item(9, DataType.INT32, frame_integration, True)
+        self._init_item(10, DataType.BOOL, drift_correction, True)
 
     def _has_resolution(self):
         return self._has_item(6)
 
     @property
-    def resolution(self) -> 'str':        
+    def resolution(self) -> 'Optional[str]':
         """
-        The resolution of the image. You can use ScanningResolution enumeration to access few preset resolutions.
+        Image size in pixels. You can use ScanningResolution enumeration to access standard resolution presets.
         """
         return self._get_item(6)
 
     @resolution.setter
-    def resolution(self, value):        
+    def resolution(self, value: 'Optional[str]'):
         """
-        The resolution of the image. You can use ScanningResolution enumeration to access few preset resolutions.
+        Image size in pixels. You can use ScanningResolution enumeration to access standard resolution presets.
         """
         self._set_item(6, value)
 
@@ -302,16 +306,16 @@ class GrabFrameSettings(StructureBase):
         return self._has_item(7)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'Optional[float]':
         """
-        The time the beam spends on a single pixel.
+        The time the beam scans a single pixel.
         """
         return self._get_item(7)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'Optional[float]'):
         """
-        The time the beam spends on a single pixel.
+        The time the beam scans a single pixel.
         """
         self._set_item(7, value)
 
@@ -319,16 +323,16 @@ class GrabFrameSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def bit_depth(self) -> 'int':        
+    def bit_depth(self) -> 'Optional[int]':
         """
-        The number of bits representing one pixel. It can be either 8 or 16 bits for grayscale and 24 for RGB.
+        The number of bits representing one pixel. It can be either 8 or 16 bits for grayscale images or 24 for RGB images.
         """
         return self._get_item(1)
 
     @bit_depth.setter
-    def bit_depth(self, value):        
+    def bit_depth(self, value: 'Optional[int]'):
         """
-        The number of bits representing one pixel. It can be either 8 or 16 bits for grayscale and 24 for RGB.
+        The number of bits representing one pixel. It can be either 8 or 16 bits for grayscale images or 24 for RGB images.
         """
         self._set_item(1, value)
 
@@ -336,16 +340,16 @@ class GrabFrameSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def reduced_area(self) -> 'Rectangle':        
+    def reduced_area(self) -> 'Optional[structures.Rectangle]':
         """
-        The rectangular area which should be grabbed specified in reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        The rectangular area which should be scanned specified in the reduced area coordinate system. In this system point [0,0] corresponds to the upper left image corner and point [1, 1] to the lower right image corner.
         """
         return self._get_item(2)
 
     @reduced_area.setter
-    def reduced_area(self, value):        
+    def reduced_area(self, value: 'Optional[structures.Rectangle]'):
         """
-        The rectangular area which should be grabbed specified in reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        The rectangular area which should be scanned specified in the reduced area coordinate system. In this system point [0,0] corresponds to the upper left image corner and point [1, 1] to the lower right image corner.
         """
         self._set_item(2, value)
 
@@ -353,14 +357,14 @@ class GrabFrameSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def line_integration(self) -> 'int':        
+    def line_integration(self) -> 'Optional[int]':
         """
         If the number is > 1, each line scan is repeated several times (from 2 to 255) before proceeding to the next line. Signal data collected from these passes are integrated and shown as an actual image line. The default is 1.
         """
         return self._get_item(3)
 
     @line_integration.setter
-    def line_integration(self, value):        
+    def line_integration(self, value: 'Optional[int]'):
         """
         If the number is > 1, each line scan is repeated several times (from 2 to 255) before proceeding to the next line. Signal data collected from these passes are integrated and shown as an actual image line. The default is 1.
         """
@@ -370,14 +374,14 @@ class GrabFrameSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def scan_interlacing(self) -> 'int':        
+    def scan_interlacing(self) -> 'Optional[int]':
         """
         If the number is > 1, scanning splits an imaging area into blocks defined by the number of lines (from 2 to 8). In the first instance, the first line of each block is scanned, then the second one, etc. This imaging method significantly reduces sample charging. The default is 1.
         """
         return self._get_item(5)
 
     @scan_interlacing.setter
-    def scan_interlacing(self, value):        
+    def scan_interlacing(self, value: 'Optional[int]'):
         """
         If the number is > 1, scanning splits an imaging area into blocks defined by the number of lines (from 2 to 8). In the first instance, the first line of each block is scanned, then the second one, etc. This imaging method significantly reduces sample charging. The default is 1.
         """
@@ -387,36 +391,69 @@ class GrabFrameSettings(StructureBase):
         return self._has_item(8)
 
     @property
-    def preview_resolution(self) -> 'str':        
+    def preview_resolution(self) -> 'Optional[str]':
         """
-        The resolution of the preview image. This property is applied only for large images (any side is longer than maximum predefined resolution side). In that case only preview is returned.
+        Preview image resolution. This property is only considered for the grab_frame_to_disk() function.
         """
         return self._get_item(8)
 
     @preview_resolution.setter
-    def preview_resolution(self, value):        
+    def preview_resolution(self, value: 'Optional[str]'):
         """
-        The resolution of the preview image. This property is applied only for large images (any side is longer than maximum predefined resolution side). In that case only preview is returned.
+        Preview image resolution. This property is only considered for the grab_frame_to_disk() function.
         """
         self._set_item(8, value)
 
+    def _has_frame_integration(self):
+        return self._has_item(9)
+
+    @property
+    def frame_integration(self) -> 'Optional[int]':
+        """
+        If the number is > 1, integration filter is switched on during image acquisition with specified number of frames.
+        """
+        return self._get_item(9)
+
+    @frame_integration.setter
+    def frame_integration(self, value: 'Optional[int]'):
+        """
+        If the number is > 1, integration filter is switched on during image acquisition with specified number of frames.
+        """
+        self._set_item(9, value)
+
+    def _has_drift_correction(self):
+        return self._has_item(10)
+
+    @property
+    def drift_correction(self) -> 'Optional[bool]':
+        """
+        Enables to correct image drifting when integration filter is active. Requires frame_inegration parameter be specified and > 1.
+        """
+        return self._get_item(10)
+
+    @drift_correction.setter
+    def drift_correction(self, value: 'Optional[bool]'):
+        """
+        Enables to correct image drifting when integration filter is active. Requires frame_inegration parameter be specified and > 1.
+        """
+        self._set_item(10, value)
 
 
-class RunAutoSourceTiltSettings(StructureBase):    
+class RunAutoSourceTiltSettings(StructureBase):
     """
     Settings for automatic source tilt adjustment routines.
     
-    :param str method: Method to be used during the routine.
+    :param method: Name of the the auto source tilt algorithm variant.
     
-    :param float contrast: Detector contrast to be used during the routine.
+    :param contrast: Detector contrast to be used during the routine.
     
-    :param float brightness: Detector brightness to be used during the routine.
+    :param brightness: Detector brightness to be used during the routine.
     
-    :param float dwell_time: Dwell time to be used during the routine.
+    :param dwell_time: Dwell time to be used during the routine.
     
-    :param str resolution: Resolution to be used during the routine.
+    :param resolution: Resolution to be used during the routine.
     """
-    def __init__(self, method=None, contrast=None, brightness=None, dwell_time=None, resolution=None):
+    def __init__(self, method: 'str' = None, contrast: 'float' = None, brightness: 'float' = None, dwell_time: 'float' = None, resolution: 'str' = None):
         super(RunAutoSourceTiltSettings, self).__init__("RunAutoSourceTiltSettings")
 
         self._init_item(1, DataType.STRING, method, True)
@@ -429,16 +466,16 @@ class RunAutoSourceTiltSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def method(self) -> 'str':        
+    def method(self) -> 'Optional[str]':
         """
-        Method to be used during the routine.
+        Name of the the auto source tilt algorithm variant.
         """
         return self._get_item(1)
 
     @method.setter
-    def method(self, value):        
+    def method(self, value: 'Optional[str]'):
         """
-        Method to be used during the routine.
+        Name of the the auto source tilt algorithm variant.
         """
         self._set_item(1, value)
 
@@ -446,14 +483,14 @@ class RunAutoSourceTiltSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def contrast(self) -> 'float':        
+    def contrast(self) -> 'Optional[float]':
         """
         Detector contrast to be used during the routine.
         """
         return self._get_item(2)
 
     @contrast.setter
-    def contrast(self, value):        
+    def contrast(self, value: 'Optional[float]'):
         """
         Detector contrast to be used during the routine.
         """
@@ -463,14 +500,14 @@ class RunAutoSourceTiltSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def brightness(self) -> 'float':        
+    def brightness(self) -> 'Optional[float]':
         """
         Detector brightness to be used during the routine.
         """
         return self._get_item(3)
 
     @brightness.setter
-    def brightness(self, value):        
+    def brightness(self, value: 'Optional[float]'):
         """
         Detector brightness to be used during the routine.
         """
@@ -480,14 +517,14 @@ class RunAutoSourceTiltSettings(StructureBase):
         return self._has_item(4)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'Optional[float]':
         """
         Dwell time to be used during the routine.
         """
         return self._get_item(4)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'Optional[float]'):
         """
         Dwell time to be used during the routine.
         """
@@ -497,48 +534,47 @@ class RunAutoSourceTiltSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def resolution(self) -> 'str':        
+    def resolution(self) -> 'Optional[str]':
         """
         Resolution to be used during the routine.
         """
         return self._get_item(5)
 
     @resolution.setter
-    def resolution(self, value):        
+    def resolution(self, value: 'Optional[str]'):
         """
         Resolution to be used during the routine.
         """
         self._set_item(5, value)
 
 
-
-class RunAutoCbSettings(StructureBase):    
+class RunAutoCbSettings(StructureBase):
     """
     Settings for automatic brightness and contrast adjustment routines.
     
-    :param float black_target: Grayscale level at which the black pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
+    :param black_target: Grayscale level at which the black pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
     
-    :param float white_target: Grayscale level at which the white pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
+    :param white_target: Grayscale level at which the white pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
     
-    :param str method: Method to be used during the routine.
+    :param method: Name of the the auto contrast brightness algorithm variant.
     
-    :param bool calibrate_detector: Force detector calibration prior to running the routine. Normally, it is sufficient to calibrate the detector only once. Using this option, you can make the routine more robust in exchange for a slightly longer duration.
+    :param calibrate_detector: Whether to force detector calibration prior to running the routine. Normally, it is sufficient to calibrate the detector only once. Using this option, you can make the routine more robust in exchange for a slightly longer duration.
     
-    :param float dwell_time: Dwell time to be used during the routine.
+    :param dwell_time: Dwell time to be used during the routine.
     
-    :param int line_integration: Line integration to be used during the routine.
+    :param line_integration: Line integration to be used during the routine.
     
-    :param float max_black_clipping: Maximum percentage of black pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
+    :param max_black_clipping: Maximum percentage of black pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
     
-    :param float max_white_clipping: Maximum percentage of white pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
+    :param max_white_clipping: Maximum percentage of white pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
     
-    :param int number_of_frames: Number of frames to be used during the routine.
+    :param number_of_frames: Number of frames to be used during the routine.
     
-    :param str resolution: Resolution to be used during the routine.
+    :param resolution: Resolution to be used during the routine.
     
-    :param float brightness_target: Brightness level at which the median brightness pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
+    :param brightness_target: Brightness level at which the median brightness pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
     """
-    def __init__(self, black_target=None, white_target=None, method=None, calibrate_detector=None, dwell_time=None, line_integration=None, max_black_clipping=None, max_white_clipping=None, number_of_frames=None, resolution=None, brightness_target=None):
+    def __init__(self, black_target: 'float' = None, white_target: 'float' = None, method: 'str' = None, calibrate_detector: 'bool' = None, dwell_time: 'float' = None, line_integration: 'int' = None, max_black_clipping: 'float' = None, max_white_clipping: 'float' = None, number_of_frames: 'int' = None, resolution: 'str' = None, brightness_target: 'float' = None):
         super(RunAutoCbSettings, self).__init__("RunAutoCbSettings")
 
         self._init_item(1, DataType.DOUBLE, black_target, True)
@@ -557,14 +593,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def black_target(self) -> 'float':        
+    def black_target(self) -> 'Optional[float]':
         """
         Grayscale level at which the black pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
         return self._get_item(1)
 
     @black_target.setter
-    def black_target(self, value):        
+    def black_target(self, value: 'Optional[float]'):
         """
         Grayscale level at which the black pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
@@ -574,14 +610,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def white_target(self) -> 'float':        
+    def white_target(self) -> 'Optional[float]':
         """
         Grayscale level at which the white pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
         return self._get_item(2)
 
     @white_target.setter
-    def white_target(self, value):        
+    def white_target(self, value: 'Optional[float]'):
         """
         Grayscale level at which the white pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
@@ -591,16 +627,16 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def method(self) -> 'str':        
+    def method(self) -> 'Optional[str]':
         """
-        Method to be used during the routine.
+        Name of the the auto contrast brightness algorithm variant.
         """
         return self._get_item(3)
 
     @method.setter
-    def method(self, value):        
+    def method(self, value: 'Optional[str]'):
         """
-        Method to be used during the routine.
+        Name of the the auto contrast brightness algorithm variant.
         """
         self._set_item(3, value)
 
@@ -608,16 +644,16 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(4)
 
     @property
-    def calibrate_detector(self) -> 'bool':        
+    def calibrate_detector(self) -> 'Optional[bool]':
         """
-        Force detector calibration prior to running the routine. Normally, it is sufficient to calibrate the detector only once. Using this option, you can make the routine more robust in exchange for a slightly longer duration.
+        Whether to force detector calibration prior to running the routine. Normally, it is sufficient to calibrate the detector only once. Using this option, you can make the routine more robust in exchange for a slightly longer duration.
         """
         return self._get_item(4)
 
     @calibrate_detector.setter
-    def calibrate_detector(self, value):        
+    def calibrate_detector(self, value: 'Optional[bool]'):
         """
-        Force detector calibration prior to running the routine. Normally, it is sufficient to calibrate the detector only once. Using this option, you can make the routine more robust in exchange for a slightly longer duration.
+        Whether to force detector calibration prior to running the routine. Normally, it is sufficient to calibrate the detector only once. Using this option, you can make the routine more robust in exchange for a slightly longer duration.
         """
         self._set_item(4, value)
 
@@ -625,14 +661,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'Optional[float]':
         """
         Dwell time to be used during the routine.
         """
         return self._get_item(5)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'Optional[float]'):
         """
         Dwell time to be used during the routine.
         """
@@ -642,14 +678,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(6)
 
     @property
-    def line_integration(self) -> 'int':        
+    def line_integration(self) -> 'Optional[int]':
         """
         Line integration to be used during the routine.
         """
         return self._get_item(6)
 
     @line_integration.setter
-    def line_integration(self, value):        
+    def line_integration(self, value: 'Optional[int]'):
         """
         Line integration to be used during the routine.
         """
@@ -659,14 +695,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(7)
 
     @property
-    def max_black_clipping(self) -> 'float':        
+    def max_black_clipping(self) -> 'Optional[float]':
         """
         Maximum percentage of black pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
         return self._get_item(7)
 
     @max_black_clipping.setter
-    def max_black_clipping(self, value):        
+    def max_black_clipping(self, value: 'Optional[float]'):
         """
         Maximum percentage of black pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
@@ -676,14 +712,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(8)
 
     @property
-    def max_white_clipping(self) -> 'float':        
+    def max_white_clipping(self) -> 'Optional[float]':
         """
         Maximum percentage of white pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
         return self._get_item(8)
 
     @max_white_clipping.setter
-    def max_white_clipping(self, value):        
+    def max_white_clipping(self, value: 'Optional[float]'):
         """
         Maximum percentage of white pixels which can be clipped during the routine. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
@@ -693,14 +729,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(9)
 
     @property
-    def number_of_frames(self) -> 'int':        
+    def number_of_frames(self) -> 'Optional[int]':
         """
         Number of frames to be used during the routine.
         """
         return self._get_item(9)
 
     @number_of_frames.setter
-    def number_of_frames(self, value):        
+    def number_of_frames(self, value: 'Optional[int]'):
         """
         Number of frames to be used during the routine.
         """
@@ -710,14 +746,14 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(10)
 
     @property
-    def resolution(self) -> 'str':        
+    def resolution(self) -> 'Optional[str]':
         """
         Resolution to be used during the routine.
         """
         return self._get_item(10)
 
     @resolution.setter
-    def resolution(self, value):        
+    def resolution(self, value: 'Optional[str]'):
         """
         Resolution to be used during the routine.
         """
@@ -727,42 +763,43 @@ class RunAutoCbSettings(StructureBase):
         return self._has_item(11)
 
     @property
-    def brightness_target(self) -> 'float':        
+    def brightness_target(self) -> 'Optional[float]':
         """
         Brightness level at which the median brightness pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
         return self._get_item(11)
 
     @brightness_target.setter
-    def brightness_target(self, value):        
+    def brightness_target(self, value: 'Optional[float]'):
         """
         Brightness level at which the median brightness pixels should be placed. The value is expected to be in the range between [0, 1] corresponding to 0% - 100%.
         """
         self._set_item(11, value)
 
 
-
-class RunAutoFocusSettings(StructureBase):    
+class RunAutoFocusSettings(StructureBase):
     """
     Settings for automatic focus routines.
     
-    :param str method: Method to be used during the routine.
+    :param method: Name of the the auto focus algorithm variant.
     
-    :param float dwell_time: Dwell time to be used during the routine.
+    :param dwell_time: Dwell time to be used during the routine.
     
-    :param float horizontal_field_width: Horizontal field width to be used during the routine.
+    :param horizontal_field_width: Horizontal field width to be used during the routine.
     
-    :param int line_integration: Line integration to be used during the routine.
+    :param line_integration: Line integration to be used during the routine.
     
-    :param int number_of_frames: Number of frames to be used during the routine.
+    :param number_of_frames: Number of frames to be used during the routine.
     
-    :param Rectangle reduced_area: Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+    :param reduced_area: Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
     
-    :param str resolution: Resolution to be used during the routine.
+    :param resolution: Resolution to be used during the routine.
     
-    :param float working_distance_step: Initial working distance step to be used by the routine while searching for the optimal focus setting.
+    :param working_distance_step: Initial working distance step to be used by the routine while searching for the optimal focus setting.
+    
+    :param display_point: The point from which reduced area will be computed. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
     """
-    def __init__(self, method=None, dwell_time=None, horizontal_field_width=None, line_integration=None, number_of_frames=None, reduced_area=None, resolution=None, working_distance_step=None):
+    def __init__(self, method: 'str' = None, dwell_time: 'float' = None, horizontal_field_width: 'float' = None, line_integration: 'int' = None, number_of_frames: 'int' = None, reduced_area: 'structures.Rectangle' = None, resolution: 'str' = None, working_distance_step: 'float' = None, display_point: 'structures.Point' = None):
         super(RunAutoFocusSettings, self).__init__("RunAutoFocusSettings")
 
         self._init_item(1, DataType.STRING, method, True)
@@ -773,21 +810,22 @@ class RunAutoFocusSettings(StructureBase):
         self._init_item(7, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Rectangle"), reduced_area, True)
         self._init_item(8, DataType.STRING, resolution, True)
         self._init_item(9, DataType.DOUBLE, working_distance_step, True)
+        self._init_item(10, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Point"), display_point, True)
 
     def _has_method(self):
         return self._has_item(1)
 
     @property
-    def method(self) -> 'str':        
+    def method(self) -> 'Optional[str]':
         """
-        Method to be used during the routine.
+        Name of the the auto focus algorithm variant.
         """
         return self._get_item(1)
 
     @method.setter
-    def method(self, value):        
+    def method(self, value: 'Optional[str]'):
         """
-        Method to be used during the routine.
+        Name of the the auto focus algorithm variant.
         """
         self._set_item(1, value)
 
@@ -795,14 +833,14 @@ class RunAutoFocusSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'Optional[float]':
         """
         Dwell time to be used during the routine.
         """
         return self._get_item(2)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'Optional[float]'):
         """
         Dwell time to be used during the routine.
         """
@@ -812,14 +850,14 @@ class RunAutoFocusSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def horizontal_field_width(self) -> 'float':        
+    def horizontal_field_width(self) -> 'Optional[float]':
         """
         Horizontal field width to be used during the routine.
         """
         return self._get_item(3)
 
     @horizontal_field_width.setter
-    def horizontal_field_width(self, value):        
+    def horizontal_field_width(self, value: 'Optional[float]'):
         """
         Horizontal field width to be used during the routine.
         """
@@ -829,14 +867,14 @@ class RunAutoFocusSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def line_integration(self) -> 'int':        
+    def line_integration(self) -> 'Optional[int]':
         """
         Line integration to be used during the routine.
         """
         return self._get_item(5)
 
     @line_integration.setter
-    def line_integration(self, value):        
+    def line_integration(self, value: 'Optional[int]'):
         """
         Line integration to be used during the routine.
         """
@@ -846,14 +884,14 @@ class RunAutoFocusSettings(StructureBase):
         return self._has_item(6)
 
     @property
-    def number_of_frames(self) -> 'int':        
+    def number_of_frames(self) -> 'Optional[int]':
         """
         Number of frames to be used during the routine.
         """
         return self._get_item(6)
 
     @number_of_frames.setter
-    def number_of_frames(self, value):        
+    def number_of_frames(self, value: 'Optional[int]'):
         """
         Number of frames to be used during the routine.
         """
@@ -863,16 +901,16 @@ class RunAutoFocusSettings(StructureBase):
         return self._has_item(7)
 
     @property
-    def reduced_area(self) -> 'Rectangle':        
+    def reduced_area(self) -> 'Optional[structures.Rectangle]':
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         return self._get_item(7)
 
     @reduced_area.setter
-    def reduced_area(self, value):        
+    def reduced_area(self, value: 'Optional[structures.Rectangle]'):
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         self._set_item(7, value)
 
@@ -880,14 +918,14 @@ class RunAutoFocusSettings(StructureBase):
         return self._has_item(8)
 
     @property
-    def resolution(self) -> 'str':        
+    def resolution(self) -> 'Optional[str]':
         """
         Resolution to be used during the routine.
         """
         return self._get_item(8)
 
     @resolution.setter
-    def resolution(self, value):        
+    def resolution(self, value: 'Optional[str]'):
         """
         Resolution to be used during the routine.
         """
@@ -897,40 +935,56 @@ class RunAutoFocusSettings(StructureBase):
         return self._has_item(9)
 
     @property
-    def working_distance_step(self) -> 'float':        
+    def working_distance_step(self) -> 'Optional[float]':
         """
         Initial working distance step to be used by the routine while searching for the optimal focus setting.
         """
         return self._get_item(9)
 
     @working_distance_step.setter
-    def working_distance_step(self, value):        
+    def working_distance_step(self, value: 'Optional[float]'):
         """
         Initial working distance step to be used by the routine while searching for the optimal focus setting.
         """
         self._set_item(9, value)
 
+    def _has_display_point(self):
+        return self._has_item(10)
+
+    @property
+    def display_point(self) -> 'Optional[structures.Point]':
+        """
+        The point from which reduced area will be computed. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        """
+        return self._get_item(10)
+
+    @display_point.setter
+    def display_point(self, value: 'Optional[structures.Point]'):
+        """
+        The point from which reduced area will be computed. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        """
+        self._set_item(10, value)
 
 
-class RunAutoLensAlignmentSettings(StructureBase):    
+class RunAutoLensAlignmentSettings(StructureBase):
     """
     Settings for automatic lens alignment adjustment routines.
     
-    :param str method: Method to be used during the routine.
+    :param method: Name of the the auto lens alignment algorithm variant.
     
-    :param float dwell_time: Dwell time to be used during the routine.
+    :param dwell_time: Dwell time to be used during the routine.
     
-    :param int line_integration: Line integration to be used during the routine.
+    :param line_integration: Line integration to be used during the routine.
     
-    :param str modulation_type: Modulation type to be used during the routine.
+    :param modulation_type: Modulation type to be used during the routine.
     
-    :param int number_of_frames: Number of frames to be used during the routine.
+    :param number_of_frames: Number of frames to be used during the routine.
     
-    :param Rectangle reduced_area: Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+    :param reduced_area: Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
     
-    :param str resolution: Resolution to be used during the routine.
+    :param resolution: Resolution to be used during the routine.
     """
-    def __init__(self, method=None, dwell_time=None, line_integration=None, modulation_type=None, number_of_frames=None, reduced_area=None, resolution=None):
+    def __init__(self, method: 'str' = None, dwell_time: 'float' = None, line_integration: 'int' = None, modulation_type: 'str' = None, number_of_frames: 'int' = None, reduced_area: 'structures.Rectangle' = None, resolution: 'str' = None):
         super(RunAutoLensAlignmentSettings, self).__init__("RunAutoLensAlignmentSettings")
 
         self._init_item(1, DataType.STRING, method, True)
@@ -945,16 +999,16 @@ class RunAutoLensAlignmentSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def method(self) -> 'str':        
+    def method(self) -> 'Optional[str]':
         """
-        Method to be used during the routine.
+        Name of the the auto lens alignment algorithm variant.
         """
         return self._get_item(1)
 
     @method.setter
-    def method(self, value):        
+    def method(self, value: 'Optional[str]'):
         """
-        Method to be used during the routine.
+        Name of the the auto lens alignment algorithm variant.
         """
         self._set_item(1, value)
 
@@ -962,14 +1016,14 @@ class RunAutoLensAlignmentSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'Optional[float]':
         """
         Dwell time to be used during the routine.
         """
         return self._get_item(2)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'Optional[float]'):
         """
         Dwell time to be used during the routine.
         """
@@ -979,14 +1033,14 @@ class RunAutoLensAlignmentSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def line_integration(self) -> 'int':        
+    def line_integration(self) -> 'Optional[int]':
         """
         Line integration to be used during the routine.
         """
         return self._get_item(3)
 
     @line_integration.setter
-    def line_integration(self, value):        
+    def line_integration(self, value: 'Optional[int]'):
         """
         Line integration to be used during the routine.
         """
@@ -996,14 +1050,14 @@ class RunAutoLensAlignmentSettings(StructureBase):
         return self._has_item(4)
 
     @property
-    def modulation_type(self) -> 'str':        
+    def modulation_type(self) -> 'Optional[str]':
         """
         Modulation type to be used during the routine.
         """
         return self._get_item(4)
 
     @modulation_type.setter
-    def modulation_type(self, value):        
+    def modulation_type(self, value: 'Optional[str]'):
         """
         Modulation type to be used during the routine.
         """
@@ -1013,14 +1067,14 @@ class RunAutoLensAlignmentSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def number_of_frames(self) -> 'int':        
+    def number_of_frames(self) -> 'Optional[int]':
         """
         Number of frames to be used during the routine.
         """
         return self._get_item(5)
 
     @number_of_frames.setter
-    def number_of_frames(self, value):        
+    def number_of_frames(self, value: 'Optional[int]'):
         """
         Number of frames to be used during the routine.
         """
@@ -1030,16 +1084,16 @@ class RunAutoLensAlignmentSettings(StructureBase):
         return self._has_item(6)
 
     @property
-    def reduced_area(self) -> 'Rectangle':        
+    def reduced_area(self) -> 'Optional[structures.Rectangle]':
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         return self._get_item(6)
 
     @reduced_area.setter
-    def reduced_area(self, value):        
+    def reduced_area(self, value: 'Optional[structures.Rectangle]'):
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         self._set_item(6, value)
 
@@ -1047,38 +1101,37 @@ class RunAutoLensAlignmentSettings(StructureBase):
         return self._has_item(7)
 
     @property
-    def resolution(self) -> 'str':        
+    def resolution(self) -> 'Optional[str]':
         """
         Resolution to be used during the routine.
         """
         return self._get_item(7)
 
     @resolution.setter
-    def resolution(self, value):        
+    def resolution(self, value: 'Optional[str]'):
         """
         Resolution to be used during the routine.
         """
         self._set_item(7, value)
 
 
-
-class RunAutoStigmatorCenteringSettings(StructureBase):    
+class RunAutoStigmatorCenteringSettings(StructureBase):
     """
     Settings for automatic brightness and contrast adjustment routines.
     
-    :param str method: Method to be used during the routine.
+    :param method: Name of the the auto stigmator centering algorithm variant.
     
-    :param float dwell_time: Dwell time to be used during the routine.
+    :param dwell_time: Dwell time to be used during the routine.
     
-    :param int line_integration: Line integration to be used during the routine.
+    :param line_integration: Line integration to be used during the routine.
     
-    :param int number_of_frames: Number of frames to be used during the routine.
+    :param number_of_frames: Number of frames to be used during the routine.
     
-    :param Rectangle reduced_area: Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+    :param reduced_area: Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
     
-    :param str resolution: Resolution to be used during the routine.
+    :param resolution: Resolution to be used during the routine.
     """
-    def __init__(self, method=None, dwell_time=None, line_integration=None, number_of_frames=None, reduced_area=None, resolution=None):
+    def __init__(self, method: 'str' = None, dwell_time: 'float' = None, line_integration: 'int' = None, number_of_frames: 'int' = None, reduced_area: 'structures.Rectangle' = None, resolution: 'str' = None):
         super(RunAutoStigmatorCenteringSettings, self).__init__("RunAutoStigmatorCenteringSettings")
 
         self._init_item(1, DataType.STRING, method, True)
@@ -1092,16 +1145,16 @@ class RunAutoStigmatorCenteringSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def method(self) -> 'str':        
+    def method(self) -> 'Optional[str]':
         """
-        Method to be used during the routine.
+        Name of the the auto stigmator centering algorithm variant.
         """
         return self._get_item(1)
 
     @method.setter
-    def method(self, value):        
+    def method(self, value: 'Optional[str]'):
         """
-        Method to be used during the routine.
+        Name of the the auto stigmator centering algorithm variant.
         """
         self._set_item(1, value)
 
@@ -1109,14 +1162,14 @@ class RunAutoStigmatorCenteringSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'Optional[float]':
         """
         Dwell time to be used during the routine.
         """
         return self._get_item(2)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'Optional[float]'):
         """
         Dwell time to be used during the routine.
         """
@@ -1126,14 +1179,14 @@ class RunAutoStigmatorCenteringSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def line_integration(self) -> 'int':        
+    def line_integration(self) -> 'Optional[int]':
         """
         Line integration to be used during the routine.
         """
         return self._get_item(3)
 
     @line_integration.setter
-    def line_integration(self, value):        
+    def line_integration(self, value: 'Optional[int]'):
         """
         Line integration to be used during the routine.
         """
@@ -1143,14 +1196,14 @@ class RunAutoStigmatorCenteringSettings(StructureBase):
         return self._has_item(4)
 
     @property
-    def number_of_frames(self) -> 'int':        
+    def number_of_frames(self) -> 'Optional[int]':
         """
         Number of frames to be used during the routine.
         """
         return self._get_item(4)
 
     @number_of_frames.setter
-    def number_of_frames(self, value):        
+    def number_of_frames(self, value: 'Optional[int]'):
         """
         Number of frames to be used during the routine.
         """
@@ -1160,16 +1213,16 @@ class RunAutoStigmatorCenteringSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def reduced_area(self) -> 'Rectangle':        
+    def reduced_area(self) -> 'Optional[structures.Rectangle]':
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         return self._get_item(5)
 
     @reduced_area.setter
-    def reduced_area(self, value):        
+    def reduced_area(self, value: 'Optional[structures.Rectangle]'):
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         self._set_item(5, value)
 
@@ -1177,42 +1230,43 @@ class RunAutoStigmatorCenteringSettings(StructureBase):
         return self._has_item(6)
 
     @property
-    def resolution(self) -> 'str':        
+    def resolution(self) -> 'Optional[str]':
         """
         Resolution to be used during the routine.
         """
         return self._get_item(6)
 
     @resolution.setter
-    def resolution(self, value):        
+    def resolution(self, value: 'Optional[str]'):
         """
         Resolution to be used during the routine.
         """
         self._set_item(6, value)
 
 
-
-class RunAutoStigmatorSettings(StructureBase):    
+class RunAutoStigmatorSettings(StructureBase):
     """
     Settings for automatic stigmator adjustment routines.
     
-    :param str method: Method to be used during the routine.
+    :param method: Name of the the auto stigmator algorithm variant.
     
-    :param float dwell_time: Dwell time to be used during the routine.
+    :param dwell_time: Dwell time to be used during the routine.
     
-    :param float horizontal_field_width: Horizontal field width to be used during the routine.
+    :param horizontal_field_width: Horizontal field width to be used during the routine.
     
-    :param int line_integration: Line integration to be used during the routine.
+    :param line_integration: Line integration to be used during the routine.
     
-    :param int number_of_frames: Number of frames to be used during the routine.
+    :param number_of_frames: Number of frames to be used during the routine.
     
-    :param Rectangle reduced_area: Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+    :param reduced_area: Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
     
-    :param str resolution: Resolution to be used during the routine.
+    :param resolution: Resolution to be used during the routine.
     
-    :param float stigmation_step: Initial stigmation step to be used by the routine while searching for the optimal stigmator setting.
+    :param stigmation_step: Initial stigmation step to be used by the routine while searching for the optimal stigmator setting.
+    
+    :param display_point: Point in imaging view from which the reduced area position will be calculated. Point [0,0] corresponds to the upper left corner of the view, point [1, 1] to the lower right corner.
     """
-    def __init__(self, method=None, dwell_time=None, horizontal_field_width=None, line_integration=None, number_of_frames=None, reduced_area=None, resolution=None, stigmation_step=None):
+    def __init__(self, method: 'str' = None, dwell_time: 'float' = None, horizontal_field_width: 'float' = None, line_integration: 'int' = None, number_of_frames: 'int' = None, reduced_area: 'structures.Rectangle' = None, resolution: 'str' = None, stigmation_step: 'float' = None, display_point: 'structures.Point' = None):
         super(RunAutoStigmatorSettings, self).__init__("RunAutoStigmatorSettings")
 
         self._init_item(1, DataType.STRING, method, True)
@@ -1223,21 +1277,22 @@ class RunAutoStigmatorSettings(StructureBase):
         self._init_item(6, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Rectangle"), reduced_area, True)
         self._init_item(7, DataType.STRING, resolution, True)
         self._init_item(8, DataType.DOUBLE, stigmation_step, True)
+        self._init_item(9, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Point"), display_point, True)
 
     def _has_method(self):
         return self._has_item(1)
 
     @property
-    def method(self) -> 'str':        
+    def method(self) -> 'Optional[str]':
         """
-        Method to be used during the routine.
+        Name of the the auto stigmator algorithm variant.
         """
         return self._get_item(1)
 
     @method.setter
-    def method(self, value):        
+    def method(self, value: 'Optional[str]'):
         """
-        Method to be used during the routine.
+        Name of the the auto stigmator algorithm variant.
         """
         self._set_item(1, value)
 
@@ -1245,14 +1300,14 @@ class RunAutoStigmatorSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'Optional[float]':
         """
         Dwell time to be used during the routine.
         """
         return self._get_item(2)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'Optional[float]'):
         """
         Dwell time to be used during the routine.
         """
@@ -1262,14 +1317,14 @@ class RunAutoStigmatorSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def horizontal_field_width(self) -> 'float':        
+    def horizontal_field_width(self) -> 'Optional[float]':
         """
         Horizontal field width to be used during the routine.
         """
         return self._get_item(3)
 
     @horizontal_field_width.setter
-    def horizontal_field_width(self, value):        
+    def horizontal_field_width(self, value: 'Optional[float]'):
         """
         Horizontal field width to be used during the routine.
         """
@@ -1279,14 +1334,14 @@ class RunAutoStigmatorSettings(StructureBase):
         return self._has_item(4)
 
     @property
-    def line_integration(self) -> 'int':        
+    def line_integration(self) -> 'Optional[int]':
         """
         Line integration to be used during the routine.
         """
         return self._get_item(4)
 
     @line_integration.setter
-    def line_integration(self, value):        
+    def line_integration(self, value: 'Optional[int]'):
         """
         Line integration to be used during the routine.
         """
@@ -1296,14 +1351,14 @@ class RunAutoStigmatorSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def number_of_frames(self) -> 'int':        
+    def number_of_frames(self) -> 'Optional[int]':
         """
         Number of frames to be used during the routine.
         """
         return self._get_item(5)
 
     @number_of_frames.setter
-    def number_of_frames(self, value):        
+    def number_of_frames(self, value: 'Optional[int]'):
         """
         Number of frames to be used during the routine.
         """
@@ -1313,16 +1368,16 @@ class RunAutoStigmatorSettings(StructureBase):
         return self._has_item(6)
 
     @property
-    def reduced_area(self) -> 'Rectangle':        
+    def reduced_area(self) -> 'Optional[structures.Rectangle]':
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         return self._get_item(6)
 
     @reduced_area.setter
-    def reduced_area(self, value):        
+    def reduced_area(self, value: 'Optional[structures.Rectangle]'):
         """
-        Reduced area to be used during the routine specified in Reduce area coordinate system. In this system point [0,0] means left-top image corner and point [1, 1] right-bottom image corner.
+        Reduced area to be used during the routine. Point [0,0] corresponds to the upper left corner of the image, point [1, 1] to the lower right corner.
         """
         self._set_item(6, value)
 
@@ -1330,14 +1385,14 @@ class RunAutoStigmatorSettings(StructureBase):
         return self._has_item(7)
 
     @property
-    def resolution(self) -> 'str':        
+    def resolution(self) -> 'Optional[str]':
         """
         Resolution to be used during the routine.
         """
         return self._get_item(7)
 
     @resolution.setter
-    def resolution(self, value):        
+    def resolution(self, value: 'Optional[str]'):
         """
         Resolution to be used during the routine.
         """
@@ -1347,36 +1402,52 @@ class RunAutoStigmatorSettings(StructureBase):
         return self._has_item(8)
 
     @property
-    def stigmation_step(self) -> 'float':        
+    def stigmation_step(self) -> 'Optional[float]':
         """
         Initial stigmation step to be used by the routine while searching for the optimal stigmator setting.
         """
         return self._get_item(8)
 
     @stigmation_step.setter
-    def stigmation_step(self, value):        
+    def stigmation_step(self, value: 'Optional[float]'):
         """
         Initial stigmation step to be used by the routine while searching for the optimal stigmator setting.
         """
         self._set_item(8, value)
 
+    def _has_display_point(self):
+        return self._has_item(9)
+
+    @property
+    def display_point(self) -> 'Optional[structures.Point]':
+        """
+        Point in imaging view from which the reduced area position will be calculated. Point [0,0] corresponds to the upper left corner of the view, point [1, 1] to the lower right corner.
+        """
+        return self._get_item(9)
+
+    @display_point.setter
+    def display_point(self, value: 'Optional[structures.Point]'):
+        """
+        Point in imaging view from which the reduced area position will be calculated. Point [0,0] corresponds to the upper left corner of the view, point [1, 1] to the lower right corner.
+        """
+        self._set_item(9, value)
 
 
-class CompustagePosition(StructureBase):    
+class CompustagePosition(StructureBase):
     """
     The structure representing a compustage position.
     
-    :param float x: X coordinate.
+    :param x: X coordinate.
     
-    :param float y: Y coordinate.
+    :param y: Y coordinate.
     
-    :param float z: Z coordinate.
+    :param z: Z coordinate.
     
-    :param float a: Alpha coordinate.
+    :param a: Alpha coordinate.
     
-    :param float b: Beta coordinate.
+    :param b: Beta coordinate.
     """
-    def __init__(self, x=None, y=None, z=None, a=None, b=None):
+    def __init__(self, x: 'float' = None, y: 'float' = None, z: 'float' = None, a: 'float' = None, b: 'float' = None):
         super(CompustagePosition, self).__init__("CompustagePosition")
 
         self._init_item(1, DataType.DOUBLE, x, True)
@@ -1389,14 +1460,14 @@ class CompustagePosition(StructureBase):
         return self._has_item(1)
 
     @property
-    def x(self) -> 'float':        
+    def x(self) -> 'Optional[float]':
         """
         X coordinate.
         """
         return self._get_item(1)
 
     @x.setter
-    def x(self, value):        
+    def x(self, value: 'Optional[float]'):
         """
         X coordinate.
         """
@@ -1406,14 +1477,14 @@ class CompustagePosition(StructureBase):
         return self._has_item(2)
 
     @property
-    def y(self) -> 'float':        
+    def y(self) -> 'Optional[float]':
         """
         Y coordinate.
         """
         return self._get_item(2)
 
     @y.setter
-    def y(self, value):        
+    def y(self, value: 'Optional[float]'):
         """
         Y coordinate.
         """
@@ -1423,14 +1494,14 @@ class CompustagePosition(StructureBase):
         return self._has_item(3)
 
     @property
-    def z(self) -> 'float':        
+    def z(self) -> 'Optional[float]':
         """
         Z coordinate.
         """
         return self._get_item(3)
 
     @z.setter
-    def z(self, value):        
+    def z(self, value: 'Optional[float]'):
         """
         Z coordinate.
         """
@@ -1440,14 +1511,14 @@ class CompustagePosition(StructureBase):
         return self._has_item(4)
 
     @property
-    def a(self) -> 'float':        
+    def a(self) -> 'Optional[float]':
         """
         Alpha coordinate.
         """
         return self._get_item(4)
 
     @a.setter
-    def a(self, value):        
+    def a(self, value: 'Optional[float]'):
         """
         Alpha coordinate.
         """
@@ -1457,38 +1528,37 @@ class CompustagePosition(StructureBase):
         return self._has_item(5)
 
     @property
-    def b(self) -> 'float':        
+    def b(self) -> 'Optional[float]':
         """
         Beta coordinate.
         """
         return self._get_item(5)
 
     @b.setter
-    def b(self, value):        
+    def b(self, value: 'Optional[float]'):
         """
         Beta coordinate.
         """
         self._set_item(5, value)
 
 
-
-class StagePosition(StructureBase):    
+class StagePosition(StructureBase):
     """
     The structure representing a stage position.
     
-    :param float x: X coordinate.
+    :param x: X coordinate.
     
-    :param float y: Y coordinate.
+    :param y: Y coordinate.
     
-    :param float z: Z coordinate.
+    :param z: Z coordinate.
     
-    :param float r: Rotation.
+    :param r: Rotation.
     
-    :param float t: Tilt.
+    :param t: Tilt.
     
-    :param str coordinate_system: The coordinate system in which the position is specified.
+    :param coordinate_system: The coordinate system in which the position is specified.
     """
-    def __init__(self, x=None, y=None, z=None, r=None, t=None, coordinate_system=None):
+    def __init__(self, x: 'float' = None, y: 'float' = None, z: 'float' = None, r: 'float' = None, t: 'float' = None, coordinate_system: 'str' = None):
         super(StagePosition, self).__init__("StagePosition")
 
         self._init_item(1, DataType.DOUBLE, x, True)
@@ -1502,14 +1572,14 @@ class StagePosition(StructureBase):
         return self._has_item(1)
 
     @property
-    def x(self) -> 'float':        
+    def x(self) -> 'Optional[float]':
         """
         X coordinate.
         """
         return self._get_item(1)
 
     @x.setter
-    def x(self, value):        
+    def x(self, value: 'Optional[float]'):
         """
         X coordinate.
         """
@@ -1519,14 +1589,14 @@ class StagePosition(StructureBase):
         return self._has_item(2)
 
     @property
-    def y(self) -> 'float':        
+    def y(self) -> 'Optional[float]':
         """
         Y coordinate.
         """
         return self._get_item(2)
 
     @y.setter
-    def y(self, value):        
+    def y(self, value: 'Optional[float]'):
         """
         Y coordinate.
         """
@@ -1536,14 +1606,14 @@ class StagePosition(StructureBase):
         return self._has_item(3)
 
     @property
-    def z(self) -> 'float':        
+    def z(self) -> 'Optional[float]':
         """
         Z coordinate.
         """
         return self._get_item(3)
 
     @z.setter
-    def z(self, value):        
+    def z(self, value: 'Optional[float]'):
         """
         Z coordinate.
         """
@@ -1553,14 +1623,14 @@ class StagePosition(StructureBase):
         return self._has_item(4)
 
     @property
-    def r(self) -> 'float':        
+    def r(self) -> 'Optional[float]':
         """
         Rotation.
         """
         return self._get_item(4)
 
     @r.setter
-    def r(self, value):        
+    def r(self, value: 'Optional[float]'):
         """
         Rotation.
         """
@@ -1570,14 +1640,14 @@ class StagePosition(StructureBase):
         return self._has_item(5)
 
     @property
-    def t(self) -> 'float':        
+    def t(self) -> 'Optional[float]':
         """
         Tilt.
         """
         return self._get_item(5)
 
     @t.setter
-    def t(self, value):        
+    def t(self, value: 'Optional[float]'):
         """
         Tilt.
         """
@@ -1587,34 +1657,33 @@ class StagePosition(StructureBase):
         return self._has_item(6)
 
     @property
-    def coordinate_system(self) -> 'str':        
+    def coordinate_system(self) -> 'str':
         """
         The coordinate system in which the position is specified.
         """
         return self._get_item(6)
 
     @coordinate_system.setter
-    def coordinate_system(self, value):        
+    def coordinate_system(self, value: 'str'):
         """
         The coordinate system in which the position is specified.
         """
         self._set_item(6, value)
 
 
-
-class ManipulatorPosition(StructureBase):    
+class ManipulatorPosition(StructureBase):
     """
     The structure representing a manipulator position.
     
-    :param float x: X coordinate.
+    :param x: X coordinate.
     
-    :param float y: Y coordinate.
+    :param y: Y coordinate.
     
-    :param float z: Z coordinate.
+    :param z: Z coordinate.
     
-    :param float r: Rotation.
+    :param r: Rotation.
     """
-    def __init__(self, x=None, y=None, z=None, r=None):
+    def __init__(self, x: 'float' = None, y: 'float' = None, z: 'float' = None, r: 'float' = None):
         super(ManipulatorPosition, self).__init__("ManipulatorPosition")
 
         self._init_item(1, DataType.DOUBLE, x, True)
@@ -1626,14 +1695,14 @@ class ManipulatorPosition(StructureBase):
         return self._has_item(1)
 
     @property
-    def x(self) -> 'float':        
+    def x(self) -> 'Optional[float]':
         """
         X coordinate.
         """
         return self._get_item(1)
 
     @x.setter
-    def x(self, value):        
+    def x(self, value: 'Optional[float]'):
         """
         X coordinate.
         """
@@ -1643,14 +1712,14 @@ class ManipulatorPosition(StructureBase):
         return self._has_item(2)
 
     @property
-    def y(self) -> 'float':        
+    def y(self) -> 'Optional[float]':
         """
         Y coordinate.
         """
         return self._get_item(2)
 
     @y.setter
-    def y(self, value):        
+    def y(self, value: 'Optional[float]'):
         """
         Y coordinate.
         """
@@ -1660,14 +1729,14 @@ class ManipulatorPosition(StructureBase):
         return self._has_item(3)
 
     @property
-    def z(self) -> 'float':        
+    def z(self) -> 'Optional[float]':
         """
         Z coordinate.
         """
         return self._get_item(3)
 
     @z.setter
-    def z(self, value):        
+    def z(self, value: 'Optional[float]'):
         """
         Z coordinate.
         """
@@ -1677,50 +1746,55 @@ class ManipulatorPosition(StructureBase):
         return self._has_item(4)
 
     @property
-    def r(self) -> 'float':        
+    def r(self) -> 'Optional[float]':
         """
         Rotation.
         """
         return self._get_item(4)
 
     @r.setter
-    def r(self, value):        
+    def r(self, value: 'Optional[float]'):
         """
         Rotation.
         """
         self._set_item(4, value)
 
 
-
-class MoveSettings(StructureBase):    
+class MoveSettings(StructureBase):
     """
     The collection of additional options for a stage move.
     
-    :param bool rotate_compucentric: The option specifies if compucentric rotation should be used in the move.
+    :param rotate_compucentric: The option specifies if compucentric rotation should be used in the move.
     
-    :param bool link_z_y: The option specifies if z-y compensation should be used in the move.
+    :param link_z_y: The option specifies if z-y compensation should be used in the move.
     
-    :param bool link_z_b: The option specifies if z-beta compensation should be used in the move. Supported for Compustage movements only.
+    :param link_z_b: The option specifies if z-beta compensation should be used in the move. Supported for Compustage movements only.
+    
+    :param z_cap_move: The option specifies if the CapProbe sensor should be used in the move.
+    
+    :param tilt_compucentric: The option specifies if compucentric tilt should be used in the move.
     """
-    def __init__(self, rotate_compucentric=None, link_z_y=None, link_z_b=None):
+    def __init__(self, rotate_compucentric: 'bool' = None, link_z_y: 'bool' = None, link_z_b: 'bool' = None, z_cap_move: 'bool' = None, tilt_compucentric: 'bool' = None):
         super(MoveSettings, self).__init__("MoveSettings")
 
         self._init_item(1, DataType.BOOL, rotate_compucentric, True)
         self._init_item(2, DataType.BOOL, link_z_y, True)
         self._init_item(3, DataType.BOOL, link_z_b, True)
+        self._init_item(4, DataType.BOOL, z_cap_move, True)
+        self._init_item(5, DataType.BOOL, tilt_compucentric, True)
 
     def _has_rotate_compucentric(self):
         return self._has_item(1)
 
     @property
-    def rotate_compucentric(self) -> 'bool':        
+    def rotate_compucentric(self) -> 'Optional[bool]':
         """
         The option specifies if compucentric rotation should be used in the move.
         """
         return self._get_item(1)
 
     @rotate_compucentric.setter
-    def rotate_compucentric(self, value):        
+    def rotate_compucentric(self, value: 'Optional[bool]'):
         """
         The option specifies if compucentric rotation should be used in the move.
         """
@@ -1730,14 +1804,14 @@ class MoveSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def link_z_y(self) -> 'bool':        
+    def link_z_y(self) -> 'Optional[bool]':
         """
         The option specifies if z-y compensation should be used in the move.
         """
         return self._get_item(2)
 
     @link_z_y.setter
-    def link_z_y(self, value):        
+    def link_z_y(self, value: 'Optional[bool]'):
         """
         The option specifies if z-y compensation should be used in the move.
         """
@@ -1747,30 +1821,63 @@ class MoveSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def link_z_b(self) -> 'bool':        
+    def link_z_b(self) -> 'Optional[bool]':
         """
         The option specifies if z-beta compensation should be used in the move. Supported for Compustage movements only.
         """
         return self._get_item(3)
 
     @link_z_b.setter
-    def link_z_b(self, value):        
+    def link_z_b(self, value: 'Optional[bool]'):
         """
         The option specifies if z-beta compensation should be used in the move. Supported for Compustage movements only.
         """
         self._set_item(3, value)
 
+    def _has_z_cap_move(self):
+        return self._has_item(4)
+
+    @property
+    def z_cap_move(self) -> 'Optional[bool]':
+        """
+        The option specifies if the CapProbe sensor should be used in the move.
+        """
+        return self._get_item(4)
+
+    @z_cap_move.setter
+    def z_cap_move(self, value: 'Optional[bool]'):
+        """
+        The option specifies if the CapProbe sensor should be used in the move.
+        """
+        self._set_item(4, value)
+
+    def _has_tilt_compucentric(self):
+        return self._has_item(5)
+
+    @property
+    def tilt_compucentric(self) -> 'Optional[bool]':
+        """
+        The option specifies if compucentric tilt should be used in the move.
+        """
+        return self._get_item(5)
+
+    @tilt_compucentric.setter
+    def tilt_compucentric(self, value: 'Optional[bool]'):
+        """
+        The option specifies if compucentric tilt should be used in the move.
+        """
+        self._set_item(5, value)
 
 
-class ImageMatch(StructureBase):    
+class ImageMatch(StructureBase):
     """
     Information about match of a template in an image.
     
-    :param Point center: Point structure containing coordinates of the center of the match in the original image, in pixels.
+    :param center: Point structure containing coordinates of the center of the match in the original image, in pixels.
     
-    :param float score: Level of confidence with which the template matching algorithm matched the template, in range between [0, 1] corresponding to 0% - 100%.
+    :param score: Level of confidence with which the template matching algorithm matched the template, in range between [0, 1] corresponding to 0% - 100%.
     """
-    def __init__(self, center=None, score=None):
+    def __init__(self, center: 'structures.Point' = None, score: 'float' = None):
         super(ImageMatch, self).__init__("ImageMatch")
 
         self._init_item(1, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Point"), center, False)
@@ -1780,14 +1887,14 @@ class ImageMatch(StructureBase):
         return self._has_item(1)
 
     @property
-    def center(self) -> 'Point':        
+    def center(self) -> 'structures.Point':
         """
         Point structure containing coordinates of the center of the match in the original image, in pixels.
         """
         return self._get_item(1)
 
     @center.setter
-    def center(self, value):        
+    def center(self, value: 'structures.Point'):
         """
         Point structure containing coordinates of the center of the match in the original image, in pixels.
         """
@@ -1797,32 +1904,31 @@ class ImageMatch(StructureBase):
         return self._has_item(2)
 
     @property
-    def score(self) -> 'float':        
+    def score(self) -> 'Optional[float]':
         """
         Level of confidence with which the template matching algorithm matched the template, in range between [0, 1] corresponding to 0% - 100%.
         """
         return self._get_item(2)
 
     @score.setter
-    def score(self, value):        
+    def score(self, value: 'Optional[float]'):
         """
         Level of confidence with which the template matching algorithm matched the template, in range between [0, 1] corresponding to 0% - 100%.
         """
         self._set_item(2, value)
 
 
-
-class StreamPatternDefinition(StructureBase):    
+class StreamPatternDefinition(StructureBase):
     """
     The definition of a stream pattern.
     
-    :param bytes raw_points: Patterning points in a raw form.
+    :param raw_points: Patterning points in a raw form.
     
-    :param int repeat_count: The number of patterning cycles.
+    :param repeat_count: The number of patterning cycles.
     
-    :param int bit_depth: Bit depth of the point coordinates. It can be either 12 or 16.
+    :param bit_depth: Bit depth of the point coordinates. It can be either 12 or 16.
     """
-    def __init__(self, raw_points=None, repeat_count=0, bit_depth=0):
+    def __init__(self, raw_points: 'bytes' = None, repeat_count: 'int' = 0, bit_depth: 'int' = 0):
         super(StreamPatternDefinition, self).__init__("StreamPatternDefinition")
 
         self._init_item(1, DataType.BYTE_ARRAY, raw_points, False)
@@ -1833,14 +1939,14 @@ class StreamPatternDefinition(StructureBase):
         return self._has_item(1)
 
     @property
-    def raw_points(self) -> 'bytes':        
+    def raw_points(self) -> 'bytes':
         """
         Patterning points in a raw form.
         """
         return self._get_item(1)
 
     @raw_points.setter
-    def raw_points(self, value):        
+    def raw_points(self, value: 'bytes'):
         """
         Patterning points in a raw form.
         """
@@ -1850,14 +1956,14 @@ class StreamPatternDefinition(StructureBase):
         return self._has_item(2)
 
     @property
-    def repeat_count(self) -> 'int':        
+    def repeat_count(self) -> 'int':
         """
         The number of patterning cycles.
         """
         return self._get_item(2)
 
     @repeat_count.setter
-    def repeat_count(self, value):        
+    def repeat_count(self, value: 'int'):
         """
         The number of patterning cycles.
         """
@@ -1867,34 +1973,33 @@ class StreamPatternDefinition(StructureBase):
         return self._has_item(3)
 
     @property
-    def bit_depth(self) -> 'int':        
+    def bit_depth(self) -> 'int':
         """
         Bit depth of the point coordinates. It can be either 12 or 16.
         """
         return self._get_item(3)
 
     @bit_depth.setter
-    def bit_depth(self, value):        
+    def bit_depth(self, value: 'int'):
         """
         Bit depth of the point coordinates. It can be either 12 or 16.
         """
         self._set_item(3, value)
 
 
-
-class StreamPatternPoint(StructureBase):    
+class StreamPatternPoint(StructureBase):
     """
     The stream pattern point.
     
-    :param int x: The X coordinate of a point.
+    :param x: The X coordinate of a point.
     
-    :param int y: The Y coordinate of a point.
+    :param y: The Y coordinate of a point.
     
-    :param float dwell_time: The dwell time in seconds.
+    :param dwell_time: The dwell time in seconds.
     
-    :param int flags: The bit mask for additional settings. Blank from file is reverted here.
+    :param flags: The bit mask for additional settings. Blank from file is reverted here.
     """
-    def __init__(self, x=0, y=0, dwell_time=0.0, flags=0):
+    def __init__(self, x: 'int' = 0, y: 'int' = 0, dwell_time: 'float' = 0.0, flags: 'int' = 0):
         super(StreamPatternPoint, self).__init__("StreamPatternPoint")
 
         self._init_item(1, DataType.INT32, x, False)
@@ -1906,14 +2011,14 @@ class StreamPatternPoint(StructureBase):
         return self._has_item(1)
 
     @property
-    def x(self) -> 'int':        
+    def x(self) -> 'int':
         """
         The X coordinate of a point.
         """
         return self._get_item(1)
 
     @x.setter
-    def x(self, value):        
+    def x(self, value: 'int'):
         """
         The X coordinate of a point.
         """
@@ -1923,14 +2028,14 @@ class StreamPatternPoint(StructureBase):
         return self._has_item(2)
 
     @property
-    def y(self) -> 'int':        
+    def y(self) -> 'int':
         """
         The Y coordinate of a point.
         """
         return self._get_item(2)
 
     @y.setter
-    def y(self, value):        
+    def y(self, value: 'int'):
         """
         The Y coordinate of a point.
         """
@@ -1940,14 +2045,14 @@ class StreamPatternPoint(StructureBase):
         return self._has_item(3)
 
     @property
-    def dwell_time(self) -> 'float':        
+    def dwell_time(self) -> 'float':
         """
         The dwell time in seconds.
         """
         return self._get_item(3)
 
     @dwell_time.setter
-    def dwell_time(self, value):        
+    def dwell_time(self, value: 'float'):
         """
         The dwell time in seconds.
         """
@@ -1957,32 +2062,31 @@ class StreamPatternPoint(StructureBase):
         return self._has_item(4)
 
     @property
-    def flags(self) -> 'int':        
+    def flags(self) -> 'int':
         """
         The bit mask for additional settings. Blank from file is reverted here.
         """
         return self._get_item(4)
 
     @flags.setter
-    def flags(self, value):        
+    def flags(self, value: 'int'):
         """
         The bit mask for additional settings. Blank from file is reverted here.
         """
         self._set_item(4, value)
 
 
-
-class BitmapPatternDefinition(StructureBase):    
+class BitmapPatternDefinition(StructureBase):
     """
     The definition of a bitmap pattern.
     
-    :param bytes raw_points: Patterning points in a raw form.
+    :param raw_points: Patterning points in a raw form.
     
-    :param int width: The width of the bitmap in pixels.
+    :param width: The width of the bitmap in pixels.
     
-    :param int height: The height of the bitmap in pixels.
+    :param height: The height of the bitmap in pixels.
     """
-    def __init__(self, raw_points=None, width=0, height=0):
+    def __init__(self, raw_points: 'bytes' = None, width: 'int' = 0, height: 'int' = 0):
         super(BitmapPatternDefinition, self).__init__("BitmapPatternDefinition")
 
         self._init_item(1, DataType.BYTE_ARRAY, raw_points, False)
@@ -1993,14 +2097,14 @@ class BitmapPatternDefinition(StructureBase):
         return self._has_item(1)
 
     @property
-    def raw_points(self) -> 'bytes':        
+    def raw_points(self) -> 'bytes':
         """
         Patterning points in a raw form.
         """
         return self._get_item(1)
 
     @raw_points.setter
-    def raw_points(self, value):        
+    def raw_points(self, value: 'bytes'):
         """
         Patterning points in a raw form.
         """
@@ -2010,14 +2114,14 @@ class BitmapPatternDefinition(StructureBase):
         return self._has_item(2)
 
     @property
-    def width(self) -> 'int':        
+    def width(self) -> 'int':
         """
         The width of the bitmap in pixels.
         """
         return self._get_item(2)
 
     @width.setter
-    def width(self, value):        
+    def width(self, value: 'int'):
         """
         The width of the bitmap in pixels.
         """
@@ -2027,30 +2131,29 @@ class BitmapPatternDefinition(StructureBase):
         return self._has_item(3)
 
     @property
-    def height(self) -> 'int':        
+    def height(self) -> 'int':
         """
         The height of the bitmap in pixels.
         """
         return self._get_item(3)
 
     @height.setter
-    def height(self, value):        
+    def height(self, value: 'int'):
         """
         The height of the bitmap in pixels.
         """
         self._set_item(3, value)
 
 
-
-class BitmapPatternPoint(StructureBase):    
+class BitmapPatternPoint(StructureBase):
     """
     The bitmap pattern point.
     
-    :param float dwell_time_coefficient: The coefficient used for blue color. Range is <0,1>.
+    :param dwell_time_coefficient: The coefficient used for blue color. Range is <0,1>.
     
-    :param int flags: If flags are not zero, dwell time coefficient is used for green and red colors instead.
+    :param flags: If flags are not zero, dwell time coefficient is used for green and red colors instead.
     """
-    def __init__(self, dwell_time_coefficient=0.0, flags=0):
+    def __init__(self, dwell_time_coefficient: 'float' = 0.0, flags: 'int' = 0):
         super(BitmapPatternPoint, self).__init__("BitmapPatternPoint")
 
         self._init_item(1, DataType.DOUBLE, dwell_time_coefficient, False)
@@ -2060,14 +2163,14 @@ class BitmapPatternPoint(StructureBase):
         return self._has_item(1)
 
     @property
-    def dwell_time_coefficient(self) -> 'float':        
+    def dwell_time_coefficient(self) -> 'float':
         """
         The coefficient used for blue color. Range is <0,1>.
         """
         return self._get_item(1)
 
     @dwell_time_coefficient.setter
-    def dwell_time_coefficient(self, value):        
+    def dwell_time_coefficient(self, value: 'float'):
         """
         The coefficient used for blue color. Range is <0,1>.
         """
@@ -2077,30 +2180,29 @@ class BitmapPatternPoint(StructureBase):
         return self._has_item(2)
 
     @property
-    def flags(self) -> 'int':        
+    def flags(self) -> 'int':
         """
         If flags are not zero, dwell time coefficient is used for green and red colors instead.
         """
         return self._get_item(2)
 
     @flags.setter
-    def flags(self, value):        
+    def flags(self, value: 'int'):
         """
         If flags are not zero, dwell time coefficient is used for green and red colors instead.
         """
         self._set_item(2, value)
 
 
-
-class GetRtmPositionSettings(StructureBase):    
+class GetRtmPositionSettings(StructureBase):
     """
     The structure specifying the setting of the get real time positions method.
     
-    :param list pattern_ids: Specify which patterns should be used to retrieve positions from the RTM. If the list is empty, all patterns will be used.
+    :param pattern_ids: Specify which patterns should be used to retrieve positions from the RTM. If the list is empty, all patterns will be used.
     
-    :param int coordinate_system: Specify the coordinate system of the retrieved positions.
+    :param coordinate_system: Specify the coordinate system of the retrieved positions. Maps to RtmCoordinateSystem enumeration.
     """
-    def __init__(self, pattern_ids=None, coordinate_system=None):
+    def __init__(self, pattern_ids: 'List[int]' = None, coordinate_system: 'int' = None):
         super(GetRtmPositionSettings, self).__init__("GetRtmPositionSettings")
 
         self._init_item(1, DataTypeDefinition(DataType.LIST_PRIMARY_ID, template_argument=DataType.INT32), pattern_ids, True)
@@ -2110,14 +2212,14 @@ class GetRtmPositionSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def pattern_ids(self) -> 'List[int]':        
+    def pattern_ids(self) -> 'Optional[List[int]]':
         """
         Specify which patterns should be used to retrieve positions from the RTM. If the list is empty, all patterns will be used.
         """
         return self._get_item(1)
 
     @pattern_ids.setter
-    def pattern_ids(self, value):        
+    def pattern_ids(self, value: 'Optional[List[int]]'):
         """
         Specify which patterns should be used to retrieve positions from the RTM. If the list is empty, all patterns will be used.
         """
@@ -2127,32 +2229,31 @@ class GetRtmPositionSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def coordinate_system(self) -> 'int':        
+    def coordinate_system(self) -> 'Optional[int]':
         """
-        Specify the coordinate system of the retrieved positions.
+        Specify the coordinate system of the retrieved positions. Maps to RtmCoordinateSystem enumeration.
         """
         return self._get_item(2)
 
     @coordinate_system.setter
-    def coordinate_system(self, value):        
+    def coordinate_system(self, value: 'Optional[int]'):
         """
-        Specify the coordinate system of the retrieved positions.
+        Specify the coordinate system of the retrieved positions. Maps to RtmCoordinateSystem enumeration.
         """
         self._set_item(2, value)
 
 
-
-class RtmPositionSet(StructureBase):    
+class RtmPositionSet(StructureBase):
     """
-    The pattern point positions set.
+    The set of pattern point positions.
     
-    :param int pattern_id: The ID of the pattern.
+    :param pattern_id: The ID of the pattern.
     
-    :param int coordinate_system: The coordinate system of the pattern point positions.
+    :param coordinate_system: The coordinate system of the pattern point positions. Maps to RtmCoordinateSystem enumeration.
     
-    :param bytes raw_positions: The raw data sent via network.
+    :param raw_positions: The raw data sent from the AutoScript Server. Do not use directly.
     """
-    def __init__(self, pattern_id=0, coordinate_system=0, raw_positions=None):
+    def __init__(self, pattern_id: 'int' = 0, coordinate_system: 'int' = 0, raw_positions: 'bytes' = None):
         super(RtmPositionSet, self).__init__("RtmPositionSet")
 
         self._init_item(1, DataType.INT32, pattern_id, False)
@@ -2163,14 +2264,14 @@ class RtmPositionSet(StructureBase):
         return self._has_item(1)
 
     @property
-    def pattern_id(self) -> 'int':        
+    def pattern_id(self) -> 'int':
         """
         The ID of the pattern.
         """
         return self._get_item(1)
 
     @pattern_id.setter
-    def pattern_id(self, value):        
+    def pattern_id(self, value: 'int'):
         """
         The ID of the pattern.
         """
@@ -2180,16 +2281,16 @@ class RtmPositionSet(StructureBase):
         return self._has_item(2)
 
     @property
-    def coordinate_system(self) -> 'int':        
+    def coordinate_system(self) -> 'int':
         """
-        The coordinate system of the pattern point positions.
+        The coordinate system of the pattern point positions. Maps to RtmCoordinateSystem enumeration.
         """
         return self._get_item(2)
 
     @coordinate_system.setter
-    def coordinate_system(self, value):        
+    def coordinate_system(self, value: 'int'):
         """
-        The coordinate system of the pattern point positions.
+        The coordinate system of the pattern point positions. Maps to RtmCoordinateSystem enumeration.
         """
         self._set_item(2, value)
 
@@ -2197,30 +2298,29 @@ class RtmPositionSet(StructureBase):
         return self._has_item(3)
 
     @property
-    def raw_positions(self) -> 'bytes':        
+    def raw_positions(self) -> 'bytes':
         """
-        The raw data sent via network.
+        The raw data sent from the AutoScript Server. Do not use directly.
         """
         return self._get_item(3)
 
     @raw_positions.setter
-    def raw_positions(self, value):        
+    def raw_positions(self, value: 'bytes'):
         """
-        The raw data sent via network.
+        The raw data sent from the AutoScript Server. Do not use directly.
         """
         self._set_item(3, value)
 
 
-
-class RtmPosition(StructureBase):    
+class RtmPosition(StructureBase):
     """
     The pattern point position.
     
-    :param int x: The X coordinate of a point.
+    :param x: The X coordinate of a point.
     
-    :param int y: The Y coordinate of a point.
+    :param y: The Y coordinate of a point.
     """
-    def __init__(self, x=0, y=0):
+    def __init__(self, x: 'int' = 0, y: 'int' = 0):
         super(RtmPosition, self).__init__("RtmPosition")
 
         self._init_item(1, DataType.INT32, x, False)
@@ -2230,14 +2330,14 @@ class RtmPosition(StructureBase):
         return self._has_item(1)
 
     @property
-    def x(self) -> 'int':        
+    def x(self) -> 'int':
         """
         The X coordinate of a point.
         """
         return self._get_item(1)
 
     @x.setter
-    def x(self, value):        
+    def x(self, value: 'int'):
         """
         The X coordinate of a point.
         """
@@ -2247,30 +2347,29 @@ class RtmPosition(StructureBase):
         return self._has_item(2)
 
     @property
-    def y(self) -> 'int':        
+    def y(self) -> 'int':
         """
         The Y coordinate of a point.
         """
         return self._get_item(2)
 
     @y.setter
-    def y(self, value):        
+    def y(self, value: 'int'):
         """
         The Y coordinate of a point.
         """
         self._set_item(2, value)
 
 
-
-class GetRtmDataSettings(StructureBase):    
+class GetRtmDataSettings(StructureBase):
     """
     The structure specifying the setting of the get_data() method.
     
-    :param list pattern_ids: Specify which patterns should be used to retrieve data from the RTM. If the list is empty, all patterns will be used.
+    :param pattern_ids: Specify which patterns should be used to retrieve data from the RTM. If the list is empty, all patterns will be used.
     
-    :param bool wait_for_next_data: When the flag is set to True, the get_data() function call is waiting for next data. Once the data is available the call returns back to script. When no data was captured and patterning job was finished, None is returned. The flag can be useful for patterning jobs where one pass takes a lot of time and user doesn't want to process the same data twice.
+    :param wait_for_next_data: When the flag is set to True, the get_data() function call is waiting for next data. Once the data is available the call returns back to script. When no data was captured and patterning job was finished, None is returned. The flag can be useful for patterning jobs where one pass takes a lot of time and user doesn't want to process the same data twice.
     """
-    def __init__(self, pattern_ids=None, wait_for_next_data=None):
+    def __init__(self, pattern_ids: 'List[int]' = None, wait_for_next_data: 'bool' = None):
         super(GetRtmDataSettings, self).__init__("GetRtmDataSettings")
 
         self._init_item(1, DataTypeDefinition(DataType.LIST_PRIMARY_ID, template_argument=DataType.INT32), pattern_ids, True)
@@ -2280,14 +2379,14 @@ class GetRtmDataSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def pattern_ids(self) -> 'List[int]':        
+    def pattern_ids(self) -> 'Optional[List[int]]':
         """
         Specify which patterns should be used to retrieve data from the RTM. If the list is empty, all patterns will be used.
         """
         return self._get_item(1)
 
     @pattern_ids.setter
-    def pattern_ids(self, value):        
+    def pattern_ids(self, value: 'Optional[List[int]]'):
         """
         Specify which patterns should be used to retrieve data from the RTM. If the list is empty, all patterns will be used.
         """
@@ -2297,30 +2396,29 @@ class GetRtmDataSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def wait_for_next_data(self) -> 'bool':        
+    def wait_for_next_data(self) -> 'Optional[bool]':
         """
         When the flag is set to True, the get_data() function call is waiting for next data. Once the data is available the call returns back to script. When no data was captured and patterning job was finished, None is returned. The flag can be useful for patterning jobs where one pass takes a lot of time and user doesn't want to process the same data twice.
         """
         return self._get_item(2)
 
     @wait_for_next_data.setter
-    def wait_for_next_data(self, value):        
+    def wait_for_next_data(self, value: 'Optional[bool]'):
         """
         When the flag is set to True, the get_data() function call is waiting for next data. Once the data is available the call returns back to script. When no data was captured and patterning job was finished, None is returned. The flag can be useful for patterning jobs where one pass takes a lot of time and user doesn't want to process the same data twice.
         """
         self._set_item(2, value)
 
 
-
-class RtmDataSet(StructureBase):    
+class RtmDataSet(StructureBase):
     """
     The pattern point data set.
     
-    :param int pattern_id: The ID of the pattern.
+    :param pattern_id: The ID of the pattern.
     
-    :param bytes raw_values: The raw data sent via network.
+    :param raw_values: The raw data sent via network.
     """
-    def __init__(self, pattern_id=0, raw_values=None):
+    def __init__(self, pattern_id: 'int' = 0, raw_values: 'bytes' = None):
         super(RtmDataSet, self).__init__("RtmDataSet")
 
         self._init_item(1, DataType.INT32, pattern_id, False)
@@ -2330,14 +2428,14 @@ class RtmDataSet(StructureBase):
         return self._has_item(1)
 
     @property
-    def pattern_id(self) -> 'int':        
+    def pattern_id(self) -> 'int':
         """
         The ID of the pattern.
         """
         return self._get_item(1)
 
     @pattern_id.setter
-    def pattern_id(self, value):        
+    def pattern_id(self, value: 'int'):
         """
         The ID of the pattern.
         """
@@ -2347,23 +2445,22 @@ class RtmDataSet(StructureBase):
         return self._has_item(2)
 
     @property
-    def raw_values(self) -> 'bytes':        
+    def raw_values(self) -> 'bytes':
         """
         The raw data sent via network.
         """
         return self._get_item(2)
 
     @raw_values.setter
-    def raw_values(self, value):        
+    def raw_values(self, value: 'bytes'):
         """
         The raw data sent via network.
         """
         self._set_item(2, value)
 
 
-
 class LargeImageHeader(StructureBase):
-    def __init__(self, image_id=None, preview=None, part_count=0):
+    def __init__(self, image_id: 'str' = None, preview: 'structures.AdornedImage' = None, part_count: 'int' = 0):
         super(LargeImageHeader, self).__init__("LargeImageHeader")
 
         self._init_item(1, DataType.STRING, image_id, False)
@@ -2378,18 +2475,18 @@ class LargeImageHeader(StructureBase):
         return self._get_item(1)
 
     @image_id.setter
-    def image_id(self, value):
+    def image_id(self, value: 'str'):
         self._set_item(1, value)
 
     def _has_preview(self):
         return self._has_item(2)
 
     @property
-    def preview(self) -> 'AdornedImage':
+    def preview(self) -> 'structures.AdornedImage':
         return self._get_item(2)
 
     @preview.setter
-    def preview(self, value):
+    def preview(self, value: 'structures.AdornedImage'):
         self._set_item(2, value)
 
     def _has_part_count(self):
@@ -2400,13 +2497,12 @@ class LargeImageHeader(StructureBase):
         return self._get_item(3)
 
     @part_count.setter
-    def part_count(self, value):
+    def part_count(self, value: 'int'):
         self._set_item(3, value)
 
 
-
 class AdornedImageMetadataOpticsScanFieldSize(StructureBase):
-    def __init__(self, width=0.0, height=0.0):
+    def __init__(self, width: 'float' = 0.0, height: 'float' = 0.0):
         super(AdornedImageMetadataOpticsScanFieldSize, self).__init__("AdornedImageMetadataOpticsScanFieldSize")
 
         self._init_item(1, DataType.DOUBLE, width, False)
@@ -2420,7 +2516,7 @@ class AdornedImageMetadataOpticsScanFieldSize(StructureBase):
         return self._get_item(1)
 
     @width.setter
-    def width(self, value):
+    def width(self, value: 'float'):
         self._set_item(1, value)
 
     def _has_height(self):
@@ -2431,13 +2527,12 @@ class AdornedImageMetadataOpticsScanFieldSize(StructureBase):
         return self._get_item(2)
 
     @height.setter
-    def height(self, value):
+    def height(self, value: 'float'):
         self._set_item(2, value)
 
 
-
 class AdornedImageMetadataAcquisition(StructureBase):
-    def __init__(self, acquisition_datetime=None, acquisition_id=None, acquisition_start_datetime=None, beam_type=None, column_type=None, source_type=None):
+    def __init__(self, acquisition_datetime: 'str' = None, acquisition_id: 'str' = None, acquisition_start_datetime: 'str' = None, beam_type: 'str' = None, column_type: 'str' = None, source_type: 'str' = None):
         super(AdornedImageMetadataAcquisition, self).__init__("AdornedImageMetadataAcquisition")
 
         self._init_item(1, DataType.STRING, acquisition_datetime, True)
@@ -2451,72 +2546,71 @@ class AdornedImageMetadataAcquisition(StructureBase):
         return self._has_item(1)
 
     @property
-    def acquisition_datetime(self) -> 'str':
+    def acquisition_datetime(self) -> 'Optional[str]':
         return self._get_item(1)
 
     @acquisition_datetime.setter
-    def acquisition_datetime(self, value):
+    def acquisition_datetime(self, value: 'Optional[str]'):
         self._set_item(1, value)
 
     def _has_acquisition_id(self):
         return self._has_item(2)
 
     @property
-    def acquisition_id(self) -> 'str':
+    def acquisition_id(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @acquisition_id.setter
-    def acquisition_id(self, value):
+    def acquisition_id(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
     def _has_acquisition_start_datetime(self):
         return self._has_item(3)
 
     @property
-    def acquisition_start_datetime(self) -> 'str':
+    def acquisition_start_datetime(self) -> 'Optional[str]':
         return self._get_item(3)
 
     @acquisition_start_datetime.setter
-    def acquisition_start_datetime(self, value):
+    def acquisition_start_datetime(self, value: 'Optional[str]'):
         self._set_item(3, value)
 
     def _has_beam_type(self):
         return self._has_item(4)
 
     @property
-    def beam_type(self) -> 'str':
+    def beam_type(self) -> 'Optional[str]':
         return self._get_item(4)
 
     @beam_type.setter
-    def beam_type(self, value):
+    def beam_type(self, value: 'Optional[str]'):
         self._set_item(4, value)
 
     def _has_column_type(self):
         return self._has_item(5)
 
     @property
-    def column_type(self) -> 'str':
+    def column_type(self) -> 'Optional[str]':
         return self._get_item(5)
 
     @column_type.setter
-    def column_type(self, value):
+    def column_type(self, value: 'Optional[str]'):
         self._set_item(5, value)
 
     def _has_source_type(self):
         return self._has_item(6)
 
     @property
-    def source_type(self) -> 'str':
+    def source_type(self) -> 'Optional[str]':
         return self._get_item(6)
 
     @source_type.setter
-    def source_type(self, value):
+    def source_type(self, value: 'Optional[str]'):
         self._set_item(6, value)
 
 
-
 class AdornedImageMetadataBinaryResult(StructureBase):
-    def __init__(self, acquisition_unit=None, bits_per_pixel=None, black_level=None, composition_type=None, detector=None, detector_index=None, digital_brightness=None, digital_contrast=None, encoding=None, filter_frame_count=None, filter_type=None, gamma=None, intensity_offset=None, intensity_scale=None, pixel_value_maximum=None, pixel_value_minimum=None, pixel_value_mean=None, pixel_value_standard_deviation=None, recursive_filter_coefficient=None, reference_transformation=None, sharpness=None, sharpness_algorithm=None, sigma=None, white_level=None, acquisition_area=None, image_size=None, offset=None, pixel_size=None):
+    def __init__(self, acquisition_unit: 'str' = None, bits_per_pixel: 'int' = None, black_level: 'float' = None, composition_type: 'str' = None, detector: 'str' = None, detector_index: 'int' = None, digital_brightness: 'float' = None, digital_contrast: 'float' = None, encoding: 'str' = None, filter_frame_count: 'int' = None, filter_type: 'str' = None, gamma: 'float' = None, intensity_offset: 'float' = None, intensity_scale: 'float' = None, pixel_value_maximum: 'float' = None, pixel_value_minimum: 'float' = None, pixel_value_mean: 'float' = None, pixel_value_standard_deviation: 'float' = None, recursive_filter_coefficient: 'float' = None, reference_transformation: 'str' = None, sharpness: 'float' = None, sharpness_algorithm: 'str' = None, sigma: 'float' = None, white_level: 'float' = None, acquisition_area: 'structures.Rectangle' = None, image_size: 'structures.Point' = None, offset: 'structures.Point' = None, pixel_size: 'structures.Point' = None):
         super(AdornedImageMetadataBinaryResult, self).__init__("AdornedImageMetadataBinaryResult")
 
         self._init_item(2, DataType.STRING, acquisition_unit, True)
@@ -2552,314 +2646,313 @@ class AdornedImageMetadataBinaryResult(StructureBase):
         return self._has_item(2)
 
     @property
-    def acquisition_unit(self) -> 'str':
+    def acquisition_unit(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @acquisition_unit.setter
-    def acquisition_unit(self, value):
+    def acquisition_unit(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
     def _has_bits_per_pixel(self):
         return self._has_item(3)
 
     @property
-    def bits_per_pixel(self) -> 'int':
+    def bits_per_pixel(self) -> 'Optional[int]':
         return self._get_item(3)
 
     @bits_per_pixel.setter
-    def bits_per_pixel(self, value):
+    def bits_per_pixel(self, value: 'Optional[int]'):
         self._set_item(3, value)
 
     def _has_black_level(self):
         return self._has_item(4)
 
     @property
-    def black_level(self) -> 'float':
+    def black_level(self) -> 'Optional[float]':
         return self._get_item(4)
 
     @black_level.setter
-    def black_level(self, value):
+    def black_level(self, value: 'Optional[float]'):
         self._set_item(4, value)
 
     def _has_composition_type(self):
         return self._has_item(5)
 
     @property
-    def composition_type(self) -> 'str':
+    def composition_type(self) -> 'Optional[str]':
         return self._get_item(5)
 
     @composition_type.setter
-    def composition_type(self, value):
+    def composition_type(self, value: 'Optional[str]'):
         self._set_item(5, value)
 
     def _has_detector(self):
         return self._has_item(6)
 
     @property
-    def detector(self) -> 'str':
+    def detector(self) -> 'Optional[str]':
         return self._get_item(6)
 
     @detector.setter
-    def detector(self, value):
+    def detector(self, value: 'Optional[str]'):
         self._set_item(6, value)
 
     def _has_detector_index(self):
         return self._has_item(7)
 
     @property
-    def detector_index(self) -> 'int':
+    def detector_index(self) -> 'Optional[int]':
         return self._get_item(7)
 
     @detector_index.setter
-    def detector_index(self, value):
+    def detector_index(self, value: 'Optional[int]'):
         self._set_item(7, value)
 
     def _has_digital_brightness(self):
         return self._has_item(8)
 
     @property
-    def digital_brightness(self) -> 'float':
+    def digital_brightness(self) -> 'Optional[float]':
         return self._get_item(8)
 
     @digital_brightness.setter
-    def digital_brightness(self, value):
+    def digital_brightness(self, value: 'Optional[float]'):
         self._set_item(8, value)
 
     def _has_digital_contrast(self):
         return self._has_item(9)
 
     @property
-    def digital_contrast(self) -> 'float':
+    def digital_contrast(self) -> 'Optional[float]':
         return self._get_item(9)
 
     @digital_contrast.setter
-    def digital_contrast(self, value):
+    def digital_contrast(self, value: 'Optional[float]'):
         self._set_item(9, value)
 
     def _has_encoding(self):
         return self._has_item(10)
 
     @property
-    def encoding(self) -> 'str':
+    def encoding(self) -> 'Optional[str]':
         return self._get_item(10)
 
     @encoding.setter
-    def encoding(self, value):
+    def encoding(self, value: 'Optional[str]'):
         self._set_item(10, value)
 
     def _has_filter_frame_count(self):
         return self._has_item(11)
 
     @property
-    def filter_frame_count(self) -> 'int':
+    def filter_frame_count(self) -> 'Optional[int]':
         return self._get_item(11)
 
     @filter_frame_count.setter
-    def filter_frame_count(self, value):
+    def filter_frame_count(self, value: 'Optional[int]'):
         self._set_item(11, value)
 
     def _has_filter_type(self):
         return self._has_item(12)
 
     @property
-    def filter_type(self) -> 'str':
+    def filter_type(self) -> 'Optional[str]':
         return self._get_item(12)
 
     @filter_type.setter
-    def filter_type(self, value):
+    def filter_type(self, value: 'Optional[str]'):
         self._set_item(12, value)
 
     def _has_gamma(self):
         return self._has_item(13)
 
     @property
-    def gamma(self) -> 'float':
+    def gamma(self) -> 'Optional[float]':
         return self._get_item(13)
 
     @gamma.setter
-    def gamma(self, value):
+    def gamma(self, value: 'Optional[float]'):
         self._set_item(13, value)
 
     def _has_intensity_offset(self):
         return self._has_item(15)
 
     @property
-    def intensity_offset(self) -> 'float':
+    def intensity_offset(self) -> 'Optional[float]':
         return self._get_item(15)
 
     @intensity_offset.setter
-    def intensity_offset(self, value):
+    def intensity_offset(self, value: 'Optional[float]'):
         self._set_item(15, value)
 
     def _has_intensity_scale(self):
         return self._has_item(16)
 
     @property
-    def intensity_scale(self) -> 'float':
+    def intensity_scale(self) -> 'Optional[float]':
         return self._get_item(16)
 
     @intensity_scale.setter
-    def intensity_scale(self, value):
+    def intensity_scale(self, value: 'Optional[float]'):
         self._set_item(16, value)
 
     def _has_pixel_value_maximum(self):
         return self._has_item(19)
 
     @property
-    def pixel_value_maximum(self) -> 'float':
+    def pixel_value_maximum(self) -> 'Optional[float]':
         return self._get_item(19)
 
     @pixel_value_maximum.setter
-    def pixel_value_maximum(self, value):
+    def pixel_value_maximum(self, value: 'Optional[float]'):
         self._set_item(19, value)
 
     def _has_pixel_value_minimum(self):
         return self._has_item(20)
 
     @property
-    def pixel_value_minimum(self) -> 'float':
+    def pixel_value_minimum(self) -> 'Optional[float]':
         return self._get_item(20)
 
     @pixel_value_minimum.setter
-    def pixel_value_minimum(self, value):
+    def pixel_value_minimum(self, value: 'Optional[float]'):
         self._set_item(20, value)
 
     def _has_pixel_value_mean(self):
         return self._has_item(21)
 
     @property
-    def pixel_value_mean(self) -> 'float':
+    def pixel_value_mean(self) -> 'Optional[float]':
         return self._get_item(21)
 
     @pixel_value_mean.setter
-    def pixel_value_mean(self, value):
+    def pixel_value_mean(self, value: 'Optional[float]'):
         self._set_item(21, value)
 
     def _has_pixel_value_standard_deviation(self):
         return self._has_item(22)
 
     @property
-    def pixel_value_standard_deviation(self) -> 'float':
+    def pixel_value_standard_deviation(self) -> 'Optional[float]':
         return self._get_item(22)
 
     @pixel_value_standard_deviation.setter
-    def pixel_value_standard_deviation(self, value):
+    def pixel_value_standard_deviation(self, value: 'Optional[float]'):
         self._set_item(22, value)
 
     def _has_recursive_filter_coefficient(self):
         return self._has_item(23)
 
     @property
-    def recursive_filter_coefficient(self) -> 'float':
+    def recursive_filter_coefficient(self) -> 'Optional[float]':
         return self._get_item(23)
 
     @recursive_filter_coefficient.setter
-    def recursive_filter_coefficient(self, value):
+    def recursive_filter_coefficient(self, value: 'Optional[float]'):
         self._set_item(23, value)
 
     def _has_reference_transformation(self):
         return self._has_item(24)
 
     @property
-    def reference_transformation(self) -> 'str':
+    def reference_transformation(self) -> 'Optional[str]':
         return self._get_item(24)
 
     @reference_transformation.setter
-    def reference_transformation(self, value):
+    def reference_transformation(self, value: 'Optional[str]'):
         self._set_item(24, value)
 
     def _has_sharpness(self):
         return self._has_item(25)
 
     @property
-    def sharpness(self) -> 'float':
+    def sharpness(self) -> 'Optional[float]':
         return self._get_item(25)
 
     @sharpness.setter
-    def sharpness(self, value):
+    def sharpness(self, value: 'Optional[float]'):
         self._set_item(25, value)
 
     def _has_sharpness_algorithm(self):
         return self._has_item(26)
 
     @property
-    def sharpness_algorithm(self) -> 'str':
+    def sharpness_algorithm(self) -> 'Optional[str]':
         return self._get_item(26)
 
     @sharpness_algorithm.setter
-    def sharpness_algorithm(self, value):
+    def sharpness_algorithm(self, value: 'Optional[str]'):
         self._set_item(26, value)
 
     def _has_sigma(self):
         return self._has_item(27)
 
     @property
-    def sigma(self) -> 'float':
+    def sigma(self) -> 'Optional[float]':
         return self._get_item(27)
 
     @sigma.setter
-    def sigma(self, value):
+    def sigma(self, value: 'Optional[float]'):
         self._set_item(27, value)
 
     def _has_white_level(self):
         return self._has_item(28)
 
     @property
-    def white_level(self) -> 'float':
+    def white_level(self) -> 'Optional[float]':
         return self._get_item(28)
 
     @white_level.setter
-    def white_level(self, value):
+    def white_level(self, value: 'Optional[float]'):
         self._set_item(28, value)
 
     def _has_acquisition_area(self):
         return self._has_item(29)
 
     @property
-    def acquisition_area(self) -> 'Rectangle':
+    def acquisition_area(self) -> 'Optional[structures.Rectangle]':
         return self._get_item(29)
 
     @acquisition_area.setter
-    def acquisition_area(self, value):
+    def acquisition_area(self, value: 'Optional[structures.Rectangle]'):
         self._set_item(29, value)
 
     def _has_image_size(self):
         return self._has_item(30)
 
     @property
-    def image_size(self) -> 'Point':
+    def image_size(self) -> 'Optional[structures.Point]':
         return self._get_item(30)
 
     @image_size.setter
-    def image_size(self, value):
+    def image_size(self, value: 'Optional[structures.Point]'):
         self._set_item(30, value)
 
     def _has_offset(self):
         return self._has_item(31)
 
     @property
-    def offset(self) -> 'Point':
+    def offset(self) -> 'Optional[structures.Point]':
         return self._get_item(31)
 
     @offset.setter
-    def offset(self, value):
+    def offset(self, value: 'Optional[structures.Point]'):
         self._set_item(31, value)
 
     def _has_pixel_size(self):
         return self._has_item(32)
 
     @property
-    def pixel_size(self) -> 'Point':
+    def pixel_size(self) -> 'Optional[structures.Point]':
         return self._get_item(32)
 
     @pixel_size.setter
-    def pixel_size(self, value):
+    def pixel_size(self, value: 'Optional[structures.Point]'):
         self._set_item(32, value)
 
 
-
 class AdornedImageMetadataCore(StructureBase):
-    def __init__(self, application_computer_name=None, application_software=None, application_software_version=None, comment=None, file_date_time=None, file_name=None, guid=None, md5_checksum=None, parent_guid=None, private_checksum=None, user_id=None):
+    def __init__(self, application_computer_name: 'str' = None, application_software: 'str' = None, application_software_version: 'str' = None, comment: 'str' = None, file_date_time: 'str' = None, file_name: 'str' = None, guid: 'str' = None, md5_checksum: 'bytes' = None, parent_guid: 'str' = None, private_checksum: 'bytes' = None, user_id: 'str' = None):
         super(AdornedImageMetadataCore, self).__init__("AdornedImageMetadataCore")
 
         self._init_item(1, DataType.STRING, application_computer_name, True)
@@ -2878,127 +2971,126 @@ class AdornedImageMetadataCore(StructureBase):
         return self._has_item(1)
 
     @property
-    def application_computer_name(self) -> 'str':
+    def application_computer_name(self) -> 'Optional[str]':
         return self._get_item(1)
 
     @application_computer_name.setter
-    def application_computer_name(self, value):
+    def application_computer_name(self, value: 'Optional[str]'):
         self._set_item(1, value)
 
     def _has_application_software(self):
         return self._has_item(2)
 
     @property
-    def application_software(self) -> 'str':
+    def application_software(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @application_software.setter
-    def application_software(self, value):
+    def application_software(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
     def _has_application_software_version(self):
         return self._has_item(3)
 
     @property
-    def application_software_version(self) -> 'str':
+    def application_software_version(self) -> 'Optional[str]':
         return self._get_item(3)
 
     @application_software_version.setter
-    def application_software_version(self, value):
+    def application_software_version(self, value: 'Optional[str]'):
         self._set_item(3, value)
 
     def _has_comment(self):
         return self._has_item(4)
 
     @property
-    def comment(self) -> 'str':
+    def comment(self) -> 'Optional[str]':
         return self._get_item(4)
 
     @comment.setter
-    def comment(self, value):
+    def comment(self, value: 'Optional[str]'):
         self._set_item(4, value)
 
     def _has_file_date_time(self):
         return self._has_item(5)
 
     @property
-    def file_date_time(self) -> 'str':
+    def file_date_time(self) -> 'Optional[str]':
         return self._get_item(5)
 
     @file_date_time.setter
-    def file_date_time(self, value):
+    def file_date_time(self, value: 'Optional[str]'):
         self._set_item(5, value)
 
     def _has_file_name(self):
         return self._has_item(6)
 
     @property
-    def file_name(self) -> 'str':
+    def file_name(self) -> 'Optional[str]':
         return self._get_item(6)
 
     @file_name.setter
-    def file_name(self, value):
+    def file_name(self, value: 'Optional[str]'):
         self._set_item(6, value)
 
     def _has_guid(self):
         return self._has_item(7)
 
     @property
-    def guid(self) -> 'str':
+    def guid(self) -> 'Optional[str]':
         return self._get_item(7)
 
     @guid.setter
-    def guid(self, value):
+    def guid(self, value: 'Optional[str]'):
         self._set_item(7, value)
 
     def _has_md5_checksum(self):
         return self._has_item(8)
 
     @property
-    def md5_checksum(self) -> 'bytes':
+    def md5_checksum(self) -> 'Optional[bytes]':
         return self._get_item(8)
 
     @md5_checksum.setter
-    def md5_checksum(self, value):
+    def md5_checksum(self, value: 'Optional[bytes]'):
         self._set_item(8, value)
 
     def _has_parent_guid(self):
         return self._has_item(9)
 
     @property
-    def parent_guid(self) -> 'str':
+    def parent_guid(self) -> 'Optional[str]':
         return self._get_item(9)
 
     @parent_guid.setter
-    def parent_guid(self, value):
+    def parent_guid(self, value: 'Optional[str]'):
         self._set_item(9, value)
 
     def _has_private_checksum(self):
         return self._has_item(10)
 
     @property
-    def private_checksum(self) -> 'bytes':
+    def private_checksum(self) -> 'Optional[bytes]':
         return self._get_item(10)
 
     @private_checksum.setter
-    def private_checksum(self, value):
+    def private_checksum(self, value: 'Optional[bytes]'):
         self._set_item(10, value)
 
     def _has_user_id(self):
         return self._has_item(11)
 
     @property
-    def user_id(self) -> 'str':
+    def user_id(self) -> 'Optional[str]':
         return self._get_item(11)
 
     @user_id.setter
-    def user_id(self, value):
+    def user_id(self, value: 'Optional[str]'):
         self._set_item(11, value)
 
 
-
 class AdornedImageMetadataDetector(StructureBase):
-    def __init__(self, detector_name=None, detector_type=None, enabled=None, inserted=None):
+    def __init__(self, detector_name: 'str' = None, detector_type: 'str' = None, enabled: 'bool' = None, inserted: 'bool' = None):
         super(AdornedImageMetadataDetector, self).__init__("AdornedImageMetadataDetector")
 
         self._init_item(1, DataType.STRING, detector_name, True)
@@ -3010,50 +3102,49 @@ class AdornedImageMetadataDetector(StructureBase):
         return self._has_item(1)
 
     @property
-    def detector_name(self) -> 'str':
+    def detector_name(self) -> 'Optional[str]':
         return self._get_item(1)
 
     @detector_name.setter
-    def detector_name(self, value):
+    def detector_name(self, value: 'Optional[str]'):
         self._set_item(1, value)
 
     def _has_detector_type(self):
         return self._has_item(2)
 
     @property
-    def detector_type(self) -> 'str':
+    def detector_type(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @detector_type.setter
-    def detector_type(self, value):
+    def detector_type(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
     def _has_enabled(self):
         return self._has_item(3)
 
     @property
-    def enabled(self) -> 'bool':
+    def enabled(self) -> 'Optional[bool]':
         return self._get_item(3)
 
     @enabled.setter
-    def enabled(self, value):
+    def enabled(self, value: 'Optional[bool]'):
         self._set_item(3, value)
 
     def _has_inserted(self):
         return self._has_item(4)
 
     @property
-    def inserted(self) -> 'bool':
+    def inserted(self) -> 'Optional[bool]':
         return self._get_item(4)
 
     @inserted.setter
-    def inserted(self, value):
+    def inserted(self, value: 'Optional[bool]'):
         self._set_item(4, value)
 
 
-
 class AdornedImageMetadataEnergyFilterSettings(StructureBase):
-    def __init__(self, acceleration_voltage_offset=None, drift_tube_voltage=None, energy_selection_slit_width=None, energy_shift=None, entrance_aperture_diameter=None, entrance_aperture_type=None, energy_selection_slit_inserted=None):
+    def __init__(self, acceleration_voltage_offset: 'float' = None, drift_tube_voltage: 'float' = None, energy_selection_slit_width: 'float' = None, energy_shift: 'float' = None, entrance_aperture_diameter: 'float' = None, entrance_aperture_type: 'str' = None, energy_selection_slit_inserted: 'bool' = None):
         super(AdornedImageMetadataEnergyFilterSettings, self).__init__("AdornedImageMetadataEnergyFilterSettings")
 
         self._init_item(1, DataType.DOUBLE, acceleration_voltage_offset, True)
@@ -3068,83 +3159,82 @@ class AdornedImageMetadataEnergyFilterSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def acceleration_voltage_offset(self) -> 'float':
+    def acceleration_voltage_offset(self) -> 'Optional[float]':
         return self._get_item(1)
 
     @acceleration_voltage_offset.setter
-    def acceleration_voltage_offset(self, value):
+    def acceleration_voltage_offset(self, value: 'Optional[float]'):
         self._set_item(1, value)
 
     def _has_drift_tube_voltage(self):
         return self._has_item(2)
 
     @property
-    def drift_tube_voltage(self) -> 'float':
+    def drift_tube_voltage(self) -> 'Optional[float]':
         return self._get_item(2)
 
     @drift_tube_voltage.setter
-    def drift_tube_voltage(self, value):
+    def drift_tube_voltage(self, value: 'Optional[float]'):
         self._set_item(2, value)
 
     def _has_energy_selection_slit_width(self):
         return self._has_item(3)
 
     @property
-    def energy_selection_slit_width(self) -> 'float':
+    def energy_selection_slit_width(self) -> 'Optional[float]':
         return self._get_item(3)
 
     @energy_selection_slit_width.setter
-    def energy_selection_slit_width(self, value):
+    def energy_selection_slit_width(self, value: 'Optional[float]'):
         self._set_item(3, value)
 
     def _has_energy_shift(self):
         return self._has_item(4)
 
     @property
-    def energy_shift(self) -> 'float':
+    def energy_shift(self) -> 'Optional[float]':
         return self._get_item(4)
 
     @energy_shift.setter
-    def energy_shift(self, value):
+    def energy_shift(self, value: 'Optional[float]'):
         self._set_item(4, value)
 
     def _has_entrance_aperture_diameter(self):
         return self._has_item(5)
 
     @property
-    def entrance_aperture_diameter(self) -> 'float':
+    def entrance_aperture_diameter(self) -> 'Optional[float]':
         return self._get_item(5)
 
     @entrance_aperture_diameter.setter
-    def entrance_aperture_diameter(self, value):
+    def entrance_aperture_diameter(self, value: 'Optional[float]'):
         self._set_item(5, value)
 
     def _has_entrance_aperture_type(self):
         return self._has_item(6)
 
     @property
-    def entrance_aperture_type(self) -> 'str':
+    def entrance_aperture_type(self) -> 'Optional[str]':
         return self._get_item(6)
 
     @entrance_aperture_type.setter
-    def entrance_aperture_type(self, value):
+    def entrance_aperture_type(self, value: 'Optional[str]'):
         self._set_item(6, value)
 
     def _has_energy_selection_slit_inserted(self):
         return self._has_item(7)
 
     @property
-    def energy_selection_slit_inserted(self) -> 'bool':
+    def energy_selection_slit_inserted(self) -> 'Optional[bool]':
         return self._get_item(7)
 
     @energy_selection_slit_inserted.setter
-    def energy_selection_slit_inserted(self, value):
+    def energy_selection_slit_inserted(self, value: 'Optional[bool]'):
         self._set_item(7, value)
 
 
-
 class AdornedImageMetadataGasInjectionSystemGas(StructureBase):
-    def __init__(self, crucible_temperature=None, gas_type=None):
+    def __init__(self, crucible_temperature: 'float' = None, gas_type: 'str' = None):
         super(AdornedImageMetadataGasInjectionSystemGas, self).__init__("AdornedImageMetadataGasInjectionSystemGas")
 
         self._init_item(1, DataType.DOUBLE, crucible_temperature, True)
@@ -3154,28 +3244,27 @@ class AdornedImageMetadataGasInjectionSystemGas(StructureBase):
         return self._has_item(1)
 
     @property
-    def crucible_temperature(self) -> 'float':
+    def crucible_temperature(self) -> 'Optional[float]':
         return self._get_item(1)
 
     @crucible_temperature.setter
-    def crucible_temperature(self, value):
+    def crucible_temperature(self, value: 'Optional[float]'):
         self._set_item(1, value)
 
     def _has_gas_type(self):
         return self._has_item(2)
 
     @property
-    def gas_type(self) -> 'str':
+    def gas_type(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @gas_type.setter
-    def gas_type(self, value):
+    def gas_type(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
 
-
 class AdornedImageMetadataGasInjectionSystem(StructureBase):
-    def __init__(self, gases=None, needle_temperature=None, gas_flow_on=None, heater_on=None, needle_state=None, port_name=None, port_number=None):
+    def __init__(self, gases: 'List[structures.AdornedImageMetadataGasInjectionSystemGas]' = None, needle_temperature: 'float' = None, gas_flow_on: 'bool' = None, heater_on: 'bool' = None, needle_state: 'str' = None, port_name: 'str' = None, port_number: 'int' = None):
         super(AdornedImageMetadataGasInjectionSystem, self).__init__("AdornedImageMetadataGasInjectionSystem")
 
         self._init_item(1, DataTypeDefinition(DataType.LIST_PRIMARY_ID, template_argument=DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="AdornedImageMetadataGasInjectionSystemGas")), gases, False)
@@ -3190,83 +3279,82 @@ class AdornedImageMetadataGasInjectionSystem(StructureBase):
         return self._has_item(1)
 
     @property
-    def gases(self) -> 'List[AdornedImageMetadataGasInjectionSystemGas]':
+    def gases(self) -> 'List[structures.AdornedImageMetadataGasInjectionSystemGas]':
         return self._get_item(1)
 
     @gases.setter
-    def gases(self, value):
+    def gases(self, value: 'List[structures.AdornedImageMetadataGasInjectionSystemGas]'):
         self._set_item(1, value)
 
     def _has_needle_temperature(self):
         return self._has_item(2)
 
     @property
-    def needle_temperature(self) -> 'float':
+    def needle_temperature(self) -> 'Optional[float]':
         return self._get_item(2)
 
     @needle_temperature.setter
-    def needle_temperature(self, value):
+    def needle_temperature(self, value: 'Optional[float]'):
         self._set_item(2, value)
 
     def _has_gas_flow_on(self):
         return self._has_item(3)
 
     @property
-    def gas_flow_on(self) -> 'bool':
+    def gas_flow_on(self) -> 'Optional[bool]':
         return self._get_item(3)
 
     @gas_flow_on.setter
-    def gas_flow_on(self, value):
+    def gas_flow_on(self, value: 'Optional[bool]'):
         self._set_item(3, value)
 
     def _has_heater_on(self):
         return self._has_item(4)
 
     @property
-    def heater_on(self) -> 'bool':
+    def heater_on(self) -> 'Optional[bool]':
         return self._get_item(4)
 
     @heater_on.setter
-    def heater_on(self, value):
+    def heater_on(self, value: 'Optional[bool]'):
         self._set_item(4, value)
 
     def _has_needle_state(self):
         return self._has_item(5)
 
     @property
-    def needle_state(self) -> 'str':
+    def needle_state(self) -> 'Optional[str]':
         return self._get_item(5)
 
     @needle_state.setter
-    def needle_state(self, value):
+    def needle_state(self, value: 'Optional[str]'):
         self._set_item(5, value)
 
     def _has_port_name(self):
         return self._has_item(6)
 
     @property
-    def port_name(self) -> 'str':
+    def port_name(self) -> 'Optional[str]':
         return self._get_item(6)
 
     @port_name.setter
-    def port_name(self, value):
+    def port_name(self, value: 'Optional[str]'):
         self._set_item(6, value)
 
     def _has_port_number(self):
         return self._has_item(7)
 
     @property
-    def port_number(self) -> 'int':
+    def port_number(self) -> 'Optional[int]':
         return self._get_item(7)
 
     @port_number.setter
-    def port_number(self, value):
+    def port_number(self, value: 'Optional[int]'):
         self._set_item(7, value)
 
 
-
 class AdornedImageMetadataInstrument(StructureBase):
-    def __init__(self, acquisition_server=None, acquisition_server_version=None, computer_name=None, control_software=None, control_software_version=None, instrument_class=None, instrument_id=None, instrument_model=None, manufacturer=None):
+    def __init__(self, acquisition_server: 'str' = None, acquisition_server_version: 'str' = None, computer_name: 'str' = None, control_software: 'str' = None, control_software_version: 'str' = None, instrument_class: 'str' = None, instrument_id: 'str' = None, instrument_model: 'str' = None, manufacturer: 'str' = None):
         super(AdornedImageMetadataInstrument, self).__init__("AdornedImageMetadataInstrument")
 
         self._init_item(1, DataType.STRING, acquisition_server, True)
@@ -3283,105 +3371,104 @@ class AdornedImageMetadataInstrument(StructureBase):
         return self._has_item(1)
 
     @property
-    def acquisition_server(self) -> 'str':
+    def acquisition_server(self) -> 'Optional[str]':
         return self._get_item(1)
 
     @acquisition_server.setter
-    def acquisition_server(self, value):
+    def acquisition_server(self, value: 'Optional[str]'):
         self._set_item(1, value)
 
     def _has_acquisition_server_version(self):
         return self._has_item(2)
 
     @property
-    def acquisition_server_version(self) -> 'str':
+    def acquisition_server_version(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @acquisition_server_version.setter
-    def acquisition_server_version(self, value):
+    def acquisition_server_version(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
     def _has_computer_name(self):
         return self._has_item(3)
 
     @property
-    def computer_name(self) -> 'str':
+    def computer_name(self) -> 'Optional[str]':
         return self._get_item(3)
 
     @computer_name.setter
-    def computer_name(self, value):
+    def computer_name(self, value: 'Optional[str]'):
         self._set_item(3, value)
 
     def _has_control_software(self):
         return self._has_item(4)
 
     @property
-    def control_software(self) -> 'str':
+    def control_software(self) -> 'Optional[str]':
         return self._get_item(4)
 
     @control_software.setter
-    def control_software(self, value):
+    def control_software(self, value: 'Optional[str]'):
         self._set_item(4, value)
 
     def _has_control_software_version(self):
         return self._has_item(5)
 
     @property
-    def control_software_version(self) -> 'str':
+    def control_software_version(self) -> 'Optional[str]':
         return self._get_item(5)
 
     @control_software_version.setter
-    def control_software_version(self, value):
+    def control_software_version(self, value: 'Optional[str]'):
         self._set_item(5, value)
 
     def _has_instrument_class(self):
         return self._has_item(6)
 
     @property
-    def instrument_class(self) -> 'str':
+    def instrument_class(self) -> 'Optional[str]':
         return self._get_item(6)
 
     @instrument_class.setter
-    def instrument_class(self, value):
+    def instrument_class(self, value: 'Optional[str]'):
         self._set_item(6, value)
 
     def _has_instrument_id(self):
         return self._has_item(7)
 
     @property
-    def instrument_id(self) -> 'str':
+    def instrument_id(self) -> 'Optional[str]':
         return self._get_item(7)
 
     @instrument_id.setter
-    def instrument_id(self, value):
+    def instrument_id(self, value: 'Optional[str]'):
         self._set_item(7, value)
 
     def _has_instrument_model(self):
         return self._has_item(8)
 
     @property
-    def instrument_model(self) -> 'str':
+    def instrument_model(self) -> 'Optional[str]':
         return self._get_item(8)
 
     @instrument_model.setter
-    def instrument_model(self, value):
+    def instrument_model(self, value: 'Optional[str]'):
         self._set_item(8, value)
 
     def _has_manufacturer(self):
         return self._has_item(9)
 
     @property
-    def manufacturer(self) -> 'str':
+    def manufacturer(self) -> 'Optional[str]':
         return self._get_item(9)
 
     @manufacturer.setter
-    def manufacturer(self, value):
+    def manufacturer(self, value: 'Optional[str]'):
         self._set_item(9, value)
 
 
-
 class AdornedImageMetadataOpticsAperture(StructureBase):
-    def __init__(self, diameter=None, index=None, mechanism_type=None, name=None, number=None, type=None, position_offset=None):
+    def __init__(self, diameter: 'float' = None, index: 'int' = None, mechanism_type: 'str' = None, name: 'str' = None, number: 'int' = None, type: 'str' = None, position_offset: 'structures.Point' = None):
         super(AdornedImageMetadataOpticsAperture, self).__init__("AdornedImageMetadataOpticsAperture")
 
         self._init_item(1, DataType.DOUBLE, diameter, True)
@@ -3396,83 +3483,82 @@ class AdornedImageMetadataOpticsAperture(StructureBase):
         return self._has_item(1)
 
     @property
-    def diameter(self) -> 'float':
+    def diameter(self) -> 'Optional[float]':
         return self._get_item(1)
 
     @diameter.setter
-    def diameter(self, value):
+    def diameter(self, value: 'Optional[float]'):
         self._set_item(1, value)
 
     def _has_index(self):
         return self._has_item(3)
 
     @property
-    def index(self) -> 'int':
+    def index(self) -> 'Optional[int]':
         return self._get_item(3)
 
     @index.setter
-    def index(self, value):
+    def index(self, value: 'Optional[int]'):
         self._set_item(3, value)
 
     def _has_mechanism_type(self):
         return self._has_item(4)
 
     @property
-    def mechanism_type(self) -> 'str':
+    def mechanism_type(self) -> 'Optional[str]':
         return self._get_item(4)
 
     @mechanism_type.setter
-    def mechanism_type(self, value):
+    def mechanism_type(self, value: 'Optional[str]'):
         self._set_item(4, value)
 
     def _has_name(self):
         return self._has_item(5)
 
     @property
-    def name(self) -> 'str':
+    def name(self) -> 'Optional[str]':
         return self._get_item(5)
 
     @name.setter
-    def name(self, value):
+    def name(self, value: 'Optional[str]'):
         self._set_item(5, value)
 
     def _has_number(self):
         return self._has_item(6)
 
     @property
-    def number(self) -> 'int':
+    def number(self) -> 'Optional[int]':
         return self._get_item(6)
 
     @number.setter
-    def number(self, value):
+    def number(self, value: 'Optional[int]'):
         self._set_item(6, value)
 
     def _has_type(self):
         return self._has_item(7)
 
     @property
-    def type(self) -> 'str':
+    def type(self) -> 'Optional[str]':
         return self._get_item(7)
 
     @type.setter
-    def type(self, value):
+    def type(self, value: 'Optional[str]'):
         self._set_item(7, value)
 
     def _has_position_offset(self):
         return self._has_item(8)
 
     @property
-    def position_offset(self) -> 'Point':
+    def position_offset(self) -> 'Optional[structures.Point]':
         return self._get_item(8)
 
     @position_offset.setter
-    def position_offset(self, value):
+    def position_offset(self, value: 'Optional[structures.Point]'):
         self._set_item(8, value)
 
 
-
 class AdornedImageMetadataOptics(StructureBase):
-    def __init__(self, acceleration_voltage=None, apertures=None, beam_convergence=None, beam_current=None, beam_current_selected=None, beam_diameter=None, camera_length=None, deceleration_voltage=None, defocus=None, emission_current=None, eucentric_working_distance=None, extractor_voltage=None, fib_l0_voltage=None, fib_l1_voltage=None, fib_l2_voltage=None, focus=None, full_scan_field_of_view=None, landing_energy=None, last_measured_screen_current=None, sample_pre_tilt_angle=None, scan_field_of_view=None, screen_current=None, spherical_aberration=None, spot_size=None, stem_focus=None, wehnelt_bias=None, working_distance=None, cross_over_on=None, diffraction_focus=None, eftem_on=None, gun_filament_settings=None, gun_lens_setting=None, high_magnification_mode=None, illumination_intensity_normalized=None, illumination_mode=None, illumination_on=None, illumination_type=None, nominal_magnification=None, objective_lens_mode=None, operation_mode=None, optical_mode=None, probe_mode=None, projector_mode=None, sample_tilt_correction_is_on=None, spot_index=None, tem_operating_sub_mode=None, beam_shift=None, beam_tilt=None, c1_lens_intensity=None, c2_lens_intensity=None, c3_lens_intensity=None, condenser_stigmator_raw=None, diffraction_lens_intensity=None, diffraction_stigmator_raw=None, fib_steering=None, gun_shift_raw=None, gun_stigmator_raw=None, gun_tilt_raw=None, image_shift=None, intermediate_lens_intensity=None, lorentz_lens_intensity=None, mini_condenser_lens_intensity=None, objective_lens_intensity=None, objective_stigmator_raw=None, projector1_lens_intensity=None, projector2_lens_intensity=None, stigmator_raw=None):
+    def __init__(self, acceleration_voltage: 'float' = None, apertures: 'List[structures.AdornedImageMetadataOpticsAperture]' = None, beam_convergence: 'float' = None, beam_current: 'float' = None, beam_current_selected: 'float' = None, beam_diameter: 'float' = None, camera_length: 'float' = None, deceleration_voltage: 'float' = None, defocus: 'float' = None, emission_current: 'float' = None, eucentric_working_distance: 'float' = None, extractor_voltage: 'float' = None, fib_l0_voltage: 'float' = None, fib_l1_voltage: 'float' = None, fib_l2_voltage: 'float' = None, focus: 'float' = None, full_scan_field_of_view: 'structures.AdornedImageMetadataOpticsScanFieldSize' = None, landing_energy: 'float' = None, last_measured_screen_current: 'float' = None, sample_pre_tilt_angle: 'float' = None, scan_field_of_view: 'structures.AdornedImageMetadataOpticsScanFieldSize' = None, screen_current: 'float' = None, spherical_aberration: 'float' = None, spot_size: 'float' = None, stem_focus: 'float' = None, wehnelt_bias: 'float' = None, working_distance: 'float' = None, cross_over_on: 'bool' = None, diffraction_focus: 'float' = None, eftem_on: 'bool' = None, gun_filament_settings: 'float' = None, gun_lens_setting: 'float' = None, high_magnification_mode: 'str' = None, illumination_intensity_normalized: 'float' = None, illumination_mode: 'str' = None, illumination_on: 'bool' = None, illumination_type: 'str' = None, nominal_magnification: 'float' = None, objective_lens_mode: 'str' = None, operation_mode: 'str' = None, optical_mode: 'str' = None, probe_mode: 'str' = None, projector_mode: 'str' = None, sample_tilt_correction_is_on: 'bool' = None, spot_index: 'int' = None, tem_operating_sub_mode: 'str' = None, beam_shift: 'structures.Point' = None, beam_tilt: 'structures.Point' = None, c1_lens_intensity: 'float' = None, c2_lens_intensity: 'float' = None, c3_lens_intensity: 'float' = None, condenser_stigmator_raw: 'structures.Point' = None, diffraction_lens_intensity: 'float' = None, diffraction_stigmator_raw: 'structures.Point' = None, fib_steering: 'structures.Point' = None, gun_shift_raw: 'structures.Point' = None, gun_stigmator_raw: 'structures.Point' = None, gun_tilt_raw: 'structures.Point' = None, image_shift: 'structures.Point' = None, intermediate_lens_intensity: 'float' = None, lorentz_lens_intensity: 'float' = None, mini_condenser_lens_intensity: 'float' = None, objective_lens_intensity: 'float' = None, objective_stigmator_raw: 'structures.Point' = None, projector1_lens_intensity: 'float' = None, projector2_lens_intensity: 'float' = None, stigmator_raw: 'structures.Point' = None):
         super(AdornedImageMetadataOptics, self).__init__("AdornedImageMetadataOptics")
 
         self._init_item(1, DataType.DOUBLE, acceleration_voltage, True)
@@ -3547,743 +3633,742 @@ class AdornedImageMetadataOptics(StructureBase):
         return self._has_item(1)
 
     @property
-    def acceleration_voltage(self) -> 'float':
+    def acceleration_voltage(self) -> 'Optional[float]':
         return self._get_item(1)
 
     @acceleration_voltage.setter
-    def acceleration_voltage(self, value):
+    def acceleration_voltage(self, value: 'Optional[float]'):
         self._set_item(1, value)
 
     def _has_apertures(self):
         return self._has_item(2)
 
     @property
-    def apertures(self) -> 'List[AdornedImageMetadataOpticsAperture]':
+    def apertures(self) -> 'List[structures.AdornedImageMetadataOpticsAperture]':
         return self._get_item(2)
 
     @apertures.setter
-    def apertures(self, value):
+    def apertures(self, value: 'List[structures.AdornedImageMetadataOpticsAperture]'):
         self._set_item(2, value)
 
     def _has_beam_convergence(self):
         return self._has_item(3)
 
     @property
-    def beam_convergence(self) -> 'float':
+    def beam_convergence(self) -> 'Optional[float]':
         return self._get_item(3)
 
     @beam_convergence.setter
-    def beam_convergence(self, value):
+    def beam_convergence(self, value: 'Optional[float]'):
         self._set_item(3, value)
 
     def _has_beam_current(self):
         return self._has_item(4)
 
     @property
-    def beam_current(self) -> 'float':
+    def beam_current(self) -> 'Optional[float]':
         return self._get_item(4)
 
     @beam_current.setter
-    def beam_current(self, value):
+    def beam_current(self, value: 'Optional[float]'):
         self._set_item(4, value)
 
     def _has_beam_current_selected(self):
         return self._has_item(5)
 
     @property
-    def beam_current_selected(self) -> 'float':
+    def beam_current_selected(self) -> 'Optional[float]':
         return self._get_item(5)
 
     @beam_current_selected.setter
-    def beam_current_selected(self, value):
+    def beam_current_selected(self, value: 'Optional[float]'):
         self._set_item(5, value)
 
     def _has_beam_diameter(self):
         return self._has_item(6)
 
     @property
-    def beam_diameter(self) -> 'float':
+    def beam_diameter(self) -> 'Optional[float]':
         return self._get_item(6)
 
     @beam_diameter.setter
-    def beam_diameter(self, value):
+    def beam_diameter(self, value: 'Optional[float]'):
         self._set_item(6, value)
 
     def _has_camera_length(self):
         return self._has_item(12)
 
     @property
-    def camera_length(self) -> 'float':
+    def camera_length(self) -> 'Optional[float]':
         return self._get_item(12)
 
     @camera_length.setter
-    def camera_length(self, value):
+    def camera_length(self, value: 'Optional[float]'):
         self._set_item(12, value)
 
     def _has_deceleration_voltage(self):
         return self._has_item(14)
 
     @property
-    def deceleration_voltage(self) -> 'float':
+    def deceleration_voltage(self) -> 'Optional[float]':
         return self._get_item(14)
 
     @deceleration_voltage.setter
-    def deceleration_voltage(self, value):
+    def deceleration_voltage(self, value: 'Optional[float]'):
         self._set_item(14, value)
 
     def _has_defocus(self):
         return self._has_item(15)
 
     @property
-    def defocus(self) -> 'float':
+    def defocus(self) -> 'Optional[float]':
         return self._get_item(15)
 
     @defocus.setter
-    def defocus(self, value):
+    def defocus(self, value: 'Optional[float]'):
         self._set_item(15, value)
 
     def _has_emission_current(self):
         return self._has_item(18)
 
     @property
-    def emission_current(self) -> 'float':
+    def emission_current(self) -> 'Optional[float]':
         return self._get_item(18)
 
     @emission_current.setter
-    def emission_current(self, value):
+    def emission_current(self, value: 'Optional[float]'):
         self._set_item(18, value)
 
     def _has_eucentric_working_distance(self):
         return self._has_item(19)
 
     @property
-    def eucentric_working_distance(self) -> 'float':
+    def eucentric_working_distance(self) -> 'Optional[float]':
         return self._get_item(19)
 
     @eucentric_working_distance.setter
-    def eucentric_working_distance(self, value):
+    def eucentric_working_distance(self, value: 'Optional[float]'):
         self._set_item(19, value)
 
     def _has_extractor_voltage(self):
         return self._has_item(20)
 
     @property
-    def extractor_voltage(self) -> 'float':
+    def extractor_voltage(self) -> 'Optional[float]':
         return self._get_item(20)
 
     @extractor_voltage.setter
-    def extractor_voltage(self, value):
+    def extractor_voltage(self, value: 'Optional[float]'):
         self._set_item(20, value)
 
     def _has_fib_l0_voltage(self):
         return self._has_item(21)
 
     @property
-    def fib_l0_voltage(self) -> 'float':
+    def fib_l0_voltage(self) -> 'Optional[float]':
         return self._get_item(21)
 
     @fib_l0_voltage.setter
-    def fib_l0_voltage(self, value):
+    def fib_l0_voltage(self, value: 'Optional[float]'):
         self._set_item(21, value)
 
     def _has_fib_l1_voltage(self):
         return self._has_item(22)
 
     @property
-    def fib_l1_voltage(self) -> 'float':
+    def fib_l1_voltage(self) -> 'Optional[float]':
         return self._get_item(22)
 
     @fib_l1_voltage.setter
-    def fib_l1_voltage(self, value):
+    def fib_l1_voltage(self, value: 'Optional[float]'):
         self._set_item(22, value)
 
     def _has_fib_l2_voltage(self):
         return self._has_item(23)
 
     @property
-    def fib_l2_voltage(self) -> 'float':
+    def fib_l2_voltage(self) -> 'Optional[float]':
         return self._get_item(23)
 
     @fib_l2_voltage.setter
-    def fib_l2_voltage(self, value):
+    def fib_l2_voltage(self, value: 'Optional[float]'):
         self._set_item(23, value)
 
     def _has_focus(self):
         return self._has_item(25)
 
     @property
-    def focus(self) -> 'float':
+    def focus(self) -> 'Optional[float]':
         return self._get_item(25)
 
     @focus.setter
-    def focus(self, value):
+    def focus(self, value: 'Optional[float]'):
         self._set_item(25, value)
 
     def _has_full_scan_field_of_view(self):
         return self._has_item(26)
 
     @property
-    def full_scan_field_of_view(self) -> 'AdornedImageMetadataOpticsScanFieldSize':
+    def full_scan_field_of_view(self) -> 'Optional[structures.AdornedImageMetadataOpticsScanFieldSize]':
         return self._get_item(26)
 
     @full_scan_field_of_view.setter
-    def full_scan_field_of_view(self, value):
+    def full_scan_field_of_view(self, value: 'Optional[structures.AdornedImageMetadataOpticsScanFieldSize]'):
         self._set_item(26, value)
 
     def _has_landing_energy(self):
         return self._has_item(30)
 
     @property
-    def landing_energy(self) -> 'float':
+    def landing_energy(self) -> 'Optional[float]':
         return self._get_item(30)
 
     @landing_energy.setter
-    def landing_energy(self, value):
+    def landing_energy(self, value: 'Optional[float]'):
         self._set_item(30, value)
 
     def _has_last_measured_screen_current(self):
         return self._has_item(31)
 
     @property
-    def last_measured_screen_current(self) -> 'float':
+    def last_measured_screen_current(self) -> 'Optional[float]':
         return self._get_item(31)
 
     @last_measured_screen_current.setter
-    def last_measured_screen_current(self, value):
+    def last_measured_screen_current(self, value: 'Optional[float]'):
         self._set_item(31, value)
 
     def _has_sample_pre_tilt_angle(self):
         return self._has_item(38)
 
     @property
-    def sample_pre_tilt_angle(self) -> 'float':
+    def sample_pre_tilt_angle(self) -> 'Optional[float]':
         return self._get_item(38)
 
     @sample_pre_tilt_angle.setter
-    def sample_pre_tilt_angle(self, value):
+    def sample_pre_tilt_angle(self, value: 'Optional[float]'):
         self._set_item(38, value)
 
     def _has_scan_field_of_view(self):
         return self._has_item(39)
 
     @property
-    def scan_field_of_view(self) -> 'AdornedImageMetadataOpticsScanFieldSize':
+    def scan_field_of_view(self) -> 'Optional[structures.AdornedImageMetadataOpticsScanFieldSize]':
         return self._get_item(39)
 
     @scan_field_of_view.setter
-    def scan_field_of_view(self, value):
+    def scan_field_of_view(self, value: 'Optional[structures.AdornedImageMetadataOpticsScanFieldSize]'):
         self._set_item(39, value)
 
     def _has_screen_current(self):
         return self._has_item(40)
 
     @property
-    def screen_current(self) -> 'float':
+    def screen_current(self) -> 'Optional[float]':
         return self._get_item(40)
 
     @screen_current.setter
-    def screen_current(self, value):
+    def screen_current(self, value: 'Optional[float]'):
         self._set_item(40, value)
 
     def _has_spherical_aberration(self):
         return self._has_item(41)
 
     @property
-    def spherical_aberration(self) -> 'float':
+    def spherical_aberration(self) -> 'Optional[float]':
         return self._get_item(41)
 
     @spherical_aberration.setter
-    def spherical_aberration(self, value):
+    def spherical_aberration(self, value: 'Optional[float]'):
         self._set_item(41, value)
 
     def _has_spot_size(self):
         return self._has_item(42)
 
     @property
-    def spot_size(self) -> 'float':
+    def spot_size(self) -> 'Optional[float]':
         return self._get_item(42)
 
     @spot_size.setter
-    def spot_size(self, value):
+    def spot_size(self, value: 'Optional[float]'):
         self._set_item(42, value)
 
     def _has_stem_focus(self):
         return self._has_item(43)
 
     @property
-    def stem_focus(self) -> 'float':
+    def stem_focus(self) -> 'Optional[float]':
         return self._get_item(43)
 
     @stem_focus.setter
-    def stem_focus(self, value):
+    def stem_focus(self, value: 'Optional[float]'):
         self._set_item(43, value)
 
     def _has_wehnelt_bias(self):
         return self._has_item(44)
 
     @property
-    def wehnelt_bias(self) -> 'float':
+    def wehnelt_bias(self) -> 'Optional[float]':
         return self._get_item(44)
 
     @wehnelt_bias.setter
-    def wehnelt_bias(self, value):
+    def wehnelt_bias(self, value: 'Optional[float]'):
         self._set_item(44, value)
 
     def _has_working_distance(self):
         return self._has_item(45)
 
     @property
-    def working_distance(self) -> 'float':
+    def working_distance(self) -> 'Optional[float]':
         return self._get_item(45)
 
     @working_distance.setter
-    def working_distance(self, value):
+    def working_distance(self, value: 'Optional[float]'):
         self._set_item(45, value)
 
     def _has_cross_over_on(self):
         return self._has_item(46)
 
     @property
-    def cross_over_on(self) -> 'bool':
+    def cross_over_on(self) -> 'Optional[bool]':
         return self._get_item(46)
 
     @cross_over_on.setter
-    def cross_over_on(self, value):
+    def cross_over_on(self, value: 'Optional[bool]'):
         self._set_item(46, value)
 
     def _has_diffraction_focus(self):
         return self._has_item(47)
 
     @property
-    def diffraction_focus(self) -> 'float':
+    def diffraction_focus(self) -> 'Optional[float]':
         return self._get_item(47)
 
     @diffraction_focus.setter
-    def diffraction_focus(self, value):
+    def diffraction_focus(self, value: 'Optional[float]'):
         self._set_item(47, value)
 
     def _has_eftem_on(self):
         return self._has_item(48)
 
     @property
-    def eftem_on(self) -> 'bool':
+    def eftem_on(self) -> 'Optional[bool]':
         return self._get_item(48)
 
     @eftem_on.setter
-    def eftem_on(self, value):
+    def eftem_on(self, value: 'Optional[bool]'):
         self._set_item(48, value)
 
     def _has_gun_filament_settings(self):
         return self._has_item(49)
 
     @property
-    def gun_filament_settings(self) -> 'float':
+    def gun_filament_settings(self) -> 'Optional[float]':
         return self._get_item(49)
 
     @gun_filament_settings.setter
-    def gun_filament_settings(self, value):
+    def gun_filament_settings(self, value: 'Optional[float]'):
         self._set_item(49, value)
 
     def _has_gun_lens_setting(self):
         return self._has_item(50)
 
     @property
-    def gun_lens_setting(self) -> 'float':
+    def gun_lens_setting(self) -> 'Optional[float]':
         return self._get_item(50)
 
     @gun_lens_setting.setter
-    def gun_lens_setting(self, value):
+    def gun_lens_setting(self, value: 'Optional[float]'):
         self._set_item(50, value)
 
     def _has_high_magnification_mode(self):
         return self._has_item(53)
 
     @property
-    def high_magnification_mode(self) -> 'str':
+    def high_magnification_mode(self) -> 'Optional[str]':
         return self._get_item(53)
 
     @high_magnification_mode.setter
-    def high_magnification_mode(self, value):
+    def high_magnification_mode(self, value: 'Optional[str]'):
         self._set_item(53, value)
 
     def _has_illumination_intensity_normalized(self):
         return self._has_item(54)
 
     @property
-    def illumination_intensity_normalized(self) -> 'float':
+    def illumination_intensity_normalized(self) -> 'Optional[float]':
         return self._get_item(54)
 
     @illumination_intensity_normalized.setter
-    def illumination_intensity_normalized(self, value):
+    def illumination_intensity_normalized(self, value: 'Optional[float]'):
         self._set_item(54, value)
 
     def _has_illumination_mode(self):
         return self._has_item(55)
 
     @property
-    def illumination_mode(self) -> 'str':
+    def illumination_mode(self) -> 'Optional[str]':
         return self._get_item(55)
 
     @illumination_mode.setter
-    def illumination_mode(self, value):
+    def illumination_mode(self, value: 'Optional[str]'):
         self._set_item(55, value)
 
     def _has_illumination_on(self):
         return self._has_item(56)
 
     @property
-    def illumination_on(self) -> 'bool':
+    def illumination_on(self) -> 'Optional[bool]':
         return self._get_item(56)
 
     @illumination_on.setter
-    def illumination_on(self, value):
+    def illumination_on(self, value: 'Optional[bool]'):
         self._set_item(56, value)
 
     def _has_illumination_type(self):
         return self._has_item(57)
 
     @property
-    def illumination_type(self) -> 'str':
+    def illumination_type(self) -> 'Optional[str]':
         return self._get_item(57)
 
     @illumination_type.setter
-    def illumination_type(self, value):
+    def illumination_type(self, value: 'Optional[str]'):
         self._set_item(57, value)
 
     def _has_nominal_magnification(self):
         return self._has_item(58)
 
     @property
-    def nominal_magnification(self) -> 'float':
+    def nominal_magnification(self) -> 'Optional[float]':
         return self._get_item(58)
 
     @nominal_magnification.setter
-    def nominal_magnification(self, value):
+    def nominal_magnification(self, value: 'Optional[float]'):
         self._set_item(58, value)
 
     def _has_objective_lens_mode(self):
         return self._has_item(59)
 
     @property
-    def objective_lens_mode(self) -> 'str':
+    def objective_lens_mode(self) -> 'Optional[str]':
         return self._get_item(59)
 
     @objective_lens_mode.setter
-    def objective_lens_mode(self, value):
+    def objective_lens_mode(self, value: 'Optional[str]'):
         self._set_item(59, value)
 
     def _has_operation_mode(self):
         return self._has_item(60)
 
     @property
-    def operation_mode(self) -> 'str':
+    def operation_mode(self) -> 'Optional[str]':
         return self._get_item(60)
 
     @operation_mode.setter
-    def operation_mode(self, value):
+    def operation_mode(self, value: 'Optional[str]'):
         self._set_item(60, value)
 
     def _has_optical_mode(self):
         return self._has_item(61)
 
     @property
-    def optical_mode(self) -> 'str':
+    def optical_mode(self) -> 'Optional[str]':
         return self._get_item(61)
 
     @optical_mode.setter
-    def optical_mode(self, value):
+    def optical_mode(self, value: 'Optional[str]'):
         self._set_item(61, value)
 
     def _has_probe_mode(self):
         return self._has_item(62)
 
     @property
-    def probe_mode(self) -> 'str':
+    def probe_mode(self) -> 'Optional[str]':
         return self._get_item(62)
 
     @probe_mode.setter
-    def probe_mode(self, value):
+    def probe_mode(self, value: 'Optional[str]'):
         self._set_item(62, value)
 
     def _has_projector_mode(self):
         return self._has_item(63)
 
     @property
-    def projector_mode(self) -> 'str':
+    def projector_mode(self) -> 'Optional[str]':
         return self._get_item(63)
 
     @projector_mode.setter
-    def projector_mode(self, value):
+    def projector_mode(self, value: 'Optional[str]'):
         self._set_item(63, value)
 
     def _has_sample_tilt_correction_is_on(self):
         return self._has_item(64)
 
     @property
-    def sample_tilt_correction_is_on(self) -> 'bool':
+    def sample_tilt_correction_is_on(self) -> 'Optional[bool]':
         return self._get_item(64)
 
     @sample_tilt_correction_is_on.setter
-    def sample_tilt_correction_is_on(self, value):
+    def sample_tilt_correction_is_on(self, value: 'Optional[bool]'):
         self._set_item(64, value)
 
     def _has_spot_index(self):
         return self._has_item(65)
 
     @property
-    def spot_index(self) -> 'int':
+    def spot_index(self) -> 'Optional[int]':
         return self._get_item(65)
 
     @spot_index.setter
-    def spot_index(self, value):
+    def spot_index(self, value: 'Optional[int]'):
         self._set_item(65, value)
 
     def _has_tem_operating_sub_mode(self):
         return self._has_item(67)
 
     @property
-    def tem_operating_sub_mode(self) -> 'str':
+    def tem_operating_sub_mode(self) -> 'Optional[str]':
         return self._get_item(67)
 
     @tem_operating_sub_mode.setter
-    def tem_operating_sub_mode(self, value):
+    def tem_operating_sub_mode(self, value: 'Optional[str]'):
         self._set_item(67, value)
 
     def _has_beam_shift(self):
         return self._has_item(68)
 
     @property
-    def beam_shift(self) -> 'Point':
+    def beam_shift(self) -> 'Optional[structures.Point]':
         return self._get_item(68)
 
     @beam_shift.setter
-    def beam_shift(self, value):
+    def beam_shift(self, value: 'Optional[structures.Point]'):
         self._set_item(68, value)
 
     def _has_beam_tilt(self):
         return self._has_item(69)
 
     @property
-    def beam_tilt(self) -> 'Point':
+    def beam_tilt(self) -> 'Optional[structures.Point]':
         return self._get_item(69)
 
     @beam_tilt.setter
-    def beam_tilt(self, value):
+    def beam_tilt(self, value: 'Optional[structures.Point]'):
         self._set_item(69, value)
 
     def _has_c1_lens_intensity(self):
         return self._has_item(70)
 
     @property
-    def c1_lens_intensity(self) -> 'float':
+    def c1_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(70)
 
     @c1_lens_intensity.setter
-    def c1_lens_intensity(self, value):
+    def c1_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(70, value)
 
     def _has_c2_lens_intensity(self):
         return self._has_item(71)
 
     @property
-    def c2_lens_intensity(self) -> 'float':
+    def c2_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(71)
 
     @c2_lens_intensity.setter
-    def c2_lens_intensity(self, value):
+    def c2_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(71, value)
 
     def _has_c3_lens_intensity(self):
         return self._has_item(72)
 
     @property
-    def c3_lens_intensity(self) -> 'float':
+    def c3_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(72)
 
     @c3_lens_intensity.setter
-    def c3_lens_intensity(self, value):
+    def c3_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(72, value)
 
     def _has_condenser_stigmator_raw(self):
         return self._has_item(73)
 
     @property
-    def condenser_stigmator_raw(self) -> 'Point':
+    def condenser_stigmator_raw(self) -> 'Optional[structures.Point]':
         return self._get_item(73)
 
     @condenser_stigmator_raw.setter
-    def condenser_stigmator_raw(self, value):
+    def condenser_stigmator_raw(self, value: 'Optional[structures.Point]'):
         self._set_item(73, value)
 
     def _has_diffraction_lens_intensity(self):
         return self._has_item(74)
 
     @property
-    def diffraction_lens_intensity(self) -> 'float':
+    def diffraction_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(74)
 
     @diffraction_lens_intensity.setter
-    def diffraction_lens_intensity(self, value):
+    def diffraction_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(74, value)
 
     def _has_diffraction_stigmator_raw(self):
         return self._has_item(75)
 
     @property
-    def diffraction_stigmator_raw(self) -> 'Point':
+    def diffraction_stigmator_raw(self) -> 'Optional[structures.Point]':
         return self._get_item(75)
 
     @diffraction_stigmator_raw.setter
-    def diffraction_stigmator_raw(self, value):
+    def diffraction_stigmator_raw(self, value: 'Optional[structures.Point]'):
         self._set_item(75, value)
 
     def _has_fib_steering(self):
         return self._has_item(76)
 
     @property
-    def fib_steering(self) -> 'Point':
+    def fib_steering(self) -> 'Optional[structures.Point]':
         return self._get_item(76)
 
     @fib_steering.setter
-    def fib_steering(self, value):
+    def fib_steering(self, value: 'Optional[structures.Point]'):
         self._set_item(76, value)
 
     def _has_gun_shift_raw(self):
         return self._has_item(77)
 
     @property
-    def gun_shift_raw(self) -> 'Point':
+    def gun_shift_raw(self) -> 'Optional[structures.Point]':
         return self._get_item(77)
 
     @gun_shift_raw.setter
-    def gun_shift_raw(self, value):
+    def gun_shift_raw(self, value: 'Optional[structures.Point]'):
         self._set_item(77, value)
 
     def _has_gun_stigmator_raw(self):
         return self._has_item(78)
 
     @property
-    def gun_stigmator_raw(self) -> 'Point':
+    def gun_stigmator_raw(self) -> 'Optional[structures.Point]':
         return self._get_item(78)
 
     @gun_stigmator_raw.setter
-    def gun_stigmator_raw(self, value):
+    def gun_stigmator_raw(self, value: 'Optional[structures.Point]'):
         self._set_item(78, value)
 
     def _has_gun_tilt_raw(self):
         return self._has_item(79)
 
     @property
-    def gun_tilt_raw(self) -> 'Point':
+    def gun_tilt_raw(self) -> 'Optional[structures.Point]':
         return self._get_item(79)
 
     @gun_tilt_raw.setter
-    def gun_tilt_raw(self, value):
+    def gun_tilt_raw(self, value: 'Optional[structures.Point]'):
         self._set_item(79, value)
 
     def _has_image_shift(self):
         return self._has_item(80)
 
     @property
-    def image_shift(self) -> 'Point':
+    def image_shift(self) -> 'Optional[structures.Point]':
         return self._get_item(80)
 
     @image_shift.setter
-    def image_shift(self, value):
+    def image_shift(self, value: 'Optional[structures.Point]'):
         self._set_item(80, value)
 
     def _has_intermediate_lens_intensity(self):
         return self._has_item(81)
 
     @property
-    def intermediate_lens_intensity(self) -> 'float':
+    def intermediate_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(81)
 
     @intermediate_lens_intensity.setter
-    def intermediate_lens_intensity(self, value):
+    def intermediate_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(81, value)
 
     def _has_lorentz_lens_intensity(self):
         return self._has_item(82)
 
     @property
-    def lorentz_lens_intensity(self) -> 'float':
+    def lorentz_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(82)
 
     @lorentz_lens_intensity.setter
-    def lorentz_lens_intensity(self, value):
+    def lorentz_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(82, value)
 
     def _has_mini_condenser_lens_intensity(self):
         return self._has_item(83)
 
     @property
-    def mini_condenser_lens_intensity(self) -> 'float':
+    def mini_condenser_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(83)
 
     @mini_condenser_lens_intensity.setter
-    def mini_condenser_lens_intensity(self, value):
+    def mini_condenser_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(83, value)
 
     def _has_objective_lens_intensity(self):
         return self._has_item(84)
 
     @property
-    def objective_lens_intensity(self) -> 'float':
+    def objective_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(84)
 
     @objective_lens_intensity.setter
-    def objective_lens_intensity(self, value):
+    def objective_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(84, value)
 
     def _has_objective_stigmator_raw(self):
         return self._has_item(85)
 
     @property
-    def objective_stigmator_raw(self) -> 'Point':
+    def objective_stigmator_raw(self) -> 'Optional[structures.Point]':
         return self._get_item(85)
 
     @objective_stigmator_raw.setter
-    def objective_stigmator_raw(self, value):
+    def objective_stigmator_raw(self, value: 'Optional[structures.Point]'):
         self._set_item(85, value)
 
     def _has_projector1_lens_intensity(self):
         return self._has_item(86)
 
     @property
-    def projector1_lens_intensity(self) -> 'float':
+    def projector1_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(86)
 
     @projector1_lens_intensity.setter
-    def projector1_lens_intensity(self, value):
+    def projector1_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(86, value)
 
     def _has_projector2_lens_intensity(self):
         return self._has_item(87)
 
     @property
-    def projector2_lens_intensity(self) -> 'float':
+    def projector2_lens_intensity(self) -> 'Optional[float]':
         return self._get_item(87)
 
     @projector2_lens_intensity.setter
-    def projector2_lens_intensity(self, value):
+    def projector2_lens_intensity(self, value: 'Optional[float]'):
         self._set_item(87, value)
 
     def _has_stigmator_raw(self):
         return self._has_item(88)
 
     @property
-    def stigmator_raw(self) -> 'Point':
+    def stigmator_raw(self) -> 'Optional[structures.Point]':
         return self._get_item(88)
 
     @stigmator_raw.setter
-    def stigmator_raw(self, value):
+    def stigmator_raw(self, value: 'Optional[structures.Point]'):
         self._set_item(88, value)
 
 
-
 class AdornedImageMetadataSample(StructureBase):
-    def __init__(self, region_of_interest_id=None, sample_description=None, sample_guid=None, sample_id=None, sample_session_id=None):
+    def __init__(self, region_of_interest_id: 'str' = None, sample_description: 'str' = None, sample_guid: 'str' = None, sample_id: 'str' = None, sample_session_id: 'str' = None):
         super(AdornedImageMetadataSample, self).__init__("AdornedImageMetadataSample")
 
         self._init_item(1, DataType.STRING, region_of_interest_id, True)
@@ -4296,61 +4381,60 @@ class AdornedImageMetadataSample(StructureBase):
         return self._has_item(1)
 
     @property
-    def region_of_interest_id(self) -> 'str':
+    def region_of_interest_id(self) -> 'Optional[str]':
         return self._get_item(1)
 
     @region_of_interest_id.setter
-    def region_of_interest_id(self, value):
+    def region_of_interest_id(self, value: 'Optional[str]'):
         self._set_item(1, value)
 
     def _has_sample_description(self):
         return self._has_item(2)
 
     @property
-    def sample_description(self) -> 'str':
+    def sample_description(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @sample_description.setter
-    def sample_description(self, value):
+    def sample_description(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
     def _has_sample_guid(self):
         return self._has_item(3)
 
     @property
-    def sample_guid(self) -> 'str':
+    def sample_guid(self) -> 'Optional[str]':
         return self._get_item(3)
 
     @sample_guid.setter
-    def sample_guid(self, value):
+    def sample_guid(self, value: 'Optional[str]'):
         self._set_item(3, value)
 
     def _has_sample_id(self):
         return self._has_item(4)
 
     @property
-    def sample_id(self) -> 'str':
+    def sample_id(self) -> 'Optional[str]':
         return self._get_item(4)
 
     @sample_id.setter
-    def sample_id(self, value):
+    def sample_id(self, value: 'Optional[str]'):
         self._set_item(4, value)
 
     def _has_sample_session_id(self):
         return self._has_item(5)
 
     @property
-    def sample_session_id(self) -> 'str':
+    def sample_session_id(self) -> 'Optional[str]':
         return self._get_item(5)
 
     @sample_session_id.setter
-    def sample_session_id(self, value):
+    def sample_session_id(self, value: 'Optional[str]'):
         self._set_item(5, value)
 
 
-
 class AdornedImageMetadataScanSettings(StructureBase):
-    def __init__(self, scan_rotation=None, line_integration_count=None, line_interlacing=None, mains_lock_on=None, scan_size=None, acquisition_time=None, dwell_time=None, frame_time=None, line_time=None, scan_area=None):
+    def __init__(self, scan_rotation: 'float' = None, line_integration_count: 'int' = None, line_interlacing: 'int' = None, mains_lock_on: 'bool' = None, scan_size: 'str' = None, acquisition_time: 'float' = None, dwell_time: 'float' = None, frame_time: 'float' = None, line_time: 'float' = None, scan_area: 'structures.Rectangle' = None):
         super(AdornedImageMetadataScanSettings, self).__init__("AdornedImageMetadataScanSettings")
 
         self._init_item(6, DataType.DOUBLE, scan_rotation, True)
@@ -4368,116 +4452,115 @@ class AdornedImageMetadataScanSettings(StructureBase):
         return self._has_item(6)
 
     @property
-    def scan_rotation(self) -> 'float':
+    def scan_rotation(self) -> 'Optional[float]':
         return self._get_item(6)
 
     @scan_rotation.setter
-    def scan_rotation(self, value):
+    def scan_rotation(self, value: 'Optional[float]'):
         self._set_item(6, value)
 
     def _has_line_integration_count(self):
         return self._has_item(7)
 
     @property
-    def line_integration_count(self) -> 'int':
+    def line_integration_count(self) -> 'Optional[int]':
         return self._get_item(7)
 
     @line_integration_count.setter
-    def line_integration_count(self, value):
+    def line_integration_count(self, value: 'Optional[int]'):
         self._set_item(7, value)
 
     def _has_line_interlacing(self):
         return self._has_item(8)
 
     @property
-    def line_interlacing(self) -> 'int':
+    def line_interlacing(self) -> 'Optional[int]':
         return self._get_item(8)
 
     @line_interlacing.setter
-    def line_interlacing(self, value):
+    def line_interlacing(self, value: 'Optional[int]'):
         self._set_item(8, value)
 
     def _has_mains_lock_on(self):
         return self._has_item(9)
 
     @property
-    def mains_lock_on(self) -> 'bool':
+    def mains_lock_on(self) -> 'Optional[bool]':
         return self._get_item(9)
 
     @mains_lock_on.setter
-    def mains_lock_on(self, value):
+    def mains_lock_on(self, value: 'Optional[bool]'):
         self._set_item(9, value)
 
     def _has_scan_size(self):
         return self._has_item(10)
 
     @property
-    def scan_size(self) -> 'str':
+    def scan_size(self) -> 'Optional[str]':
         return self._get_item(10)
 
     @scan_size.setter
-    def scan_size(self, value):
+    def scan_size(self, value: 'Optional[str]'):
         self._set_item(10, value)
 
     def _has_acquisition_time(self):
         return self._has_item(11)
 
     @property
-    def acquisition_time(self) -> 'float':
+    def acquisition_time(self) -> 'Optional[float]':
         return self._get_item(11)
 
     @acquisition_time.setter
-    def acquisition_time(self, value):
+    def acquisition_time(self, value: 'Optional[float]'):
         self._set_item(11, value)
 
     def _has_dwell_time(self):
         return self._has_item(12)
 
     @property
-    def dwell_time(self) -> 'float':
+    def dwell_time(self) -> 'Optional[float]':
         return self._get_item(12)
 
     @dwell_time.setter
-    def dwell_time(self, value):
+    def dwell_time(self, value: 'Optional[float]'):
         self._set_item(12, value)
 
     def _has_frame_time(self):
         return self._has_item(13)
 
     @property
-    def frame_time(self) -> 'float':
+    def frame_time(self) -> 'Optional[float]':
         return self._get_item(13)
 
     @frame_time.setter
-    def frame_time(self, value):
+    def frame_time(self, value: 'Optional[float]'):
         self._set_item(13, value)
 
     def _has_line_time(self):
         return self._has_item(14)
 
     @property
-    def line_time(self) -> 'float':
+    def line_time(self) -> 'Optional[float]':
         return self._get_item(14)
 
     @line_time.setter
-    def line_time(self, value):
+    def line_time(self, value: 'Optional[float]'):
         self._set_item(14, value)
 
     def _has_scan_area(self):
         return self._has_item(15)
 
     @property
-    def scan_area(self) -> 'Rectangle':
+    def scan_area(self) -> 'Optional[structures.Rectangle]':
         return self._get_item(15)
 
     @scan_area.setter
-    def scan_area(self, value):
+    def scan_area(self, value: 'Optional[structures.Rectangle]'):
         self._set_item(15, value)
 
 
-
 class AdornedImageMetadataStageSettings(StructureBase):
-    def __init__(self, holder_temperature=None, holder_type=None, sample_loader=None, stage_position_string=None, stage_position=None):
+    def __init__(self, holder_temperature: 'float' = None, holder_type: 'str' = None, sample_loader: 'str' = None, stage_position_string: 'str' = None, stage_position: 'structures.StagePosition' = None):
         super(AdornedImageMetadataStageSettings, self).__init__("AdornedImageMetadataStageSettings")
 
         self._init_item(1, DataType.DOUBLE, holder_temperature, True)
@@ -4490,61 +4573,60 @@ class AdornedImageMetadataStageSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def holder_temperature(self) -> 'float':
+    def holder_temperature(self) -> 'Optional[float]':
         return self._get_item(1)
 
     @holder_temperature.setter
-    def holder_temperature(self, value):
+    def holder_temperature(self, value: 'Optional[float]'):
         self._set_item(1, value)
 
     def _has_holder_type(self):
         return self._has_item(2)
 
     @property
-    def holder_type(self) -> 'str':
+    def holder_type(self) -> 'Optional[str]':
         return self._get_item(2)
 
     @holder_type.setter
-    def holder_type(self, value):
+    def holder_type(self, value: 'Optional[str]'):
         self._set_item(2, value)
 
     def _has_sample_loader(self):
         return self._has_item(3)
 
     @property
-    def sample_loader(self) -> 'str':
+    def sample_loader(self) -> 'Optional[str]':
         return self._get_item(3)
 
     @sample_loader.setter
-    def sample_loader(self, value):
+    def sample_loader(self, value: 'Optional[str]'):
         self._set_item(3, value)
 
     def _has_stage_position_string(self):
         return self._has_item(4)
 
     @property
-    def stage_position_string(self) -> 'str':
+    def stage_position_string(self) -> 'Optional[str]':
         return self._get_item(4)
 
     @stage_position_string.setter
-    def stage_position_string(self, value):
+    def stage_position_string(self, value: 'Optional[str]'):
         self._set_item(4, value)
 
     def _has_stage_position(self):
         return self._has_item(5)
 
     @property
-    def stage_position(self) -> 'StagePosition':
+    def stage_position(self) -> 'Optional[structures.StagePosition]':
         return self._get_item(5)
 
     @stage_position.setter
-    def stage_position(self, value):
+    def stage_position(self, value: 'Optional[structures.StagePosition]'):
         self._set_item(5, value)
 
 
-
 class AdornedImageMetadataVacuumProperties(StructureBase):
-    def __init__(self, electron_column_pressure=None, electron_source_pressure=None, ion_column_pressure=None, ion_source_pressure=None, projection_chamber_pressure=None, sample_pressure=None, vacuum_mode=None):
+    def __init__(self, electron_column_pressure: 'float' = None, electron_source_pressure: 'float' = None, ion_column_pressure: 'float' = None, ion_source_pressure: 'float' = None, projection_chamber_pressure: 'float' = None, sample_pressure: 'float' = None, vacuum_mode: 'str' = None):
         super(AdornedImageMetadataVacuumProperties, self).__init__("AdornedImageMetadataVacuumProperties")
 
         self._init_item(1, DataType.DOUBLE, electron_column_pressure, True)
@@ -4559,83 +4641,82 @@ class AdornedImageMetadataVacuumProperties(StructureBase):
         return self._has_item(1)
 
     @property
-    def electron_column_pressure(self) -> 'float':
+    def electron_column_pressure(self) -> 'Optional[float]':
         return self._get_item(1)
 
     @electron_column_pressure.setter
-    def electron_column_pressure(self, value):
+    def electron_column_pressure(self, value: 'Optional[float]'):
         self._set_item(1, value)
 
     def _has_electron_source_pressure(self):
         return self._has_item(2)
 
     @property
-    def electron_source_pressure(self) -> 'float':
+    def electron_source_pressure(self) -> 'Optional[float]':
         return self._get_item(2)
 
     @electron_source_pressure.setter
-    def electron_source_pressure(self, value):
+    def electron_source_pressure(self, value: 'Optional[float]'):
         self._set_item(2, value)
 
     def _has_ion_column_pressure(self):
         return self._has_item(3)
 
     @property
-    def ion_column_pressure(self) -> 'float':
+    def ion_column_pressure(self) -> 'Optional[float]':
         return self._get_item(3)
 
     @ion_column_pressure.setter
-    def ion_column_pressure(self, value):
+    def ion_column_pressure(self, value: 'Optional[float]'):
         self._set_item(3, value)
 
     def _has_ion_source_pressure(self):
         return self._has_item(4)
 
     @property
-    def ion_source_pressure(self) -> 'float':
+    def ion_source_pressure(self) -> 'Optional[float]':
         return self._get_item(4)
 
     @ion_source_pressure.setter
-    def ion_source_pressure(self, value):
+    def ion_source_pressure(self, value: 'Optional[float]'):
         self._set_item(4, value)
 
     def _has_projection_chamber_pressure(self):
         return self._has_item(5)
 
     @property
-    def projection_chamber_pressure(self) -> 'float':
+    def projection_chamber_pressure(self) -> 'Optional[float]':
         return self._get_item(5)
 
     @projection_chamber_pressure.setter
-    def projection_chamber_pressure(self, value):
+    def projection_chamber_pressure(self, value: 'Optional[float]'):
         self._set_item(5, value)
 
     def _has_sample_pressure(self):
         return self._has_item(6)
 
     @property
-    def sample_pressure(self) -> 'float':
+    def sample_pressure(self) -> 'Optional[float]':
         return self._get_item(6)
 
     @sample_pressure.setter
-    def sample_pressure(self, value):
+    def sample_pressure(self, value: 'Optional[float]'):
         self._set_item(6, value)
 
     def _has_vacuum_mode(self):
         return self._has_item(7)
 
     @property
-    def vacuum_mode(self) -> 'str':
+    def vacuum_mode(self) -> 'Optional[str]':
         return self._get_item(7)
 
     @vacuum_mode.setter
-    def vacuum_mode(self, value):
+    def vacuum_mode(self, value: 'Optional[str]'):
         self._set_item(7, value)
 
 
-
 class AdornedImageMetadata(StructureBase):
-    def __init__(self, acquisition=None, binary_result=None, core=None, detectors=None, energy_filter_settings=None, gas_injection_systems=None, instrument=None, optics=None, sample=None, scan_settings=None, stage_settings=None, vacuum_properties=None, metadata_as_ini=None, metadata_as_xml=None):
+    def __init__(self, acquisition: 'structures.AdornedImageMetadataAcquisition' = None, binary_result: 'structures.AdornedImageMetadataBinaryResult' = None, core: 'structures.AdornedImageMetadataCore' = None, detectors: 'List[structures.AdornedImageMetadataDetector]' = None, energy_filter_settings: 'structures.AdornedImageMetadataEnergyFilterSettings' = None, gas_injection_systems: 'List[structures.AdornedImageMetadataGasInjectionSystem]' = None, instrument: 'structures.AdornedImageMetadataInstrument' = None, optics: 'structures.AdornedImageMetadataOptics' = None, sample: 'structures.AdornedImageMetadataSample' = None, scan_settings: 'structures.AdornedImageMetadataScanSettings' = None, stage_settings: 'structures.AdornedImageMetadataStageSettings' = None, vacuum_properties: 'structures.AdornedImageMetadataVacuumProperties' = None, metadata_as_ini: 'str' = None, metadata_as_xml: 'str' = None):
         super(AdornedImageMetadata, self).__init__("AdornedImageMetadata")
 
         self._init_item(1, DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="AdornedImageMetadataAcquisition"), acquisition, False)
@@ -4657,132 +4738,132 @@ class AdornedImageMetadata(StructureBase):
         return self._has_item(1)
 
     @property
-    def acquisition(self) -> 'AdornedImageMetadataAcquisition':
+    def acquisition(self) -> 'structures.AdornedImageMetadataAcquisition':
         return self._get_item(1)
 
     @acquisition.setter
-    def acquisition(self, value):
+    def acquisition(self, value: 'structures.AdornedImageMetadataAcquisition'):
         self._set_item(1, value)
 
     def _has_binary_result(self):
         return self._has_item(2)
 
     @property
-    def binary_result(self) -> 'AdornedImageMetadataBinaryResult':
+    def binary_result(self) -> 'structures.AdornedImageMetadataBinaryResult':
         return self._get_item(2)
 
     @binary_result.setter
-    def binary_result(self, value):
+    def binary_result(self, value: 'structures.AdornedImageMetadataBinaryResult'):
         self._set_item(2, value)
 
     def _has_core(self):
         return self._has_item(3)
 
     @property
-    def core(self) -> 'AdornedImageMetadataCore':
+    def core(self) -> 'structures.AdornedImageMetadataCore':
         return self._get_item(3)
 
     @core.setter
-    def core(self, value):
+    def core(self, value: 'structures.AdornedImageMetadataCore'):
         self._set_item(3, value)
 
     def _has_detectors(self):
         return self._has_item(4)
 
     @property
-    def detectors(self) -> 'List[AdornedImageMetadataDetector]':
+    def detectors(self) -> 'List[structures.AdornedImageMetadataDetector]':
         return self._get_item(4)
 
     @detectors.setter
-    def detectors(self, value):
+    def detectors(self, value: 'List[structures.AdornedImageMetadataDetector]'):
         self._set_item(4, value)
 
     def _has_energy_filter_settings(self):
         return self._has_item(5)
 
     @property
-    def energy_filter_settings(self) -> 'AdornedImageMetadataEnergyFilterSettings':
+    def energy_filter_settings(self) -> 'structures.AdornedImageMetadataEnergyFilterSettings':
         return self._get_item(5)
 
     @energy_filter_settings.setter
-    def energy_filter_settings(self, value):
+    def energy_filter_settings(self, value: 'structures.AdornedImageMetadataEnergyFilterSettings'):
         self._set_item(5, value)
 
     def _has_gas_injection_systems(self):
         return self._has_item(6)
 
     @property
-    def gas_injection_systems(self) -> 'List[AdornedImageMetadataGasInjectionSystem]':
+    def gas_injection_systems(self) -> 'List[structures.AdornedImageMetadataGasInjectionSystem]':
         return self._get_item(6)
 
     @gas_injection_systems.setter
-    def gas_injection_systems(self, value):
+    def gas_injection_systems(self, value: 'List[structures.AdornedImageMetadataGasInjectionSystem]'):
         self._set_item(6, value)
 
     def _has_instrument(self):
         return self._has_item(7)
 
     @property
-    def instrument(self) -> 'AdornedImageMetadataInstrument':
+    def instrument(self) -> 'structures.AdornedImageMetadataInstrument':
         return self._get_item(7)
 
     @instrument.setter
-    def instrument(self, value):
+    def instrument(self, value: 'structures.AdornedImageMetadataInstrument'):
         self._set_item(7, value)
 
     def _has_optics(self):
         return self._has_item(8)
 
     @property
-    def optics(self) -> 'AdornedImageMetadataOptics':
+    def optics(self) -> 'structures.AdornedImageMetadataOptics':
         return self._get_item(8)
 
     @optics.setter
-    def optics(self, value):
+    def optics(self, value: 'structures.AdornedImageMetadataOptics'):
         self._set_item(8, value)
 
     def _has_sample(self):
         return self._has_item(9)
 
     @property
-    def sample(self) -> 'AdornedImageMetadataSample':
+    def sample(self) -> 'structures.AdornedImageMetadataSample':
         return self._get_item(9)
 
     @sample.setter
-    def sample(self, value):
+    def sample(self, value: 'structures.AdornedImageMetadataSample'):
         self._set_item(9, value)
 
     def _has_scan_settings(self):
         return self._has_item(10)
 
     @property
-    def scan_settings(self) -> 'AdornedImageMetadataScanSettings':
+    def scan_settings(self) -> 'structures.AdornedImageMetadataScanSettings':
         return self._get_item(10)
 
     @scan_settings.setter
-    def scan_settings(self, value):
+    def scan_settings(self, value: 'structures.AdornedImageMetadataScanSettings'):
         self._set_item(10, value)
 
     def _has_stage_settings(self):
         return self._has_item(11)
 
     @property
-    def stage_settings(self) -> 'AdornedImageMetadataStageSettings':
+    def stage_settings(self) -> 'structures.AdornedImageMetadataStageSettings':
         return self._get_item(11)
 
     @stage_settings.setter
-    def stage_settings(self, value):
+    def stage_settings(self, value: 'structures.AdornedImageMetadataStageSettings'):
         self._set_item(11, value)
 
     def _has_vacuum_properties(self):
         return self._has_item(12)
 
     @property
-    def vacuum_properties(self) -> 'AdornedImageMetadataVacuumProperties':
+    def vacuum_properties(self) -> 'structures.AdornedImageMetadataVacuumProperties':
         return self._get_item(12)
 
     @vacuum_properties.setter
-    def vacuum_properties(self, value):
+    def vacuum_properties(self, value: 'structures.AdornedImageMetadataVacuumProperties'):
         self._set_item(12, value)
 
     def _has_metadata_as_ini(self):
@@ -4793,7 +4874,7 @@ class AdornedImageMetadata(StructureBase):
         return self._get_item(13)
 
     @metadata_as_ini.setter
-    def metadata_as_ini(self, value):
+    def metadata_as_ini(self, value: 'str'):
         self._set_item(13, value)
 
     def _has_metadata_as_xml(self):
@@ -4804,28 +4885,27 @@ class AdornedImageMetadata(StructureBase):
         return self._get_item(14)
 
     @metadata_as_xml.setter
-    def metadata_as_xml(self, value):
+    def metadata_as_xml(self, value: 'str'):
         self._set_item(14, value)
 
 
-
-class AdornedImage(StructureBase):    
+class AdornedImage(StructureBase):
     """
     The structure representing one microscope image with additional metadata.
     
-    :param bytes raw_data: Array containing image data as sent from the AutoScript server.
+    :param raw_data: Array containing image data as sent from the AutoScript server.
     
-    :param int width: Width of the image.
+    :param width: Width of the image.
     
-    :param int height: Height of the image.
+    :param height: Height of the image.
     
-    :param int raw_encoding: Internal encoding of the image. To explain this property use enumeration ImageDataEncoding.
+    :param raw_encoding: Internal encoding of the image. To explain this property use enumeration ImageDataEncoding.
     
-    :param int bit_depth: Bit depth of the image data.
+    :param bit_depth: Bit depth of the image data.
     
-    :param AdornedImageMetadata metadata: Metadata containing information about system state at the time this image was captured.
+    :param metadata: Metadata containing information about system state at the time this image was captured.
     """
-    def __init__(self, raw_data=None, width=0, height=0, raw_encoding=0, bit_depth=0, metadata=None):
+    def __init__(self, raw_data: 'bytes' = None, width: 'int' = 0, height: 'int' = 0, raw_encoding: 'int' = 0, bit_depth: 'int' = 0, metadata: 'structures.AdornedImageMetadata' = None):
         super(AdornedImage, self).__init__("AdornedImage")
 
         self._init_item(1, DataType.BYTE_ARRAY, raw_data, False)
@@ -4839,14 +4919,14 @@ class AdornedImage(StructureBase):
         return self._has_item(1)
 
     @property
-    def raw_data(self) -> 'bytes':        
+    def raw_data(self) -> 'bytes':
         """
         Array containing image data as sent from the AutoScript server.
         """
         return self._get_item(1)
 
     @raw_data.setter
-    def raw_data(self, value):        
+    def raw_data(self, value: 'bytes'):
         """
         Array containing image data as sent from the AutoScript server.
         """
@@ -4856,14 +4936,14 @@ class AdornedImage(StructureBase):
         return self._has_item(2)
 
     @property
-    def width(self) -> 'int':        
+    def width(self) -> 'int':
         """
         Width of the image.
         """
         return self._get_item(2)
 
     @width.setter
-    def width(self, value):        
+    def width(self, value: 'int'):
         """
         Width of the image.
         """
@@ -4873,14 +4953,14 @@ class AdornedImage(StructureBase):
         return self._has_item(3)
 
     @property
-    def height(self) -> 'int':        
+    def height(self) -> 'int':
         """
         Height of the image.
         """
         return self._get_item(3)
 
     @height.setter
-    def height(self, value):        
+    def height(self, value: 'int'):
         """
         Height of the image.
         """
@@ -4890,14 +4970,14 @@ class AdornedImage(StructureBase):
         return self._has_item(4)
 
     @property
-    def raw_encoding(self) -> 'int':        
+    def raw_encoding(self) -> 'int':
         """
         Internal encoding of the image. To explain this property use enumeration ImageDataEncoding.
         """
         return self._get_item(4)
 
     @raw_encoding.setter
-    def raw_encoding(self, value):        
+    def raw_encoding(self, value: 'int'):
         """
         Internal encoding of the image. To explain this property use enumeration ImageDataEncoding.
         """
@@ -4907,14 +4987,14 @@ class AdornedImage(StructureBase):
         return self._has_item(5)
 
     @property
-    def bit_depth(self) -> 'int':        
+    def bit_depth(self) -> 'int':
         """
         Bit depth of the image data.
         """
         return self._get_item(5)
 
     @bit_depth.setter
-    def bit_depth(self, value):        
+    def bit_depth(self, value: 'int'):
         """
         Bit depth of the image data.
         """
@@ -4924,28 +5004,27 @@ class AdornedImage(StructureBase):
         return self._has_item(6)
 
     @property
-    def metadata(self) -> 'AdornedImageMetadata':        
+    def metadata(self) -> 'Optional[structures.AdornedImageMetadata]':
         """
         Metadata containing information about system state at the time this image was captured.
         """
         return self._get_item(6)
 
     @metadata.setter
-    def metadata(self, value):        
+    def metadata(self, value: 'Optional[structures.AdornedImageMetadata]'):
         """
         Metadata containing information about system state at the time this image was captured.
         """
         self._set_item(6, value)
 
 
-
-class DetectorInsertSettings(StructureBase):    
+class DetectorInsertSettings(StructureBase):
     """
     Settings for the detector insert method.
     
-    :param str insert_position: Detector insert position. The Stem4Positions enumeration can be used to specify this item.
+    :param insert_position: Detector insert position. The Stem4Positions enumeration can be used to specify this item.
     """
-    def __init__(self, insert_position=None):
+    def __init__(self, insert_position: 'str' = None):
         super(DetectorInsertSettings, self).__init__("DetectorInsertSettings")
 
         self._init_item(1, DataType.STRING, insert_position, True)
@@ -4954,32 +5033,31 @@ class DetectorInsertSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def insert_position(self) -> 'str':        
+    def insert_position(self) -> 'Optional[str]':
         """
         Detector insert position. The Stem4Positions enumeration can be used to specify this item.
         """
         return self._get_item(1)
 
     @insert_position.setter
-    def insert_position(self, value):        
+    def insert_position(self, value: 'Optional[str]'):
         """
         Detector insert position. The Stem4Positions enumeration can be used to specify this item.
         """
         self._set_item(1, value)
 
 
-
-class VacuumSettings(StructureBase):    
+class VacuumSettings(StructureBase):
     """
     Settings for pumping the chamber.
     
-    :param str mode: Sets target chamber mode. Accepts values from VacuumMode enumeration.
+    :param mode: Sets target chamber mode. Accepts values from VacuumMode enumeration.
     
-    :param str gas: Sets target chamber gas type. If set, it needs to be specified whether should be used Low Vacuum or ESEM. Accepts values from VacuumGasType enumeration.
+    :param gas: Sets target chamber gas type. If set, it needs to be specified whether should be used Low Vacuum or ESEM. Accepts values from VacuumGasType enumeration.
     
-    :param float pressure: Sets the target chamber pressure.
+    :param pressure: Sets the target chamber pressure.
     """
-    def __init__(self, mode=None, gas=None, pressure=None):
+    def __init__(self, mode: 'str' = None, gas: 'str' = None, pressure: 'float' = None):
         super(VacuumSettings, self).__init__("VacuumSettings")
 
         self._init_item(1, DataType.STRING, mode, True)
@@ -4990,14 +5068,14 @@ class VacuumSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def mode(self) -> 'str':        
+    def mode(self) -> 'Optional[str]':
         """
         Sets target chamber mode. Accepts values from VacuumMode enumeration.
         """
         return self._get_item(1)
 
     @mode.setter
-    def mode(self, value):        
+    def mode(self, value: 'Optional[str]'):
         """
         Sets target chamber mode. Accepts values from VacuumMode enumeration.
         """
@@ -5007,14 +5085,14 @@ class VacuumSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def gas(self) -> 'str':        
+    def gas(self) -> 'Optional[str]':
         """
         Sets target chamber gas type. If set, it needs to be specified whether should be used Low Vacuum or ESEM. Accepts values from VacuumGasType enumeration.
         """
         return self._get_item(2)
 
     @gas.setter
-    def gas(self, value):        
+    def gas(self, value: 'Optional[str]'):
         """
         Sets target chamber gas type. If set, it needs to be specified whether should be used Low Vacuum or ESEM. Accepts values from VacuumGasType enumeration.
         """
@@ -5024,34 +5102,33 @@ class VacuumSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def pressure(self) -> 'float':        
+    def pressure(self) -> 'Optional[float]':
         """
         Sets the target chamber pressure.
         """
         return self._get_item(3)
 
     @pressure.setter
-    def pressure(self, value):        
+    def pressure(self, value: 'Optional[float]'):
         """
         Sets the target chamber pressure.
         """
         self._set_item(3, value)
 
 
-
-class Variant(StructureBase):    
+class Variant(StructureBase):
     """
     The structure that can hold integer, float, boolean or string.
     
-    :param float value_double: 
+    :param value_double: 
     
-    :param int value_int: 
+    :param value_int: 
     
-    :param bool value_bool: 
+    :param value_bool: 
     
-    :param str value_string: 
+    :param value_string: 
     """
-    def __init__(self, value_double=None, value_int=None, value_bool=None, value_string=None):
+    def __init__(self, value_double: 'float' = None, value_int: 'int' = None, value_bool: 'bool' = None, value_string: 'str' = None):
         super(Variant, self).__init__("Variant")
 
         self._init_item(1, DataType.DOUBLE, value_double, True)
@@ -5063,63 +5140,62 @@ class Variant(StructureBase):
         return self._has_item(1)
 
     @property
-    def value_double(self) -> 'float':
+    def value_double(self) -> 'Optional[float]':
         return self._get_item(1)
 
     @value_double.setter
-    def value_double(self, value):
+    def value_double(self, value: 'Optional[float]'):
         self._set_item(1, value)
 
     def _has_value_int(self):
         return self._has_item(2)
 
     @property
-    def value_int(self) -> 'int':
+    def value_int(self) -> 'Optional[int]':
         return self._get_item(2)
 
     @value_int.setter
-    def value_int(self, value):
+    def value_int(self, value: 'Optional[int]'):
         self._set_item(2, value)
 
     def _has_value_bool(self):
         return self._has_item(3)
 
     @property
-    def value_bool(self) -> 'bool':
+    def value_bool(self) -> 'Optional[bool]':
         return self._get_item(3)
 
     @value_bool.setter
-    def value_bool(self, value):
+    def value_bool(self, value: 'Optional[bool]'):
         self._set_item(3, value)
 
     def _has_value_string(self):
         return self._has_item(4)
 
     @property
-    def value_string(self) -> 'str':
+    def value_string(self) -> 'Optional[str]':
         return self._get_item(4)
 
     @value_string.setter
-    def value_string(self, value):
+    def value_string(self, value: 'Optional[str]'):
         self._set_item(4, value)
 
 
-
-class TemperatureSettings(StructureBase):    
+class TemperatureSettings(StructureBase):
     """
     Settings for controlling temperature of heating or cooling stages.
     
-    :param float target_temperature: Target temperature in Kelvins.
+    :param target_temperature: Target temperature in Kelvins.
     
-    :param float ramping_speed: Temperature ramping speed in Kelvins per second.
+    :param ramping_speed: Temperature ramping speed in Kelvins per second.
     
-    :param float soak_time: Time in seconds to remain at the target temperature after it has been reached within the specified tolerance.
+    :param soak_time: Time in seconds to remain at the target temperature after it has been reached within the specified tolerance.
     
-    :param float tolerance: Minimum desired difference between target and actual temperatures, in Kelvins.
+    :param tolerance: Minimum desired difference between target and actual temperatures, in Kelvins.
     
-    :param int timeout: Maximum time the temperature ramping can last, in seconds.
+    :param timeout: Maximum time the temperature ramping can last, in seconds.
     """
-    def __init__(self, target_temperature=None, ramping_speed=None, soak_time=None, tolerance=None, timeout=None):
+    def __init__(self, target_temperature: 'float' = None, ramping_speed: 'float' = None, soak_time: 'float' = None, tolerance: 'float' = None, timeout: 'int' = None):
         super(TemperatureSettings, self).__init__("TemperatureSettings")
 
         self._init_item(1, DataType.DOUBLE, target_temperature, True)
@@ -5132,14 +5208,14 @@ class TemperatureSettings(StructureBase):
         return self._has_item(1)
 
     @property
-    def target_temperature(self) -> 'float':        
+    def target_temperature(self) -> 'Optional[float]':
         """
         Target temperature in Kelvins.
         """
         return self._get_item(1)
 
     @target_temperature.setter
-    def target_temperature(self, value):        
+    def target_temperature(self, value: 'Optional[float]'):
         """
         Target temperature in Kelvins.
         """
@@ -5149,14 +5225,14 @@ class TemperatureSettings(StructureBase):
         return self._has_item(2)
 
     @property
-    def ramping_speed(self) -> 'float':        
+    def ramping_speed(self) -> 'Optional[float]':
         """
         Temperature ramping speed in Kelvins per second.
         """
         return self._get_item(2)
 
     @ramping_speed.setter
-    def ramping_speed(self, value):        
+    def ramping_speed(self, value: 'Optional[float]'):
         """
         Temperature ramping speed in Kelvins per second.
         """
@@ -5166,14 +5242,14 @@ class TemperatureSettings(StructureBase):
         return self._has_item(3)
 
     @property
-    def soak_time(self) -> 'float':        
+    def soak_time(self) -> 'Optional[float]':
         """
         Time in seconds to remain at the target temperature after it has been reached within the specified tolerance.
         """
         return self._get_item(3)
 
     @soak_time.setter
-    def soak_time(self, value):        
+    def soak_time(self, value: 'Optional[float]'):
         """
         Time in seconds to remain at the target temperature after it has been reached within the specified tolerance.
         """
@@ -5183,14 +5259,14 @@ class TemperatureSettings(StructureBase):
         return self._has_item(4)
 
     @property
-    def tolerance(self) -> 'float':        
+    def tolerance(self) -> 'Optional[float]':
         """
         Minimum desired difference between target and actual temperatures, in Kelvins.
         """
         return self._get_item(4)
 
     @tolerance.setter
-    def tolerance(self, value):        
+    def tolerance(self, value: 'Optional[float]'):
         """
         Minimum desired difference between target and actual temperatures, in Kelvins.
         """
@@ -5200,14 +5276,14 @@ class TemperatureSettings(StructureBase):
         return self._has_item(5)
 
     @property
-    def timeout(self) -> 'int':        
+    def timeout(self) -> 'Optional[int]':
         """
         Maximum time the temperature ramping can last, in seconds.
         """
         return self._get_item(5)
 
     @timeout.setter
-    def timeout(self, value):        
+    def timeout(self, value: 'Optional[int]'):
         """
         Maximum time the temperature ramping can last, in seconds.
         """

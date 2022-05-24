@@ -8,14 +8,14 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from autoscript_sdb_microscope_client._dynamic_object_proxies import ControlItem, ControlItemPair, ServerAction 
 from autoscript_sdb_microscope_client._dynamic_object_handles import ControlItemHandle, ControlItemPairHandle, ServerActionHandle 
 
 
-class GenericAccess(object):    
+class GenericAccess(object):
     """
-    The object for accessing generic interfaces on the instrument server. Requires a special license.
+    The object allows accessing generic interfaces on the instrument server. Requires a special license.
     """
     __slots__ = ["__id", "__application_client"]
 
@@ -24,14 +24,13 @@ class GenericAccess(object):
         self.__id = "SdbMicroscope.Service.GenericAccess"
 
 
-    def get_control_item(self, object_model_path) -> 'ControlItem':        
+    def get_control_item(self, object_model_path: 'str') -> 'ControlItem':
         """
-        Creates a wrapper object for server control item float, boolean, integer or string.
+        Returns an object representing a control item float, boolean, integer or string specified by the object model path.
         
-        :param str object_model_path: Item path on instrument object model.
+        :param object_model_path: Item path on instrument object model.
         
         :return: Control item wrapper object.
-        :rtype: ControlItem
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetControlItem", signature= [DataType.STRING], parameters=[object_model_path]) 
         if isinstance(object_model_path, str):
@@ -44,14 +43,13 @@ class GenericAccess(object):
         handle = call_response.result.value
         return ControlItem(self.__application_client, handle)
 
-    def get_control_item_pair(self, object_model_path) -> 'ControlItemPair':        
+    def get_control_item_pair(self, object_model_path: 'str') -> 'ControlItemPair':
         """
-        Creates a wrapper object for server control item float pair.
+        Returns an object representing a control item float pair specified by the object model path.
         
-        :param str object_model_path: Item path on instrument object model.
+        :param object_model_path: Item path on instrument object model.
         
         :return: Control item pair wrapper object.
-        :rtype: ControlItemPair
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetControlItemPair", signature= [DataType.STRING], parameters=[object_model_path]) 
         if isinstance(object_model_path, str):
@@ -64,14 +62,13 @@ class GenericAccess(object):
         handle = call_response.result.value
         return ControlItemPair(self.__application_client, handle)
 
-    def get_action(self, object_model_path) -> 'ServerAction':        
+    def get_action(self, object_model_path: 'str') -> 'ServerAction':
         """
-        Creates a wrapper object for server Action item.
+        Returns an object representing a startable action specified by the object model path.
         
-        :param str object_model_path: Item path on instrument object model.
+        :param object_model_path: Item path on the instrument object model.
         
         :return: Action wrapper object.
-        :rtype: ServerAction
         """
         call_request = CallRequest(object_id=self.__id, method_name="GetAction", signature= [DataType.STRING], parameters=[object_model_path]) 
         if isinstance(object_model_path, str):
@@ -84,14 +81,13 @@ class GenericAccess(object):
         handle = call_response.result.value
         return ServerAction(self.__application_client, handle)
 
-    def item_exists(self, object_model_path) -> 'bool':        
+    def item_exists(self, object_model_path: 'str') -> 'bool':
         """
         Determines if there is any object at given object model path.
         
-        :param str object_model_path: Object path on instrument object model.
+        :param object_model_path: Object path on instrument object model.
         
         :return: True if the object was found.
-        :rtype: bool
         """
         call_request = CallRequest(object_id=self.__id, method_name="ItemExists", signature= [DataType.STRING], parameters=[object_model_path]) 
         if isinstance(object_model_path, str):

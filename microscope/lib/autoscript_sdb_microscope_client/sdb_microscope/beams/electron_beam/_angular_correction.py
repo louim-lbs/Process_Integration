@@ -8,14 +8,14 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .angular_correction._angle import Angle
 from .angular_correction._specimen_pretilt import SpecimenPretilt
 from .angular_correction._tilt_correction import TiltCorrection
 from .angular_correction._dynamic_focus import DynamicFocus
 
 
-class AngularCorrection(object):    
+class AngularCorrection(object):
     """
     The object provides control and status of the angular correction.
     """
@@ -31,35 +31,35 @@ class AngularCorrection(object):
         self.__dynamic_focus = DynamicFocus(self.__application_client)
 
     @property
-    def angle(self) -> 'Angle':        
+    def angle(self) -> 'Angle':
         """
         The object provides value and limits of the angular correction angle.
         """
         return self.__angle
 
     @property
-    def specimen_pretilt(self) -> 'SpecimenPretilt':        
+    def specimen_pretilt(self) -> 'SpecimenPretilt':
         """
         The object provides value and limits of the specimen pretilt.
         """
         return self.__specimen_pretilt
 
     @property
-    def tilt_correction(self) -> 'TiltCorrection':        
+    def tilt_correction(self) -> 'TiltCorrection':
         """
         The object provides control and status of the tilt correction.
         """
         return self.__tilt_correction
 
     @property
-    def dynamic_focus(self) -> 'DynamicFocus':        
+    def dynamic_focus(self) -> 'DynamicFocus':
         """
         The object provides control and status of the dynamic focus.
         """
         return self.__dynamic_focus
 
     @property
-    def mode(self) -> 'str':        
+    def mode(self) -> 'str':
         """
         Gets or sets mode of the angular correction.
         """
@@ -71,7 +71,7 @@ class AngularCorrection(object):
         return call_response.result.value
 
     @mode.setter
-    def mode(self, value):        
+    def mode(self, value: 'str'):
         """
         Gets or sets mode of the angular correction.
         """

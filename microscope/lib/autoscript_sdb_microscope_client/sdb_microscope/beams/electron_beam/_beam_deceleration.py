@@ -8,13 +8,13 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .beam_deceleration._stage_bias import StageBias
 
 
-class BeamDeceleration(object):    
+class BeamDeceleration(object):
     """
-    The object provides control and status of the electron beam deceleration (stage bias).
+    The object provides control and status of the electron beam deceleration.
     """
     __slots__ = ["__id", "__application_client", "__stage_bias"]
 
@@ -25,20 +25,20 @@ class BeamDeceleration(object):
         self.__stage_bias = StageBias(self.__application_client)
 
     @property
-    def stage_bias(self) -> 'StageBias':        
+    def stage_bias(self) -> 'StageBias':
         """
         The object provides control and status of the electron beam stage bias.
         """
         return self.__stage_bias
 
-    def turn_on(self):        
+    def turn_on(self):
         """
         Turns the beam deceleration on.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnOn", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def turn_off(self):        
+    def turn_off(self):
         """
         Turns the beam deceleration off.
         """
@@ -46,9 +46,9 @@ class BeamDeceleration(object):
         call_response = self.__application_client._perform_call(call_request)
 
     @property
-    def is_on(self) -> 'bool':        
+    def is_on(self) -> 'bool':
         """
-        Gets the on / off state of the beam deceleration.
+        Returns True if the beam deceleration is turned on.
         """
         call_request = CallRequest(object_id=self.__id, method_name="IsOn_GET")
         call_response = self.__application_client._perform_call(call_request)

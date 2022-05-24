@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class System(object):    
+class System(object):
     """
     The object provides service information regarding the whole microscope system.
     """
@@ -23,9 +23,9 @@ class System(object):
 
 
     @property
-    def name(self) -> 'str':        
+    def name(self) -> 'str':
         """
-        Provides name of a microscope family the AutoScript server is connected to.
+        Returns the name of a microscope family to which the AutoScript server is connected.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Name_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -35,9 +35,9 @@ class System(object):
         return call_response.result.value
 
     @property
-    def serial_number(self) -> 'str':        
+    def serial_number(self) -> 'str':
         """
-        Provides microscope system serial number.
+        Returns microscope system serial number.
         """
         call_request = CallRequest(object_id=self.__id, method_name="SerialNumber_GET")
         call_response = self.__application_client._perform_call(call_request)
@@ -47,9 +47,9 @@ class System(object):
         return call_response.result.value
 
     @property
-    def version(self) -> 'str':        
+    def version(self) -> 'str':
         """
-        Provides microscope software platform version.
+        Returns microscope software platform version.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Version_GET")
         call_response = self.__application_client._perform_call(call_request)

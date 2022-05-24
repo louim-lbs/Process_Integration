@@ -8,11 +8,11 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .server._configuration import Configuration
 
 
-class Server(object):    
+class Server(object):
     """
     The object provides service information regarding the AutoScript server.
     """
@@ -25,14 +25,14 @@ class Server(object):
         self.__configuration = Configuration(self.__application_client)
 
     @property
-    def configuration(self) -> 'Configuration':        
+    def configuration(self) -> 'Configuration':
         """
         This object provides access to the AutoScript server configuration.
         """
         return self.__configuration
 
     @property
-    def version(self) -> 'str':        
+    def version(self) -> 'str':
         """
         Provides AutoScript server version.
         """
@@ -44,7 +44,7 @@ class Server(object):
         return call_response.result.value
 
     @property
-    def is_offline(self) -> 'bool':        
+    def is_offline(self) -> 'bool':
         """
         Tells whether the AutoScript server is running in the simulation (offline) mode.
         """

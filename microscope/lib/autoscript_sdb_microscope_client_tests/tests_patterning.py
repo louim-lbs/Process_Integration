@@ -2,9 +2,20 @@ from autoscript_sdb_microscope_client import SdbMicroscopeClient
 from autoscript_sdb_microscope_client.structures import *
 from autoscript_sdb_microscope_client.enumerations import *
 from autoscript_sdb_microscope_client_tests.utilities import *
+from enum import Enum
 import os
 import time
 import unittest
+
+
+class PatternType(Enum):
+    RECTANGLE = 0
+    CIRCLE = 1
+    LINE = 2
+    REGULAR_CROSS_SECTION = 3
+    CLEANING_CROSS_SECTION = 4
+    BITMAP = 5
+    STREAM_FILE = 6
 
 
 class TestsPatterning(unittest.TestCase):
@@ -19,72 +30,11 @@ class TestsPatterning(unittest.TestCase):
         self.microscope.patterning.clear_patterns()
         print("Done.")
 
-    def __prepare_for_patterning(self, beam_type=BeamType.ION):
-        target_view_number = 1 if beam_type == BeamType.ELECTRON else 2
-        target_imaging_device = ImagingDevice.ELECTRON_BEAM if beam_type == BeamType.ELECTRON else ImagingDevice.ION_BEAM
-        target_beam = self.microscope.beams.electron_beam if beam_type == BeamType.ELECTRON else self.microscope.beams.ion_beam
-
-        self.microscope.imaging.set_active_view(target_view_number)
-        self.microscope.imaging.set_active_device(target_imaging_device)
-        self.microscope.patterning.set_default_beam_type(beam_type)
-        self.microscope.patterning.set_default_application_file("None")
-
-        target_beam.turn_on()
-        target_beam.horizontal_field_width.value = 20e-6
-
-        self.microscope.patterning.clear_patterns()
-        self.microscope.imaging.grab_frame(GrabFrameSettings(resolution="768x512", dwell_time=1e-6))
-
-    def __create_and_mill_stream_pattern(self, beam_type=BeamType.ION):
-        """Creates a stream pattern (defined by a numpy array) and mills it with ion beam."""
-
-        print("Loading stream pattern definition from a stream file...")
-        stream_file_path = os.path.dirname(__file__) + '\\resources\\frame.str'
-        stream_pattern_definition = StreamPatternDefinition.load(stream_file_path)
-
-        expected_points = numpy.array([[1000, 11922, 1e-06, 0], [32767, 11922, 1e-06, 0], [64535, 11922, 1e-06, 0],
-                                       [64535, 53613, 1e-06, 1], [32767, 53613, 1e-06, 1], [1000, 53613, 1e-06, 1]],
-                                      dtype=object)
-
-        self.__assert_stream_pattern_points_equal(expected_points, stream_pattern_definition.points)
-
-        print("Creating stream pattern...")
-        self.microscope.patterning.set_default_application_file("None")
-        p = self.microscope.patterning.create_stream(0, 0, stream_pattern_definition)
-        print("Stream pattern created")
-
-        if self.test_helper.is_offline():
-            print("Skipping milling part for offline mode, because it halts tests for too long")
-            return
-
-        print("Milling the pattern...")
-        self.microscope.patterning.run()
-        print("Milling finished")
-
-    def __assert_stream_pattern_points_equal(self, expected_array, actual_array):
-        self.assertTupleEqual(expected_array.shape, actual_array.shape)
-
-        for p in range(expected_array.shape[0]):
-            for e in range(expected_array.shape[1]):
-                self.assertAlmostEqual(expected_array[p][e], actual_array[p][e])
-
-    def __get_bitmap_pattern_definition(self, size=10) -> BitmapPatternDefinition:
-        print("Defining bitmap pattern with a numpy array...")
-        bpd = BitmapPatternDefinition()
-        bpd.points = numpy.zeros(shape=(size, size, 2), dtype=object)
-
-        flags = 0
-        i = 0
-        for y in range(size):
-            for x in range(size):
-                bpd.points[y, x] = [i / (size * size), flags]
-                i += 1
-
-        print("Bitmap pattern definition created")
-        return bpd
-
     def test_patterning1(self):
-        # prepare view and reset image in pipeline
+        if not self.microscope.beams.ion_beam.is_installed:
+            self.skipTest("Ion beam not present, skipping")
+
+        # Prepare view and reset image in pipeline
         self.__prepare_for_patterning(BeamType.ION)
 
         print("Adjusting FOV...")
@@ -168,6 +118,12 @@ class TestsPatterning(unittest.TestCase):
         print("Done.")
 
     def test_stream_pattern_operations1(self):
+        if not self.microscope.beams.ion_beam.is_installed:
+            self.skipTest("Ion beam not present, skipping")
+
+        if not self.test_helper.is_pia4_or_newer_installed:
+            self.skipTest("The system is not equipped with PIA 4 or newer, skipping")
+
         # Prepare view and reset image in pipeline
         self.__prepare_for_patterning(BeamType.ION)
 
@@ -188,7 +144,7 @@ class TestsPatterning(unittest.TestCase):
         x_deltas = [-1, 2, -1, -1, 2]
         y_deltas = [1, 0, -1, -1, 0]
 
-        if self.test_helper.is_offline():
+        if self.test_helper.is_offline:
             print("Skipping the milling part in offline mode, because it halts tests for too long")
             return
 
@@ -203,6 +159,9 @@ class TestsPatterning(unittest.TestCase):
     def test_stream_pattern_operations2(self):
         """Creates a stream pattern (defined by file) and mills it with ion beam."""
 
+        if not self.microscope.beams.ion_beam.is_installed:
+            self.skipTest("Ion beam not present, skipping")
+
         self.__prepare_for_patterning(BeamType.ION)
         self.__create_and_mill_stream_pattern(BeamType.ION)
 
@@ -213,6 +172,9 @@ class TestsPatterning(unittest.TestCase):
         self.__create_and_mill_stream_pattern(BeamType.ELECTRON)
 
     def test_stream_pattern_operations4(self):
+        if not self.microscope.beams.ion_beam.is_installed:
+            self.skipTest("Ion beam not present, skipping")
+
         self.__prepare_for_patterning(BeamType.ION)
 
         print("Defining stream pattern with a numpy array...")
@@ -234,7 +196,7 @@ class TestsPatterning(unittest.TestCase):
         p = self.microscope.patterning.create_stream(0, 0, spd)
         print("Stream pattern created")
 
-        if self.test_helper.is_offline():
+        if self.test_helper.is_offline:
             print("Skipping the milling part in offline mode, because it halts tests for too long")
             return
 
@@ -243,6 +205,9 @@ class TestsPatterning(unittest.TestCase):
         print("Done.")
 
     def test_bitmap_pattern_from_file(self):
+        if not self.microscope.beams.ion_beam.is_installed:
+            self.skipTest("Ion beam not present, skipping")
+
         self.__prepare_for_patterning(BeamType.ION)
 
         print("Loading bitmap pattern definition from a BMP file...")
@@ -268,6 +233,9 @@ class TestsPatterning(unittest.TestCase):
         print("Done.")
 
     def test_bitmap_pattern_from_numpy_array(self):
+        if not self.microscope.beams.ion_beam.is_installed:
+            self.skipTest("Ion beam not present, skipping")
+
         self.__prepare_for_patterning(BeamType.ION)
 
         bpd = self.__get_bitmap_pattern_definition()
@@ -277,12 +245,12 @@ class TestsPatterning(unittest.TestCase):
         p.time = 5
         print("Bitmap pattern created")
 
-        if self.test_helper.is_offline():
+        if self.test_helper.is_offline:
             print("Skipping the milling part in offline mode, because it halts tests for too long")
             return
 
         # Helios 5 PFIB seems to have a bug in XTUI that is causing a deadlock between XT and XTUI while milling
-        if self.test_helper.is_system(SystemFamily.HELIOS_PFIB_HYDRA) and self.test_helper.get_major_system_version() == 17:
+        if self.test_helper.is_system(SystemFamily.HELIOS_PFIB_HYDRA) and self.test_helper.is_system_version(17):
             # TODO: Monitor this and remove when fixed in XTUI
             print("Skipping the milling part on Helios 5 PFIB Hydra to avoid hitting the XT-XTUI deadlock bug")
             return
@@ -319,7 +287,7 @@ class TestsPatterning(unittest.TestCase):
         print("Success.")
 
         # Skip this part for offline mode where pattern property inter-dependencies are not simulated
-        if not self.test_helper.is_offline():
+        if not self.test_helper.is_offline:
             print("Settings 'fix_aspect_ratio' to true...")
             p.fix_aspect_ratio = True
 
@@ -338,6 +306,9 @@ class TestsPatterning(unittest.TestCase):
         print("Done.")
 
     def test_pattern_adjustments1(self):
+        if not self.microscope.beams.ion_beam.is_installed:
+            self.skipTest("Ion beam not present, skipping")
+
         delay = 0.250
 
         print("Preparing for patterning...")
@@ -419,16 +390,18 @@ class TestsPatterning(unittest.TestCase):
         self.microscope.patterning.clear_patterns()
         print("All done.")
 
-    def __test_direct_pattern_property_access_general_pattern(self, p, application):
+    def __test_direct_pattern_property_access_general_pattern(self, p, application, pattern_type):
         microscope = self.microscope
 
         print("    Testing general pattern properties...")
 
         applications = microscope.patterning.list_all_application_files()
-        if application in applications:
-            target_value = application
-            p.application_file = target_value
-            self.assertEqual(p.application_file, target_value)
+
+        if application is not None:
+            if application in applications:
+                target_value = application
+                p.application_file = target_value
+                self.assertEqual(p.application_file, target_value)
 
         target_value = BeamType.ELECTRON
         p.beam_type = target_value
@@ -444,7 +417,14 @@ class TestsPatterning(unittest.TestCase):
 
         target_value = 1000
         p.pass_count = target_value
-        self.assertEqual(p.pass_count, target_value)
+
+        # TODO: Investigate this with the XT team
+        # Quite often when PassCount property is set on a css or rcs pattern, the resulting value is 2-5x higher.
+        # So e.g. when we set 1000, the actual value is 2000.
+        # This behaviour can be observed also from XTUI, so it is caused by the pattern graph itself.
+        # Let's ignore it for now.
+        if pattern_type != PatternType.CLEANING_CROSS_SECTION and pattern_type != PatternType.REGULAR_CROSS_SECTION:
+            self.assertEqual(p.pass_count, target_value)
 
         target_value = 1
         p.refresh_time = target_value
@@ -466,6 +446,22 @@ class TestsPatterning(unittest.TestCase):
         p.dose = target_value
         self.assertAlmostEqual(p.dose, target_value)
 
+        # TODO: Remove this when EVRT-87 is fixed in XT 30.
+        # Accessing Enabled property on a bitmap pattern crashes XT30.
+        if self.test_helper.is_system(SystemFamily.PLUTO) and pattern_type == PatternType.BITMAP:
+            microscope.patterning.clear_patterns()
+            raise Exception("Accessing Enabled on a bitmap pattern crashes XT30, marking the test as failed")
+
+        # Same for Aquilos 2 (XT32), probably the same root cause
+        if self.test_helper.is_system_version(32) and pattern_type == PatternType.BITMAP:
+            microscope.patterning.clear_patterns()
+            raise Exception("Accessing Enabled on a bitmap pattern crashes XT32, marking the test as failed")
+
+        # And once more the same issue in the latest CryoFIB (XT28)
+        if self.test_helper.is_system(SystemFamily.CRYOFIB) and pattern_type == PatternType.BITMAP:
+            microscope.patterning.clear_patterns()
+            raise Exception("Accessing Enabled on a bitmap pattern crashes XT28, marking the test as failed")
+
         self.assertEqual(p.enabled, True)
         p.enabled = False
         self.assertEqual(p.enabled, False)
@@ -478,7 +474,7 @@ class TestsPatterning(unittest.TestCase):
             p.gas_type = target_value
             self.assertEqual(p.gas_type, target_value)
 
-        if self.test_helper.is_multichem_installed():
+        if self.test_helper.is_multichem_installed:
             multichem = microscope.gas.get_multichem()
             gases = multichem.list_all_gases()
             target_value = "+".join(gases)
@@ -489,8 +485,8 @@ class TestsPatterning(unittest.TestCase):
             p.gas_flow = target_value
             self.assertEqual(p.gas_flow, target_value)
 
-    def __test_direct_pattern_property_access_shape_pattern(self, p, application):
-        self.__test_direct_pattern_property_access_general_pattern(p, application)
+    def __test_direct_pattern_property_access_shape_pattern(self, p, application, pattern_type):
+        self.__test_direct_pattern_property_access_general_pattern(p, application, pattern_type)
 
         print("    Testing shape pattern properties...")
 
@@ -502,8 +498,18 @@ class TestsPatterning(unittest.TestCase):
         p.time = target_value
         self.assertAlmostEqual(p.time, target_value, 0)
 
-    def __test_direct_pattern_property_access_rectangular_pattern(self, p, application):
-        self.__test_direct_pattern_property_access_general_pattern(p, application)
+        # TODO: Remove this when the bug is fixed in XT 28 (CryoFIB).
+        # Accessing is_exclusion_zone property on a circle pattern crashes XT 28.
+        if self.test_helper.is_system(SystemFamily.CRYOFIB) and pattern_type == PatternType.CIRCLE:
+            self.microscope.patterning.clear_patterns()
+            raise Exception("Accessing is_exclusion_zone on a circle pattern crashes XT 28, marking the test as failed")
+
+        target_value = True
+        p.is_exclusion_zone = target_value
+        self.assertAlmostEqual(p.is_exclusion_zone, target_value)
+
+    def __test_direct_pattern_property_access_rectangular_pattern(self, p, application, pattern_type):
+        self.__test_direct_pattern_property_access_general_pattern(p, application, pattern_type)
 
         print("    Testing rectangular pattern properties...")
 
@@ -533,8 +539,8 @@ class TestsPatterning(unittest.TestCase):
         p.scan_type = target_value
         self.assertEqual(p.scan_type, target_value)
 
-    def __test_direct_pattern_property_access_rectangular_pattern_with_overlap(self, p, application):
-        self.__test_direct_pattern_property_access_rectangular_pattern(p, application)
+    def __test_direct_pattern_property_access_rectangular_pattern_with_overlap(self, p, application, pattern_type):
+        self.__test_direct_pattern_property_access_rectangular_pattern(p, application, pattern_type)
 
         print("    Testing rectangular pattern with overlap properties...")
 
@@ -555,20 +561,37 @@ class TestsPatterning(unittest.TestCase):
     def __test_direct_pattern_property_access_rectangle(self):
         print("Testing rectangle pattern...")
         p = self.microscope.patterning.create_rectangle(0, 0, 1e-6, 1e-6, 1e-6)
-        self.__test_direct_pattern_property_access_rectangular_pattern_with_overlap(p, "Pt dep e")
+        self.__test_direct_pattern_property_access_rectangular_pattern_with_overlap(p, "Pt dep e", PatternType.RECTANGLE)
         print("Done with rectangle.")
 
     def __test_direct_pattern_property_access_ccs(self):
         print("Testing ccs pattern...")
         p = self.microscope.patterning.create_cleaning_cross_section(-1e-6, 0, 2e-6, 1e-6, 1e-6)
-        self.__test_direct_pattern_property_access_rectangular_pattern_with_overlap(p, "__skip__")
+        self.__test_direct_pattern_property_access_rectangular_pattern_with_overlap(p, None, PatternType.CLEANING_CROSS_SECTION)
         print("Done with css.")
 
     def __test_direct_pattern_property_access_rcs(self):
         print("Testing rcs pattern...")
         p = self.microscope.patterning.create_regular_cross_section(-2e-6, 1e-6, 1e-6, 2e-6, 1.5e-6)
-        self.__test_direct_pattern_property_access_rectangular_pattern_with_overlap(p, "__skip__")
-        print("Done with css.")
+        self.__test_direct_pattern_property_access_rectangular_pattern_with_overlap(p, None, PatternType.REGULAR_CROSS_SECTION)
+
+        p.scan_method = RegularCrossSectionScanMethod.STAIR_STEP
+        p.scan_method = RegularCrossSectionScanMethod.MULTI_SCAN
+        self.assertEqual(p.scan_method, RegularCrossSectionScanMethod.MULTI_SCAN)
+
+        target_multi_scan_pass_count = 100
+        p.multi_scan_pass_count = target_multi_scan_pass_count
+        self.assertEqual(p.multi_scan_pass_count, target_multi_scan_pass_count)
+
+        target_scan_ratio = 0.2
+        p.scan_ratio = target_scan_ratio
+        self.assertEqual(p.scan_ratio, target_scan_ratio)
+
+        p.scan_method = RegularCrossSectionScanMethod.STAIR_STEP
+        target_scan_ratio = 0.4
+        p.scan_ratio = target_scan_ratio
+        self.assertEqual(p.scan_ratio, target_scan_ratio)
+        print("Done with rcs.")
 
     def __test_direct_pattern_property_access_bitmap(self):
         print("Testing bitmap pattern...")
@@ -576,7 +599,7 @@ class TestsPatterning(unittest.TestCase):
         bitmap_pattern_definition = BitmapPatternDefinition.load(bmp_file_path)
         p = self.microscope.patterning.create_bitmap(0, 0, 3e-6, 3e-6, 1e-6, bitmap_pattern_definition)
 
-        self.__test_direct_pattern_property_access_rectangular_pattern(p, "Pt dep e")
+        self.__test_direct_pattern_property_access_rectangular_pattern(p, "Pt dep e", PatternType.BITMAP)
 
         p.fix_aspect_ratio = True
         self.assertEqual(p.fix_aspect_ratio, True)
@@ -586,7 +609,7 @@ class TestsPatterning(unittest.TestCase):
         print("Testing circle pattern...")
         p = self.microscope.patterning.create_circle(3e-6, -2e-6, 1e-6, 0, 1e-6)
 
-        self.__test_direct_pattern_property_access_shape_pattern(p, "Pt dep e")
+        self.__test_direct_pattern_property_access_shape_pattern(p, "Pt dep e", PatternType.CIRCLE)
 
         target_value_x = 1e-6
         target_value_y = 2e-6
@@ -620,7 +643,7 @@ class TestsPatterning(unittest.TestCase):
         print("Testing line pattern...")
         p = self.microscope.patterning.create_line(-2e-6, -1e-6, 2e-6, 4e-6, 2e-6)
 
-        self.__test_direct_pattern_property_access_shape_pattern(p, "Pt dep e")
+        self.__test_direct_pattern_property_access_shape_pattern(p, "Pt dep e", PatternType.LINE)
 
         target_value = 1e-6
         p.depth = target_value
@@ -660,7 +683,7 @@ class TestsPatterning(unittest.TestCase):
         spd = StreamPatternDefinition.load(os.path.dirname(__file__) + '\\resources\\frame.str')
         p = self.microscope.patterning.create_stream(-2e-6, 1e-6, spd)
 
-        self.__test_direct_pattern_property_access_general_pattern(p, "Pt dep e")
+        self.__test_direct_pattern_property_access_general_pattern(p, "Pt dep e", PatternType.STREAM_FILE)
 
         target_value_x = 1e-6
         target_value_y = 2e-6
@@ -670,3 +693,66 @@ class TestsPatterning(unittest.TestCase):
         self.assertAlmostEqual(p.center_y, target_value_y)
         print("Done with stream file.")
 
+    def __prepare_for_patterning(self, beam_type=BeamType.ION):
+        target_view_number = 1 if beam_type == BeamType.ELECTRON else 2
+        target_imaging_device = ImagingDevice.ELECTRON_BEAM if beam_type == BeamType.ELECTRON else ImagingDevice.ION_BEAM
+        target_beam = self.microscope.beams.electron_beam if beam_type == BeamType.ELECTRON else self.microscope.beams.ion_beam
+
+        self.microscope.imaging.set_active_view(target_view_number)
+        self.microscope.imaging.set_active_device(target_imaging_device)
+        self.microscope.patterning.set_default_beam_type(beam_type)
+        self.microscope.patterning.set_default_application_file("None")
+
+        target_beam.turn_on()
+        target_beam.horizontal_field_width.value = 20e-6
+
+        self.microscope.patterning.clear_patterns()
+        self.microscope.imaging.grab_frame(GrabFrameSettings(resolution="768x512", dwell_time=1e-6))
+
+    def __create_and_mill_stream_pattern(self, beam_type=BeamType.ION):
+        """Creates a stream pattern (defined by a numpy array) and mills it with ion beam."""
+
+        print("Loading stream pattern definition from a stream file...")
+        stream_file_path = os.path.dirname(__file__) + '\\resources\\frame.str'
+        stream_pattern_definition = StreamPatternDefinition.load(stream_file_path)
+
+        expected_points = numpy.array([[1000, 11922, 1e-06, 0], [32767, 11922, 1e-06, 0], [64535, 11922, 1e-06, 0],
+                                       [64535, 53613, 1e-06, 1], [32767, 53613, 1e-06, 1], [1000, 53613, 1e-06, 1]],
+                                      dtype=object)
+
+        self.__assert_stream_pattern_points_equal(expected_points, stream_pattern_definition.points)
+
+        print("Creating stream pattern...")
+        self.microscope.patterning.set_default_application_file("None")
+        p = self.microscope.patterning.create_stream(0, 0, stream_pattern_definition)
+        print("Stream pattern created")
+
+        if self.test_helper.is_offline:
+            print("Skipping milling part for offline mode, because it halts tests for too long")
+            return
+
+        print("Milling the pattern...")
+        self.microscope.patterning.run()
+        print("Milling finished")
+
+    def __assert_stream_pattern_points_equal(self, expected_array, actual_array):
+        self.assertTupleEqual(expected_array.shape, actual_array.shape)
+
+        for p in range(expected_array.shape[0]):
+            for e in range(expected_array.shape[1]):
+                self.assertAlmostEqual(expected_array[p][e], actual_array[p][e])
+
+    def __get_bitmap_pattern_definition(self, size=10) -> BitmapPatternDefinition:
+        print("Defining bitmap pattern with a numpy array...")
+        bpd = BitmapPatternDefinition()
+        bpd.points = numpy.zeros(shape=(size, size, 2), dtype=object)
+
+        flags = 0
+        i = 0
+        for y in range(size):
+            for x in range(size):
+                bpd.points[y, x] = [i / (size * size), flags]
+                i += 1
+
+        print("Bitmap pattern definition created")
+        return bpd

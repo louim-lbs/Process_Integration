@@ -7,11 +7,12 @@
 # --------------------------------------------------------------------------------------------------
 
 from typing import List, Union
+from autoscript_sdb_microscope_client.structures import Limits 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class ChamberPressure(object):    
+class ChamberPressure(object):
     """
     The object provides status of the chamber pressure.
     """
@@ -23,13 +24,25 @@ class ChamberPressure(object):
 
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
-        The property retrieves current chamber pressure.
+        Returns the current chamber pressure in Pascals.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Value_GET")
         call_response = self.__application_client._perform_call(call_request)
         if call_response.result.data_type != DataType.DOUBLE:
             raise TypeError("Incompatible type: chamber_pressure.value was expecting float, but server returned different object type: " + repr(call_response.result.data_type))
+
+        return call_response.result.value
+
+    @property
+    def limits(self) -> 'Limits':
+        """
+        Retrieves the range of valid values for chamber pressure in Pascals.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="Limits_GET")
+        call_response = self.__application_client._perform_call(call_request)
+        if call_response.result.data_type != DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="Limits"):
+            raise TypeError("Incompatible type: chamber_pressure.limits was expecting Limits, but server returned different object type: " + repr(call_response.result.data_type))
 
         return call_response.result.value

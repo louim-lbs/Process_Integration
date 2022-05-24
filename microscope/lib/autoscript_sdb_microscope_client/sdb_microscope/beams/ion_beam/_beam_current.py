@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class BeamCurrent(object):    
+class BeamCurrent(object):
     """
     The object provides control and status of the ion beam current.
     """
@@ -23,7 +23,7 @@ class BeamCurrent(object):
 
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         Gets or sets the value of ion beam current.
         """
@@ -35,7 +35,7 @@ class BeamCurrent(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'float'):
         """
         Gets or sets the value of ion beam current.
         """
@@ -46,7 +46,7 @@ class BeamCurrent(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def available_values(self) -> 'List[float]':        
+    def available_values(self) -> 'List[float]':
         """
         Retrieves the range of valid values for the ion beam current.
         """

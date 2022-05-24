@@ -8,14 +8,14 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .beams._electron_beam import ElectronBeam
 from .beams._ion_beam import IonBeam
 
 
-class Beams(object):    
+class Beams(object):
     """
-    The object provides control and status of the microscope's beams.
+    The object provides control and status of the microscope beams.
     """
     __slots__ = ["__id", "__application_client", "__electron_beam", "__ion_beam"]
 
@@ -27,15 +27,15 @@ class Beams(object):
         self.__ion_beam = IonBeam(self.__application_client)
 
     @property
-    def electron_beam(self) -> 'ElectronBeam':        
+    def electron_beam(self) -> 'ElectronBeam':
         """
-        The object provides control and status of the microscope's electron beam.
+        The object provides control and status of the electron beam.
         """
         return self.__electron_beam
 
     @property
-    def ion_beam(self) -> 'IonBeam':        
+    def ion_beam(self) -> 'IonBeam':
         """
-        The object provides control and status of the microscope's ion beam.
+        The object provides control and status of the ion beam.
         """
         return self.__ion_beam

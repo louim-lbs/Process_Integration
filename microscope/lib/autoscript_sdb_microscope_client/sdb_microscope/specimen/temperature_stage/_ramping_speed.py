@@ -9,10 +9,10 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import Limits 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class RampingSpeed(object):    
+class RampingSpeed(object):
     """
     The object provides control and status of the temperature ramping speed.
     """
@@ -24,7 +24,7 @@ class RampingSpeed(object):
 
 
     @property
-    def target_value(self) -> 'float':        
+    def target_value(self) -> 'float':
         """
         The property retrieves or sets the target temperature ramping speed in Kelvins per second.
         """
@@ -36,7 +36,7 @@ class RampingSpeed(object):
         return call_response.result.value
 
     @target_value.setter
-    def target_value(self, value):        
+    def target_value(self, value: 'float'):
         """
         The property retrieves or sets the target temperature ramping speed in Kelvins per second.
         """
@@ -47,7 +47,7 @@ class RampingSpeed(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         The property retrieves the actual temperature ramping speed in Kelvins per second.
         """
@@ -59,7 +59,7 @@ class RampingSpeed(object):
         return call_response.result.value
 
     @property
-    def limits(self) -> 'Limits':        
+    def limits(self) -> 'Limits':
         """
         Retrieves the range of valid ramping speed values in Kelvins per second.
         """

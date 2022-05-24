@@ -249,13 +249,6 @@ class DataType:
     """Primary identifier for dynamic object handle data types."""
 
 
-class __UndefinedParameter:
-    pass
-
-
-UndefinedParameter = __UndefinedParameter()
-
-
 class HandyStopwatch:
     def __init__(self, format="Duration: %.3f ms", evaluation_action=None, is_in_use=True):
         self.format = format

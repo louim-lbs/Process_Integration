@@ -9,12 +9,12 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import TemperatureSettings 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .temperature_stage._temperature import Temperature
 from .temperature_stage._ramping_speed import RampingSpeed
 
 
-class TemperatureStage(object):    
+class TemperatureStage(object):
     """
     The object provides control and status of the microscope temperature stage.
     """
@@ -28,38 +28,38 @@ class TemperatureStage(object):
         self.__ramping_speed = RampingSpeed(self.__application_client)
 
     @property
-    def temperature(self) -> 'Temperature':        
+    def temperature(self) -> 'Temperature':
         """
         The object provides control and status of the stage temperature.
         """
         return self.__temperature
 
     @property
-    def ramping_speed(self) -> 'RampingSpeed':        
+    def ramping_speed(self) -> 'RampingSpeed':
         """
         The object provides control and status of the temperature ramping speed.
         """
         return self.__ramping_speed
 
-    def turn_on(self):        
+    def turn_on(self):
         """
         Turns the temperature stage on.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnOn", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def turn_off(self):        
+    def turn_off(self):
         """
         Turns the temperature stage off.
         """
         call_request = CallRequest(object_id=self.__id, method_name="TurnOff", signature= [], parameters=[]) 
         call_response = self.__application_client._perform_call(call_request)
 
-    def ramp(self, settings):        
+    def ramp(self, settings: 'TemperatureSettings'):
         """
         Ramps the stage temperature up or down according to the settings specified by the parameter.
         
-        :param TemperatureSettings settings: Settings for the ramp method.
+        :param settings: Settings for the ramp method.
         """
         call_request = CallRequest(object_id=self.__id, method_name="Ramp", signature= [DataTypeDefinition(DataType.STRUCTURE_PRIMARY_ID, secondary_id="TemperatureSettings")], parameters=[settings]) 
         if isinstance(settings, TemperatureSettings):
@@ -67,8 +67,20 @@ class TemperatureStage(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
+    def select_heat_shield(self, type: 'str'):
+        """
+        Selects the heat shield for the currently connected temperature stage.
+        
+        :param type: Heat shield type. You can use TemperatureStageHeatShieldType enumeration.
+        """
+        call_request = CallRequest(object_id=self.__id, method_name="SelectHeatShield", signature= [DataType.STRING], parameters=[type]) 
+        if isinstance(type, str):
+            call_response = self.__application_client._perform_call(call_request)
+        else:
+            raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
+
     @property
-    def is_installed(self) -> 'bool':        
+    def is_installed(self) -> 'bool':
         """
         Tells whether the microscope support temperature stages. This property does not indicate whether a temperature stage is currently connected.
         """
@@ -80,7 +92,7 @@ class TemperatureStage(object):
         return call_response.result.value
 
     @property
-    def is_on(self) -> 'bool':        
+    def is_on(self) -> 'bool':
         """
         Returns the on/off state of the currently connected temperature stage.
         """
@@ -92,7 +104,7 @@ class TemperatureStage(object):
         return call_response.result.value
 
     @property
-    def type(self) -> 'str':        
+    def type(self) -> 'str':
         """
         Returns the type of the currently connected temperature stage. Maps to TemperatureStageType enumeration.
         """

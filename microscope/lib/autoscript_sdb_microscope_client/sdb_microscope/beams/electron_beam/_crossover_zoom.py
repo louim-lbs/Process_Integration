@@ -9,10 +9,10 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import Limits 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class CrossoverZoom(object):    
+class CrossoverZoom(object):
     """
     The object provides control and status of the crossover zoom parameter on the electron beam.
     """
@@ -24,7 +24,7 @@ class CrossoverZoom(object):
 
 
     @property
-    def limits(self) -> 'Limits':        
+    def limits(self) -> 'Limits':
         """
         The property retrieves the range values for the crossover zoom.
         """
@@ -36,7 +36,7 @@ class CrossoverZoom(object):
         return call_response.result.value
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         The property retrieves or sets the current crossover zoom. The zoom value doesn't have a physical unit.
         """
@@ -48,7 +48,7 @@ class CrossoverZoom(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'float'):
         """
         The property retrieves or sets the current crossover zoom. The zoom value doesn't have a physical unit.
         """

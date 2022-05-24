@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class PlasmaGas(object):    
+class PlasmaGas(object):
     """
     The object provides control of the type of gas used in Multiple Ion Plasma FIB.
     """
@@ -23,7 +23,7 @@ class PlasmaGas(object):
 
 
     @property
-    def value(self) -> 'str':        
+    def value(self) -> 'str':
         """
         Gets or sets the type of gas for the Multiple Ion Plasma FIB. You can use PlasmaGasType enumeration to specify the value.
         """
@@ -35,7 +35,7 @@ class PlasmaGas(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'str'):
         """
         Gets or sets the type of gas for the Multiple Ion Plasma FIB. You can use PlasmaGasType enumeration to specify the value.
         """
@@ -46,7 +46,7 @@ class PlasmaGas(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def available_values(self) -> 'List[str]':        
+    def available_values(self) -> 'List[str]':
         """
         Retrieves a list of available gases for the Multiple Ion Plasma FIB.
         """

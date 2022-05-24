@@ -8,10 +8,10 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class SafetySettings(object):    
+class SafetySettings(object):
     """
     The object provides control and status of the stage safety settings.
     """
@@ -22,11 +22,11 @@ class SafetySettings(object):
         self.__id = "SdbMicroscope.Specimen.Stage.SafetySettings"
 
 
-    def lock_axis(self, axis):        
+    def lock_axis(self, axis: 'str'):
         """
-        The method locks the specified axis.
+        The function locks the specified axis.
         
-        :param str axis: Axis to be locked.
+        :param axis: Axis to be locked.
         """
         call_request = CallRequest(object_id=self.__id, method_name="LockAxis", signature= [DataType.STRING], parameters=[axis]) 
         if isinstance(axis, str):
@@ -34,11 +34,11 @@ class SafetySettings(object):
         else:
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
-    def unlock_axis(self, axis):        
+    def unlock_axis(self, axis: 'str'):
         """
-        The method unlocks the specified axis.
+        The function unlocks the specified axis.
         
-        :param str axis: Axis to be unlocked.
+        :param axis: Axis to be unlocked.
         """
         call_request = CallRequest(object_id=self.__id, method_name="UnlockAxis", signature= [DataType.STRING], parameters=[axis]) 
         if isinstance(axis, str):
@@ -47,9 +47,9 @@ class SafetySettings(object):
             raise Exception("Cannot execute method with the given parameters combination. Read the documentation for details of how to call this method.")
 
     @property
-    def locked_axes(self) -> 'List[str]':        
+    def locked_axes(self) -> 'List[str]':
         """
-        List of locked axes.
+        List of axes that are currently locked.
         """
         call_request = CallRequest(object_id=self.__id, method_name="LockedAxes_GET")
         call_response = self.__application_client._perform_call(call_request)

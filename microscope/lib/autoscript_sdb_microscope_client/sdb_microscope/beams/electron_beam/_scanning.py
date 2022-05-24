@@ -8,7 +8,7 @@
 
 from typing import List, Union
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 from .scanning._resolution import Resolution
 from .scanning._dwell_time import DwellTime
 from .scanning._rotation import Rotation
@@ -16,7 +16,7 @@ from .scanning._mode import Mode
 from .scanning._spot import Spot
 
 
-class Scanning(object):    
+class Scanning(object):
     """
     The object scanning provides control and status of the scanning properties of the beam.
     """
@@ -33,42 +33,42 @@ class Scanning(object):
         self.__spot = Spot(self.__application_client)
 
     @property
-    def resolution(self) -> 'Resolution':        
+    def resolution(self) -> 'Resolution':
         """
         The object provides control and status of scanning resolution.
         """
         return self.__resolution
 
     @property
-    def dwell_time(self) -> 'DwellTime':        
+    def dwell_time(self) -> 'DwellTime':
         """
         The object provides control and status of dwell time settings.
         """
         return self.__dwell_time
 
     @property
-    def rotation(self) -> 'Rotation':        
+    def rotation(self) -> 'Rotation':
         """
         The object provides control and status of scan rotation.
         """
         return self.__rotation
 
     @property
-    def mode(self) -> 'Mode':        
+    def mode(self) -> 'Mode':
         """
         The object provides control and status of the scanning mode.
         """
         return self.__mode
 
     @property
-    def spot(self) -> 'Spot':        
+    def spot(self) -> 'Spot':
         """
         The object provides control and status of the electron beam spot size.
         """
         return self.__spot
 
     @property
-    def bit_depth(self) -> 'int':        
+    def bit_depth(self) -> 'int':
         """
         Live acquisition bit depth.
         """
@@ -80,7 +80,7 @@ class Scanning(object):
         return call_response.result.value
 
     @bit_depth.setter
-    def bit_depth(self, value):        
+    def bit_depth(self, value: 'int'):
         """
         Live acquisition bit depth.
         """

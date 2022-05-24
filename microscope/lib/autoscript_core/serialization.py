@@ -173,7 +173,7 @@ class StructureBase(object):
             if attr_value is not None:
                 repr_attr_strings.append(repr_attr.attr_name + "=" + repr_attr.format_string % attr_value)
 
-        repr_string = "%s(%s)" % (type(self).__name__, ','.join(repr_attr_strings))
+        repr_string = "%s(%s)" % (type(self).__name__, ', '.join(repr_attr_strings))
         return repr_string
 
 

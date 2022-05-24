@@ -9,10 +9,10 @@
 from typing import List, Union
 from autoscript_sdb_microscope_client.structures import Limits 
 from autoscript_sdb_microscope_client._sdb_microscope_client_extensions import SdbMicroscopeClientExtensions
-from autoscript_core.common import CallRequest, DataType, DataTypeDefinition, UndefinedParameter
+from autoscript_core.common import CallRequest, DataType, DataTypeDefinition
 
 
-class HighVoltage(object):    
+class HighVoltage(object):
     """
     The object provides control and status of the high tension voltage.
     """
@@ -24,7 +24,7 @@ class HighVoltage(object):
 
 
     @property
-    def is_controllable(self) -> 'bool':        
+    def is_controllable(self) -> 'bool':
         """
         Retrieves the information about the controllability.
         """
@@ -36,7 +36,7 @@ class HighVoltage(object):
         return call_response.result.value
 
     @property
-    def limits(self) -> 'Limits':        
+    def limits(self) -> 'Limits':
         """
         Retrieves the range of valid values.
         """
@@ -48,7 +48,7 @@ class HighVoltage(object):
         return call_response.result.value
 
     @property
-    def value(self) -> 'float':        
+    def value(self) -> 'float':
         """
         Gets or sets the value.
         """
@@ -60,7 +60,7 @@ class HighVoltage(object):
         return call_response.result.value
 
     @value.setter
-    def value(self, value):        
+    def value(self, value: 'float'):
         """
         Gets or sets the value.
         """

@@ -7,7 +7,7 @@
 # --------------------------------------------------------------------------------------------------
 
 
-class BeamType:    
+class BeamType:
     """
     The enumeration of all available beam types.
     
@@ -15,23 +15,24 @@ class BeamType:
     
     :param ION: Ion beam.
     """
-    ELECTRON = 1    
+    ELECTRON = 1
     """
     Electron beam.
     """
-    ION = 2    
+    ION = 2
     """
     Ion beam.
     """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            1 : "ELECTRON",
-            2 : "ION",
+            1: "ELECTRON",
+            2: "ION",
             }.get(value, "?")
 
 
-class ImagingDevice:    
+class ImagingDevice:
     """
     The enumeration of all supported imaging devices.
     
@@ -39,73 +40,109 @@ class ImagingDevice:
     
     :param ION_BEAM: Ion beam.
     
-    :param CCD_CAMERA: Infrared camera.
+    :param CCD_CAMERA: CCD camera.
     
     :param NAV_CAM: Optical camera.
     
-    :param IR_CAMERA: 
+    :param IR_CAMERA: Infra red camera.
     
-    :param OPTICAL_MICROSCOPE: 
+    :param OPTICAL_MICROSCOPE: Optical microscope.
     
-    :param VOLUMESCOPE_APPROACH_CAMERA: 
+    :param VOLUMESCOPE_APPROACH_CAMERA: Microtome approach camera.
     """
-    ELECTRON_BEAM = 1    
+    ELECTRON_BEAM = 1
     """
     Electron beam.
     """
-    ION_BEAM = 2    
+    ION_BEAM = 2
     """
     Ion beam.
     """
-    CCD_CAMERA = 3    
+    CCD_CAMERA = 3
     """
-    Infrared camera.
+    CCD camera.
     """
-    NAV_CAM = 4    
+    NAV_CAM = 4
     """
     Optical camera.
     """
     IR_CAMERA = 5
+    """
+    Infra red camera.
+    """
     OPTICAL_MICROSCOPE = 6
+    """
+    Optical microscope.
+    """
     VOLUMESCOPE_APPROACH_CAMERA = 7
+    """
+    Microtome approach camera.
+    """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            1 : "ELECTRON_BEAM",
-            2 : "ION_BEAM",
-            3 : "CCD_CAMERA",
-            4 : "NAV_CAM",
-            5 : "IR_CAMERA",
-            6 : "OPTICAL_MICROSCOPE",
-            7 : "VOLUMESCOPE_APPROACH_CAMERA",
+            1: "ELECTRON_BEAM",
+            2: "ION_BEAM",
+            3: "CCD_CAMERA",
+            4: "NAV_CAM",
+            5: "IR_CAMERA",
+            6: "OPTICAL_MICROSCOPE",
+            7: "VOLUMESCOPE_APPROACH_CAMERA",
             }.get(value, "?")
 
 
-class CoordinateSystem:    
+class CoordinateSystem:
     """
-    Coordinate system in which stage coordinates are stated.
+    Coordinate system in which stage coordinates are given.
     
-    :param SPECIMEN: Coordinate system based on location on specimen. This coordinate system is affected by various additional adjustments that make it easier to navigate on a particular specimen. The most important one is link between Z coordinate and working distance. Specimen coordinate system is also used in XTUI stage control panel.
+    :param SPECIMEN: Coordinate system based on the position on the specimen. This coordinate system is influenced by several adjustments that facilitate navigation on a given specimen. The most important is the link between Z coordinate and working distance. The specimen coordinate system is also used in the main user interface (XTUI) stage control panel.
     
-    :param RAW: Coordinate system based solely on location of stage. This coordinate system is not affected by any adjustments and should bring stage to the exactly same position on a particular microscope.
+    :param RAW: Coordinate system based solely on location read from stage hardware encoders. This coordinate system is not affected by any adjustments and should bring the stage always to the exactly same position.
     """
-    SPECIMEN = "Specimen"    
+    SPECIMEN = "Specimen"
     """
-    Coordinate system based on location on specimen. This coordinate system is affected by various additional adjustments that make it easier to navigate on a particular specimen. The most important one is link between Z coordinate and working distance. Specimen coordinate system is also used in XTUI stage control panel.
+    Coordinate system based on the position on the specimen. This coordinate system is influenced by several adjustments that facilitate navigation on a given specimen. The most important is the link between Z coordinate and working distance. The specimen coordinate system is also used in the main user interface (XTUI) stage control panel.
     """
-    RAW = "Raw"    
+    RAW = "Raw"
     """
-    Coordinate system based solely on location of stage. This coordinate system is not affected by any adjustments and should bring stage to the exactly same position on a particular microscope.
+    Coordinate system based solely on location read from stage hardware encoders. This coordinate system is not affected by any adjustments and should bring the stage always to the exactly same position.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Specimen" : "SPECIMEN",
-            "Raw" : "RAW",
+            "Specimen": "SPECIMEN",
+            "Raw": "RAW",
             }.get(value, "?")
 
 
-class ScanningFilterType:    
+class ManipulatorCoordinateSystem:
+    """
+    Coordinate system in which manipulator (EasyLift) coordinates are given.
+    
+    :param STAGE: Stage coordinates have the origin [0, 0, 0] in eucentric position and the axes X, Y are considered in the plane of the stage (X points to the chamber door). The Z axis has the direction of the normal vector to the plane of the stage.
+    
+    :param RAW: Raw coordinates correspond to the real axes X, Y, Z, R. X and Y should be in the range (-0.5, 0.5) mm, axis Z should be in the range (Zbase-0.5, Zbase+0.5) mm. Zbase is 16mm when the manipulator is inserted and around 0.0 when the manipulator is retracted. Zbase values are calibrated during Insert/retract alignment.
+    """
+    STAGE = "Stage"
+    """
+    Stage coordinates have the origin [0, 0, 0] in eucentric position and the axes X, Y are considered in the plane of the stage (X points to the chamber door). The Z axis has the direction of the normal vector to the plane of the stage.
+    """
+    RAW = "Raw"
+    """
+    Raw coordinates correspond to the real axes X, Y, Z, R. X and Y should be in the range (-0.5, 0.5) mm, axis Z should be in the range (Zbase-0.5, Zbase+0.5) mm. Zbase is 16mm when the manipulator is inserted and around 0.0 when the manipulator is retracted. Zbase values are calibrated during Insert/retract alignment.
+    """
+    
+    @staticmethod
+    def explain(value: str):
+        return {
+            "Stage": "STAGE",
+            "Raw": "RAW",
+            }.get(value, "?")
+
+
+class ScanningFilterType:
     """
     The enumeration of all supported scanning filter types.
     
@@ -115,28 +152,29 @@ class ScanningFilterType:
     
     :param INTEGRATION: Allows accumulative noise reduction by true integration over a number of frames and freezes the final image. This process continues until the predefined number of frames is reached, and then stops and freezes automatically.
     """
-    NONE = 1    
+    NONE = 1
     """
     Live imaging with one frame following the other. The image remains unfiltered for collecting direct images, mostly in Live/Slow scan. This is the raw scanned image with no filtering.
     """
-    AVERAGING = 2    
+    AVERAGING = 2
     """
     Continuously averages a specified number of frames (2 or more), resulting in a better signal-to-noise ratio. During averaging, the image is updated continuously and actions such as focusing and moving the stage can still be performed. This process will continue until stopped by change of scanning condition or by freezing the result.
     """
-    INTEGRATION = 3    
+    INTEGRATION = 3
     """
     Allows accumulative noise reduction by true integration over a number of frames and freezes the final image. This process continues until the predefined number of frames is reached, and then stops and freezes automatically.
     """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            1 : "NONE",
-            2 : "AVERAGING",
-            3 : "INTEGRATION",
+            1: "NONE",
+            2: "AVERAGING",
+            3: "INTEGRATION",
             }.get(value, "?")
 
 
-class ScanningMode:    
+class ScanningMode:
     """
     The enumeration of all available scanning modes used for imaging.
     
@@ -154,50 +192,51 @@ class ScanningMode:
     
     :param CROSSOVER: The image of the electron source tip is grabbed instead of the sample surface.
     """
-    FULL_FRAME = 1    
+    FULL_FRAME = 1
     """
     The image of a whole frame is grabbed.
     """
-    LINE = 2    
+    LINE = 2
     """
     Only one line of the frame is grabbed.
     """
-    SPOT = 3    
+    SPOT = 3
     """
     Only one pixel of the frame is grabbed.
     """
-    REDUCED_AREA = 4    
+    REDUCED_AREA = 4
     """
     The specified rectangular area is grabbed.
     """
-    EXTERNAL = 5    
+    EXTERNAL = 5
     """
     The external control of the scanning system is used, such as beam control from an EDX X-ray system.
     """
-    OTHER = 6    
+    OTHER = 6
     """
     Unknown scan mode.
     """
-    CROSSOVER = 7    
+    CROSSOVER = 7
     """
     The image of the electron source tip is grabbed instead of the sample surface.
     """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            1 : "FULL_FRAME",
-            2 : "LINE",
-            3 : "SPOT",
-            4 : "REDUCED_AREA",
-            5 : "EXTERNAL",
-            6 : "OTHER",
-            7 : "CROSSOVER",
+            1: "FULL_FRAME",
+            2: "LINE",
+            3: "SPOT",
+            4: "REDUCED_AREA",
+            5: "EXTERNAL",
+            6: "OTHER",
+            7: "CROSSOVER",
             }.get(value, "?")
 
 
-class ScanningResolution:    
+class ScanningResolution:
     """
-    The enumeration representing the most used resolutions.
+    The enumeration of standard scan resolutions.
     
     :param PRESET_768X512: 
     
@@ -224,20 +263,21 @@ class ScanningResolution:
     PRESET_2048X1768 = "2048x1768"
     PRESET_4096X3536 = "4096x3536"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "768x512" : "PRESET_768X512",
-            "1536x1024" : "PRESET_1536X1024",
-            "3072x2048" : "PRESET_3072X2048",
-            "6144x4096" : "PRESET_6144X4096",
-            "512x442" : "PRESET_512X442",
-            "1024x884" : "PRESET_1024X884",
-            "2048x1768" : "PRESET_2048X1768",
-            "4096x3536" : "PRESET_4096X3536",
+            "768x512": "PRESET_768X512",
+            "1536x1024": "PRESET_1536X1024",
+            "3072x2048": "PRESET_3072X2048",
+            "6144x4096": "PRESET_6144X4096",
+            "512x442": "PRESET_512X442",
+            "1024x884": "PRESET_1024X884",
+            "2048x1768": "PRESET_2048X1768",
+            "4096x3536": "PRESET_4096X3536",
             }.get(value, "?")
 
 
-class ImageDataEncoding:    
+class ImageDataEncoding:
     """
     The enumeration of all available image encoding.
     
@@ -247,28 +287,29 @@ class ImageDataEncoding:
     
     :param BGR: The order of colors of a pixel is Blue, Green, Red.
     """
-    UNSIGNED = 0    
+    UNSIGNED = 0
     """
     Usually represents gray scale images.
     """
-    RGB = 3    
+    RGB = 3
     """
     The order of colors of a pixel is Red, Green, Blue.
     """
-    BGR = 5    
+    BGR = 5
     """
     The order of colors of a pixel is Blue, Green, Red.
     """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            0 : "UNSIGNED",
-            3 : "RGB",
-            5 : "BGR",
+            0: "UNSIGNED",
+            3: "RGB",
+            5: "BGR",
             }.get(value, "?")
 
 
-class DetectorMode:    
+class DetectorMode:
     """
     The enumeration of all available detector modes.
     
@@ -387,50 +428,51 @@ class DetectorMode:
     CUSTOM4 = "Custom4"
     CUSTOM5 = "Custom5"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "None" : "NONE",
-            "SecondaryElectrons" : "SECONDARY_ELECTRONS",
-            "SecondaryIons" : "SECONDARY_IONS",
-            "BackscatterElectrons" : "BACKSCATTER_ELECTRONS",
-            "ChargeNeutralization" : "CHARGE_NEUTRALIZATION",
-            "DownHoleVisibility" : "DOWN_HOLE_VISIBILITY",
-            "Custom" : "CUSTOM",
-            "SegmentA" : "SEGMENT_A",
-            "SegmentB" : "SEGMENT_B",
-            "ZContrast" : "Z_CONTRAST",
-            "Topography" : "TOPOGRAPHY",
-            "CathodoLuminescence" : "CATHODO_LUMINESCENCE",
-            "Mix" : "MIX",
-            "BrightField" : "BRIGHT_FIELD",
-            "DarkField" : "DARK_FIELD",
-            "Angular" : "ANGULAR",
-            "AngularPartial" : "ANGULAR_PARTIAL",
-            "AngularPartialComplement" : "ANGULAR_PARTIAL_COMPLEMENT",
-            "Custom2" : "CUSTOM2",
-            "Custom3" : "CUSTOM3",
-            "AplusB" : "A_PLUS_B",
-            "AminusB" : "A_MINUS_B",
-            "BeamDeceleration" : "BEAM_DECELERATION",
-            "LowAngle" : "LOW_ANGLE",
-            "HighAngle" : "HIGH_ANGLE",
-            "AnularB" : "ANULAR_B",
-            "AnularC" : "ANULAR_C",
-            "AnularA" : "ANULAR_A",
-            "InnerMinusOuter" : "INNER_MINUS_OUTER",
-            "All" : "ALL",
-            "AnularD" : "ANULAR_D",
-            "Scintillation" : "SCINTILLATION",
-            "DarkField1" : "DARK_FIELD1",
-            "DarkField2" : "DARK_FIELD2",
-            "DarkField3" : "DARK_FIELD3",
-            "DarkField4" : "DARK_FIELD4",
-            "Custom4" : "CUSTOM4",
-            "Custom5" : "CUSTOM5",
+            "None": "NONE",
+            "SecondaryElectrons": "SECONDARY_ELECTRONS",
+            "SecondaryIons": "SECONDARY_IONS",
+            "BackscatterElectrons": "BACKSCATTER_ELECTRONS",
+            "ChargeNeutralization": "CHARGE_NEUTRALIZATION",
+            "DownHoleVisibility": "DOWN_HOLE_VISIBILITY",
+            "Custom": "CUSTOM",
+            "SegmentA": "SEGMENT_A",
+            "SegmentB": "SEGMENT_B",
+            "ZContrast": "Z_CONTRAST",
+            "Topography": "TOPOGRAPHY",
+            "CathodoLuminescence": "CATHODO_LUMINESCENCE",
+            "Mix": "MIX",
+            "BrightField": "BRIGHT_FIELD",
+            "DarkField": "DARK_FIELD",
+            "Angular": "ANGULAR",
+            "AngularPartial": "ANGULAR_PARTIAL",
+            "AngularPartialComplement": "ANGULAR_PARTIAL_COMPLEMENT",
+            "Custom2": "CUSTOM2",
+            "Custom3": "CUSTOM3",
+            "AplusB": "A_PLUS_B",
+            "AminusB": "A_MINUS_B",
+            "BeamDeceleration": "BEAM_DECELERATION",
+            "LowAngle": "LOW_ANGLE",
+            "HighAngle": "HIGH_ANGLE",
+            "AnularB": "ANULAR_B",
+            "AnularC": "ANULAR_C",
+            "AnularA": "ANULAR_A",
+            "InnerMinusOuter": "INNER_MINUS_OUTER",
+            "All": "ALL",
+            "AnularD": "ANULAR_D",
+            "Scintillation": "SCINTILLATION",
+            "DarkField1": "DARK_FIELD1",
+            "DarkField2": "DARK_FIELD2",
+            "DarkField3": "DARK_FIELD3",
+            "DarkField4": "DARK_FIELD4",
+            "Custom4": "CUSTOM4",
+            "Custom5": "CUSTOM5",
             }.get(value, "?")
 
 
-class DetectorType:    
+class DetectorType:
     """
     The enumeration of all available detector types.
     
@@ -495,32 +537,33 @@ class DetectorType:
     T3 = "T3"
     EXTERNAL = "External"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "None" : "NONE",
-            "TLD" : "TLD",
-            "CDEM" : "CDEM",
-            "LFD" : "LFD",
-            "GBSD" : "GBSD",
-            "GSED" : "GSED",
-            "ETD" : "ETD",
-            "STEM3" : "STEM3",
-            "LVD" : "LVD",
-            "LVSED" : "LVSED",
-            "ICE" : "ICE",
-            "ABS" : "ABS",
-            "CBS" : "CBS",
-            "ECD" : "ECD",
-            "STEM3_GMode" : "STEM3_PLUS",
-            "STEM4" : "STEM4",
-            "T1" : "T1",
-            "T2" : "T2",
-            "T3" : "T3",
-            "External" : "EXTERNAL",
+            "None": "NONE",
+            "TLD": "TLD",
+            "CDEM": "CDEM",
+            "LFD": "LFD",
+            "GBSD": "GBSD",
+            "GSED": "GSED",
+            "ETD": "ETD",
+            "STEM3": "STEM3",
+            "LVD": "LVD",
+            "LVSED": "LVSED",
+            "ICE": "ICE",
+            "ABS": "ABS",
+            "CBS": "CBS",
+            "ECD": "ECD",
+            "STEM3_GMode": "STEM3_PLUS",
+            "STEM4": "STEM4",
+            "T1": "T1",
+            "T2": "T2",
+            "T3": "T3",
+            "External": "EXTERNAL",
             }.get(value, "?")
 
 
-class PatterningMode:    
+class PatterningMode:
     """
     The enumeration representing modes available for milling.
     
@@ -528,23 +571,24 @@ class PatterningMode:
     
     :param PARALLEL: All defined patterns are milled concurrently. For example, if three lines are defined as milling patterns, one pass of the beam will be made on one, then the next, then the third, back to the first, and so on until all three lines are milled to the depth selected for the first line. Parallel patterning is typically used to avoid redeposition of material on adjacent areas as well as to save milling time.
     """
-    SERIAL = "Serial"    
+    SERIAL = "Serial"
     """
     All defined patterns are milled consecutively. Milling is completed on one pattern before moving to the next. Serial patterning is always used with cleaning cross sections as well as regular cross section.
     """
-    PARALLEL = "Parallel"    
+    PARALLEL = "Parallel"
     """
     All defined patterns are milled concurrently. For example, if three lines are defined as milling patterns, one pass of the beam will be made on one, then the next, then the third, back to the first, and so on until all three lines are milled to the depth selected for the first line. Parallel patterning is typically used to avoid redeposition of material on adjacent areas as well as to save milling time.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Serial" : "SERIAL",
-            "Parallel" : "PARALLEL",
+            "Serial": "SERIAL",
+            "Parallel": "PARALLEL",
             }.get(value, "?")
 
 
-class PatterningState:    
+class PatterningState:
     """
     The enumeration contains all patterning states.
     
@@ -556,33 +600,34 @@ class PatterningState:
     
     :param PAUSED: Patterning job is paused.
     """
-    ERROR = "Error"    
+    ERROR = "Error"
     """
     Last job finished with error.
     """
-    IDLE = "Idle"    
+    IDLE = "Idle"
     """
     The patterning is in idle state. No job is running.
     """
-    RUNNING = "Running"    
+    RUNNING = "Running"
     """
     Patterning job is running.
     """
-    PAUSED = "Paused"    
+    PAUSED = "Paused"
     """
     Patterning job is paused.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Error" : "ERROR",
-            "Idle" : "IDLE",
-            "Running" : "RUNNING",
-            "Paused" : "PAUSED",
+            "Error": "ERROR",
+            "Idle": "IDLE",
+            "Running": "RUNNING",
+            "Paused": "PAUSED",
             }.get(value, "?")
 
 
-class PatternScanDirection:    
+class PatternScanDirection:
     """
     The direction of a movement of a scan.
     
@@ -617,22 +662,23 @@ class PatternScanDirection:
     INNER_TO_OUTER = "InnerToOuter"
     DYNAMIC_INNER_TO_OUTER = "DynamicInnerToOuter"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "BottomToTop" : "BOTTOM_TO_TOP",
-            "TopToBottom" : "TOP_TO_BOTTOM",
-            "RightToLeft" : "RIGHT_TO_LEFT",
-            "LeftToRight" : "LEFT_TO_RIGHT",
-            "DynamicTopToBottom" : "DYNAMIC_TOP_TO_BOTTOM",
-            "DynamicLeftToRight" : "DYNAMIC_LEFT_TO_RIGHT",
-            "DynamicAllDirections" : "DYNAMIC_ALL_DIRECTIONS",
-            "OuterToInner" : "OUTER_TO_INNER",
-            "InnerToOuter" : "INNER_TO_OUTER",
-            "DynamicInnerToOuter" : "DYNAMIC_INNER_TO_OUTER",
+            "BottomToTop": "BOTTOM_TO_TOP",
+            "TopToBottom": "TOP_TO_BOTTOM",
+            "RightToLeft": "RIGHT_TO_LEFT",
+            "LeftToRight": "LEFT_TO_RIGHT",
+            "DynamicTopToBottom": "DYNAMIC_TOP_TO_BOTTOM",
+            "DynamicLeftToRight": "DYNAMIC_LEFT_TO_RIGHT",
+            "DynamicAllDirections": "DYNAMIC_ALL_DIRECTIONS",
+            "OuterToInner": "OUTER_TO_INNER",
+            "InnerToOuter": "INNER_TO_OUTER",
+            "DynamicInnerToOuter": "DYNAMIC_INNER_TO_OUTER",
             }.get(value, "?")
 
 
-class PatternScanType:    
+class PatternScanType:
     """
     Scanning strategy used while patterning.
     
@@ -642,25 +688,26 @@ class PatternScanType:
     
     :param CIRCULAR: 
     """
-    SERPENTINE = "Serpentine"    
+    SERPENTINE = "Serpentine"
     """
     The beam proceeds from left to right and back from right to left.
     """
-    RASTER = "Raster"    
+    RASTER = "Raster"
     """
     The beam scans from left to right, then the beam is blanked and returns to the left starting point.
     """
     CIRCULAR = "Circular"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Serpentine" : "SERPENTINE",
-            "Raster" : "RASTER",
-            "Circular" : "CIRCULAR",
+            "Serpentine": "SERPENTINE",
+            "Raster": "RASTER",
+            "Circular": "CIRCULAR",
             }.get(value, "?")
 
 
-class OpticalMode:    
+class OpticalMode:
     """
     The enumeration of all available optical modes.
     
@@ -701,24 +748,25 @@ class OpticalMode:
     VOLUMESCOPE = "Volumescope"
     FISH_EYE = "FishEye"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "FieldFree" : "FIELD_FREE",
-            "Immersion" : "IMMERSION",
-            "EDX" : "EDX",
-            "Intermediate" : "INTERMEDIATE",
-            "Cathode" : "CATHODE",
-            "FIBImmersion" : "FIB_IMMERSION",
-            "Standard" : "STANDARD",
-            "OptiPlan" : "OPTIPLAN",
-            "OptiTilt" : "OPTITILT",
-            "Analytical" : "ANALYTICAL",
-            "Volumescope" : "VOLUMESCOPE",
-            "FishEye" : "FISH_EYE",
+            "FieldFree": "FIELD_FREE",
+            "Immersion": "IMMERSION",
+            "EDX": "EDX",
+            "Intermediate": "INTERMEDIATE",
+            "Cathode": "CATHODE",
+            "FIBImmersion": "FIB_IMMERSION",
+            "Standard": "STANDARD",
+            "OptiPlan": "OPTIPLAN",
+            "OptiTilt": "OPTITILT",
+            "Analytical": "ANALYTICAL",
+            "Volumescope": "VOLUMESCOPE",
+            "FishEye": "FISH_EYE",
             }.get(value, "?")
 
 
-class SegmentPolarity:    
+class SegmentPolarity:
     """
     The polarity of a detector segment.
     
@@ -728,28 +776,29 @@ class SegmentPolarity:
     
     :param NEGATIVE: The segment is enabled and the polarity is negative.
     """
-    POSITIVE = 1    
+    POSITIVE = 1
     """
     The segment is enabled and the polarity is positive.
     """
-    NEUTRAL = 0    
+    NEUTRAL = 0
     """
     The segment is disabled.
     """
-    NEGATIVE = -1    
+    NEGATIVE = -1
     """
     The segment is enabled and the polarity is negative.
     """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            1 : "POSITIVE",
-            0 : "NEUTRAL",
-            -1 : "NEGATIVE",
+            1: "POSITIVE",
+            0: "NEUTRAL",
+            -1: "NEGATIVE",
             }.get(value, "?")
 
 
-class DetectorSegment:    
+class DetectorSegment:
     """
     The detector segments.
     
@@ -805,53 +854,55 @@ class DetectorSegment:
     ANGULAR_4 = "Angular4"
     ANGULAR_5 = "Angular5"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "A" : "A",
-            "B" : "B",
-            "C" : "C",
-            "D" : "D",
-            "Inner" : "INNER",
-            "Annular0" : "ANNULAR_0",
-            "Annular1" : "ANNULAR_1",
-            "Annular2" : "ANNULAR_2",
-            "Annular3" : "ANNULAR_3",
-            "Annular4" : "ANNULAR_4",
-            "Annular5" : "ANNULAR_5",
-            "Angular0" : "ANGULAR_0",
-            "Angular1" : "ANGULAR_1",
-            "Angular2" : "ANGULAR_2",
-            "Angular3" : "ANGULAR_3",
-            "Angular4" : "ANGULAR_4",
-            "Angular5" : "ANGULAR_5",
+            "A": "A",
+            "B": "B",
+            "C": "C",
+            "D": "D",
+            "Inner": "INNER",
+            "Annular0": "ANNULAR_0",
+            "Annular1": "ANNULAR_1",
+            "Annular2": "ANNULAR_2",
+            "Annular3": "ANNULAR_3",
+            "Annular4": "ANNULAR_4",
+            "Annular5": "ANNULAR_5",
+            "Angular0": "ANGULAR_0",
+            "Angular1": "ANGULAR_1",
+            "Angular2": "ANGULAR_2",
+            "Angular3": "ANGULAR_3",
+            "Angular4": "ANGULAR_4",
+            "Angular5": "ANGULAR_5",
             }.get(value, "?")
 
 
-class RtmMode:    
+class RtmMode:
     """
     The enumeration of available RTM resolution modes.
     
-    :param LOW_RESOLUTION: In the low resolution mode, the imaging pipeline is used to retrieve the values of the pattern points. Pattern points are mapped to pixels in image, where more pattern points may belong to a single pixel if the image resolution is not as fine as the pattern point positions. If more pattern points fall into one pixel, they all will have the same value.
+    :param LOW_RESOLUTION: In low-resolution mode, the imaging pipeline is used to retrieve the values of pattern points. Pattern points are mapped to pixels in the image, and multiple pattern points may belong to a single pixel if the image resolution is not as fine as the pattern point positions. When multiple pattern points fall into a pixel, they all have the same value.
     
-    :param HIGH_RESOLUTION: In the high resolution mode, the patterning pipeline is used to retrieve the values of the pattern points. Pattern point values exactly match the pattern point positions no matter what image resolution is used.
+    :param HIGH_RESOLUTION: In high-resolution mode, the patterning pipeline is used to retrieve the values of pattern points. The values correspond exactly to the positions of the pattern points, no matter what image resolution is used.
     """
-    LOW_RESOLUTION = 1    
+    LOW_RESOLUTION = 1
     """
-    In the low resolution mode, the imaging pipeline is used to retrieve the values of the pattern points. Pattern points are mapped to pixels in image, where more pattern points may belong to a single pixel if the image resolution is not as fine as the pattern point positions. If more pattern points fall into one pixel, they all will have the same value.
+    In low-resolution mode, the imaging pipeline is used to retrieve the values of pattern points. Pattern points are mapped to pixels in the image, and multiple pattern points may belong to a single pixel if the image resolution is not as fine as the pattern point positions. When multiple pattern points fall into a pixel, they all have the same value.
     """
-    HIGH_RESOLUTION = 2    
+    HIGH_RESOLUTION = 2
     """
-    In the high resolution mode, the patterning pipeline is used to retrieve the values of the pattern points. Pattern point values exactly match the pattern point positions no matter what image resolution is used.
+    In high-resolution mode, the patterning pipeline is used to retrieve the values of pattern points. The values correspond exactly to the positions of the pattern points, no matter what image resolution is used.
     """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            1 : "LOW_RESOLUTION",
-            2 : "HIGH_RESOLUTION",
+            1: "LOW_RESOLUTION",
+            2: "HIGH_RESOLUTION",
             }.get(value, "?")
 
 
-class RtmCoordinateSystem:    
+class RtmCoordinateSystem:
     """
     The enumeration of available RTM coordinate systems.
     
@@ -859,23 +910,24 @@ class RtmCoordinateSystem:
     
     :param IMAGE_PIXELS: The positions correspond to the image pixel positions.
     """
-    DAC = 1    
+    DAC = 1
     """
     The positions correspond to the hardware positions. These positions are more precise.
     """
-    IMAGE_PIXELS = 2    
+    IMAGE_PIXELS = 2
     """
     The positions correspond to the image pixel positions.
     """
     
-    def explain(value : int):
+    @staticmethod
+    def explain(value: int):
         return {
-            1 : "DAC",
-            2 : "IMAGE_PIXELS",
+            1: "DAC",
+            2: "IMAGE_PIXELS",
             }.get(value, "?")
 
 
-class AutoFunctionMethod:    
+class AutoFunctionMethod:
     """
     The enumeration of all auto function methods.
     
@@ -887,33 +939,34 @@ class AutoFunctionMethod:
     
     :param ONG_ET_AL: Method based on research of Ong et al.
     """
-    STANDARD = "Standard"    
+    STANDARD = "Standard"
     """
     Standard method for wide range of use cases.
     """
-    VOLUMESCOPE = "Volumescope"    
+    VOLUMESCOPE = "Volumescope"
     """
     Method based on Volumescope workflow specialized for biological samples.
     """
-    MAX_CONTRAST = "MaxContrast"    
+    MAX_CONTRAST = "MaxContrast"
     """
     Method to prioritize contrast maximization.
     """
-    ONG_ET_AL = "OngEtAl"    
+    ONG_ET_AL = "OngEtAl"
     """
     Method based on research of Ong et al.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Standard" : "STANDARD",
-            "Volumescope" : "VOLUMESCOPE",
-            "MaxContrast" : "MAX_CONTRAST",
-            "OngEtAl" : "ONG_ET_AL",
+            "Standard": "STANDARD",
+            "Volumescope": "VOLUMESCOPE",
+            "MaxContrast": "MAX_CONTRAST",
+            "OngEtAl": "ONG_ET_AL",
             }.get(value, "?")
 
 
-class ImageFileFormat:    
+class ImageFileFormat:
     """
     The enumeration of supported image file formats.
     
@@ -921,23 +974,24 @@ class ImageFileFormat:
     
     :param RAW: The file contains only unformatted data.
     """
-    TIFF = "tiff"    
+    TIFF = "tiff"
     """
     The data are stored in TIFF file format. The file will also contain metadata describing conditions at image acquisition time.
     """
-    RAW = "raw"    
+    RAW = "raw"
     """
     The file contains only unformatted data.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "tiff" : "TIFF",
-            "raw" : "RAW",
+            "tiff": "TIFF",
+            "raw": "RAW",
             }.get(value, "?")
 
 
-class Stem4Positions:    
+class Stem4Positions:
     """
     The enumeration of all available STEM4 positions.
     
@@ -945,23 +999,24 @@ class Stem4Positions:
     
     :param STANDARD: This position should be used for basic STEM imaging and also for lamella lift-out and thinning with STEM end-pointing -- in the last case, insert the STEM before starting the thinning process. The stage can be at the eucentric position and Easylift with MultiChem can be inserted.
     """
-    IN_LENS = "InLens"    
+    IN_LENS = "InLens"
     """
     This position should be used only for high resolution imaging in electron column Mode 2 (Immersion). The stage cannot be at the eucentric position.
     """
-    STANDARD = "Standard"    
+    STANDARD = "Standard"
     """
     This position should be used for basic STEM imaging and also for lamella lift-out and thinning with STEM end-pointing -- in the last case, insert the STEM before starting the thinning process. The stage can be at the eucentric position and Easylift with MultiChem can be inserted.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "InLens" : "IN_LENS",
-            "Standard" : "STANDARD",
+            "InLens": "IN_LENS",
+            "Standard": "STANDARD",
             }.get(value, "?")
 
 
-class AutoLensAlignmentModulationType:    
+class AutoLensAlignmentModulationType:
     """
     Available modulation types for automatic lens alignment adjustment routine.
     
@@ -971,28 +1026,29 @@ class AutoLensAlignmentModulationType:
     
     :param HIGH_VOLTAGE: The routine uses modulation based on high voltage.
     """
-    AUTOMATIC = "Automatic"    
+    AUTOMATIC = "Automatic"
     """
     The routine uses modulation type selected automatically according to the current conditions.
     """
-    WORKING_DISTANCE = "WorkingDistance"    
+    WORKING_DISTANCE = "WorkingDistance"
     """
     The routine uses modulation based on working distance.
     """
-    HIGH_VOLTAGE = "HighVoltage"    
+    HIGH_VOLTAGE = "HighVoltage"
     """
     The routine uses modulation based on high voltage.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Automatic" : "AUTOMATIC",
-            "WorkingDistance" : "WORKING_DISTANCE",
-            "HighVoltage" : "HIGH_VOLTAGE",
+            "Automatic": "AUTOMATIC",
+            "WorkingDistance": "WORKING_DISTANCE",
+            "HighVoltage": "HIGH_VOLTAGE",
             }.get(value, "?")
 
 
-class LoadLockState:    
+class LoadLockState:
     """
     The enumeration of all supported LoadLock states.
     
@@ -1006,38 +1062,39 @@ class LoadLockState:
     
     :param OTHER: Undefined state, most likely state is undetermined.
     """
-    LOADED = "Loaded"    
+    LOADED = "Loaded"
     """
     LoadLock is loaded.
     """
-    BUSY = "Busy"    
+    BUSY = "Busy"
     """
     LoadLock is busy.
     """
-    UNLOADED = "Unloaded"    
+    UNLOADED = "Unloaded"
     """
     LoadLock is unloaded.
     """
-    ERROR = "Error"    
+    ERROR = "Error"
     """
     LoadLock is in error state.
     """
-    OTHER = "Other"    
+    OTHER = "Other"
     """
     Undefined state, most likely state is undetermined.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Loaded" : "LOADED",
-            "Busy" : "BUSY",
-            "Unloaded" : "UNLOADED",
-            "Error" : "ERROR",
-            "Other" : "OTHER",
+            "Loaded": "LOADED",
+            "Busy": "BUSY",
+            "Unloaded": "UNLOADED",
+            "Error": "ERROR",
+            "Other": "OTHER",
             }.get(value, "?")
 
 
-class RetractableDeviceState:    
+class RetractableDeviceState:
     """
     The enumeration of all supported retractable device states.
     
@@ -1051,38 +1108,39 @@ class RetractableDeviceState:
     
     :param OTHER: Undefined state, most likely state is undetermined.
     """
-    INSERTED = "Inserted"    
+    INSERTED = "Inserted"
     """
     Device is inserted.
     """
-    RETRACTED = "Retracted"    
+    RETRACTED = "Retracted"
     """
     Device is retracted.
     """
-    BUSY = "Busy"    
+    BUSY = "Busy"
     """
     Device is busy (inserting/retracting).
     """
-    ERROR = "Error"    
+    ERROR = "Error"
     """
     Device is in error state.
     """
-    OTHER = "Other"    
+    OTHER = "Other"
     """
     Undefined state, most likely state is undetermined.
     """
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Inserted" : "INSERTED",
-            "Retracted" : "RETRACTED",
-            "Busy" : "BUSY",
-            "Error" : "ERROR",
-            "Other" : "OTHER",
+            "Inserted": "INSERTED",
+            "Retracted": "RETRACTED",
+            "Busy": "BUSY",
+            "Error": "ERROR",
+            "Other": "OTHER",
             }.get(value, "?")
 
 
-class AngularCorrectionMode:    
+class AngularCorrectionMode:
     """
     Enumeration of supported angular correction modes.
     
@@ -1093,14 +1151,15 @@ class AngularCorrectionMode:
     MANUAL = "Manual"
     AUTOMATIC = "Automatic"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Manual" : "MANUAL",
-            "Automatic" : "AUTOMATIC",
+            "Manual": "MANUAL",
+            "Automatic": "AUTOMATIC",
             }.get(value, "?")
 
 
-class VacuumMode:    
+class VacuumMode:
     """
     Enumeration of supported vacuum modes.
     
@@ -1114,15 +1173,16 @@ class VacuumMode:
     LOW_VACUUM = "LowVacuum"
     ESEM = "ESEM"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "HighVacuum" : "HIGH_VACUUM",
-            "LowVacuum" : "LOW_VACUUM",
-            "ESEM" : "ESEM",
+            "HighVacuum": "HIGH_VACUUM",
+            "LowVacuum": "LOW_VACUUM",
+            "ESEM": "ESEM",
             }.get(value, "?")
 
 
-class VacuumGasType:    
+class VacuumGasType:
     """
     Enumeration of supported vacuum gas types.
     
@@ -1139,16 +1199,17 @@ class VacuumGasType:
     UNKNOWN = "Unknown"
     ARGON = "Argon"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Water" : "WATER",
-            "Auxiliary" : "AUXILIARY",
-            "Unknown" : "UNKNOWN",
-            "Argon" : "ARGON",
+            "Water": "WATER",
+            "Auxiliary": "AUXILIARY",
+            "Unknown": "UNKNOWN",
+            "Argon": "ARGON",
             }.get(value, "?")
 
 
-class VacuumState:    
+class VacuumState:
     """
     Enumeration of supported vacuum states.
     
@@ -1174,19 +1235,20 @@ class VacuumState:
     ERROR = "Error"
     PUMPED_FOR_WAFER_EXCHANGE = "PumpedForWaferExchange"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Pumping" : "PUMPING",
-            "Pumped" : "PUMPED",
-            "Venting" : "VENTING",
-            "Vented" : "VENTED",
-            "Unknown" : "UNKNOWN",
-            "Error" : "ERROR",
-            "PumpedForWaferExchange" : "PUMPED_FOR_WAFER_EXCHANGE",
+            "Pumping": "PUMPING",
+            "Pumped": "PUMPED",
+            "Venting": "VENTING",
+            "Vented": "VENTED",
+            "Unknown": "UNKNOWN",
+            "Error": "ERROR",
+            "PumpedForWaferExchange": "PUMPED_FOR_WAFER_EXCHANGE",
             }.get(value, "?")
 
 
-class MultiChemInsertPosition:    
+class MultiChemInsertPosition:
     """
     Enumeration of standard MultiChem insert positions.
     
@@ -1206,17 +1268,18 @@ class MultiChemInsertPosition:
     COMPUSTAGE90_DEFAULT = "Compustage 90 Default"
     DXLARGE_DEPROCESSING = "DX_Large_Deprocessing"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Electron Default" : "ELECTRON_DEFAULT",
-            "Ion Default" : "ION_DEFAULT",
-            "Compustage 0 Default" : "COMPUSTAGE0_DEFAULT",
-            "Compustage 90 Default" : "COMPUSTAGE90_DEFAULT",
-            "DX_Large_Deprocessing" : "DXLARGE_DEPROCESSING",
+            "Electron Default": "ELECTRON_DEFAULT",
+            "Ion Default": "ION_DEFAULT",
+            "Compustage 0 Default": "COMPUSTAGE0_DEFAULT",
+            "Compustage 90 Default": "COMPUSTAGE90_DEFAULT",
+            "DX_Large_Deprocessing": "DXLARGE_DEPROCESSING",
             }.get(value, "?")
 
 
-class PlasmaGasType:    
+class PlasmaGasType:
     """
     Enumeration of gases in Multiple Ion Plasma FIB
     
@@ -1233,16 +1296,17 @@ class PlasmaGasType:
     NITROGEN = "Nitrogen"
     OXYGEN = "Oxygen"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "Xenon" : "XENON",
-            "Argon" : "ARGON",
-            "Nitrogen" : "NITROGEN",
-            "Oxygen" : "OXYGEN",
+            "Xenon": "XENON",
+            "Argon": "ARGON",
+            "Nitrogen": "NITROGEN",
+            "Oxygen": "OXYGEN",
             }.get(value, "?")
 
 
-class StageAxis:    
+class StageAxis:
     """
     Enumeration of stage axes.
     
@@ -1255,32 +1319,25 @@ class StageAxis:
     :param T: 
     
     :param R: 
-    
-    :param FX: 
-    
-    :param FY: 
     """
     X = "X"
     Y = "Y"
     Z = "Z"
     T = "T"
     R = "R"
-    FX = "Fx"
-    FY = "Fy"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "X" : "X",
-            "Y" : "Y",
-            "Z" : "Z",
-            "T" : "T",
-            "R" : "R",
-            "Fx" : "FX",
-            "Fy" : "FY",
+            "X": "X",
+            "Y": "Y",
+            "Z": "Z",
+            "T": "T",
+            "R": "R",
             }.get(value, "?")
 
 
-class TemperatureStageType:    
+class TemperatureStageType:
     """
     Types of temperature stages.
     
@@ -1300,11 +1357,45 @@ class TemperatureStageType:
     MICRO_HEATER = "MicroHeater"
     HIGH_VACUUM_HEATING_STAGE = "HighVacuumHeatingStage"
     
-    def explain(value : str):
+    @staticmethod
+    def explain(value: str):
         return {
-            "None" : "NONE",
-            "CoolingStage" : "COOLING_STAGE",
-            "HeatingStage" : "HEATING_STAGE",
-            "MicroHeater" : "MICRO_HEATER",
-            "HighVacuumHeatingStage" : "HIGH_VACUUM_HEATING_STAGE",
+            "None": "NONE",
+            "CoolingStage": "COOLING_STAGE",
+            "HeatingStage": "HEATING_STAGE",
+            "MicroHeater": "MICRO_HEATER",
+            "HighVacuumHeatingStage": "HIGH_VACUUM_HEATING_STAGE",
+            }.get(value, "?")
+
+
+class RegularCrossSectionScanMethod:
+    """
+    The enumeration of all supported regular cross section pattern scan methods.
+    
+    :param STAIR_STEP: 
+    
+    :param MULTI_SCAN: 
+    """
+    STAIR_STEP = 0
+    MULTI_SCAN = 1
+    
+    @staticmethod
+    def explain(value: int):
+        return {
+            0: "STAIR_STEP",
+            1: "MULTI_SCAN",
+            }.get(value, "?")
+
+
+class TemperatureStageHeatShieldType:
+    NONE = "None"
+    EBSD = "EBSD"
+    TOP_DOWN = "TopDown"
+    
+    @staticmethod
+    def explain(value: str):
+        return {
+            "None": "NONE",
+            "EBSD": "EBSD",
+            "TopDown": "TOP_DOWN",
             }.get(value, "?")
