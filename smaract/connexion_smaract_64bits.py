@@ -38,16 +38,16 @@ class smaract_class(object):
         self.state_codes = {k:self.status_codes[k] for k in list(self.status_codes)[41:44]}
 
         ###### Initialisation
-        logging.info(' Initialization...')
+        print(' Initialization...')
         try:
             self.smaract = smaract_lib_client64()
         except:
-            logging.info(' Error while importing Smaract dll. Please check the path.')
+            print(' Error while importing Smaract dll. Please check the path.')
 
         self.smaract.SA_ClearInitSystemsList()
         
         AvailableSys_state, AvailableSys_list = self.smaract.SA_GetAvailableSystems()
-        logging.info(' Available Systems IDs: ' + str(AvailableSys_list))
+        print(' Available Systems IDs: ' + str(AvailableSys_list))
         
         if len(AvailableSys_list) >= 1 and AvailableSys_list[0] != 0:
             self.smaract.SA_AddSystemToInitSystemsList(AvailableSys_list[0]) #3919851221
@@ -59,17 +59,17 @@ class smaract_class(object):
                 # Init state
                 self.InitState_status, InitState = self.smaract.SA_GetInitState()
 
-                logging.info(' Initialization... OK')
-                logging.info(' System ID:       ' + str(AvailableSys_list[0]))
-                logging.info(' Dll version:     ' + str(version))
-                logging.info(' Init state:      ' + str(InitState) + ' ' + str(self.find_status_message(self.state_codes, InitState)))
-                logging.info(' ---------------------------------------')
+                print(' Initialization... OK')
+                print(' System ID:       ' + str(AvailableSys_list[0]))
+                print(' Dll version:     ' + str(version))
+                print(' Init state:      ' + str(InitState) + ' ' + str(self.find_status_message(self.state_codes, InitState)))
+                print(' ---------------------------------------')
             else:
                 self.check_status([InitSystems_status])
                 self.InitState_status = 1
         else:
             self.check_status([AvailableSys_state], ' No systems detected: ')
-            logging.info(' Check if MCS-3D is turned on. Check USB connexion.')
+            print(' Check if MCS-3D is turned on. Check USB connexion.')
             self.InitState_status = 1
 
         self.range_limits = {'z_min': -1900000,
@@ -137,7 +137,7 @@ class smaract_class(object):
         for status in list_error:
             if status != 0:
                 message = self.find_status_message(self.error_codes, status)
-                logging.info(error_text + str(status) + ' ' + str(message))
+                print(error_text + str(status) + ' ' + str(message))
                 return 1
         return error
 
@@ -213,7 +213,7 @@ class smaract_class(object):
             y_limits_state = smaract.smart.SA_GetPositionLimit_S(ctypes.c_uint32(0), ctypes.c_uint32(0), y_min, y_max)
             t_limits_state = smaract.smart.SA_GetAngleLimit_S(ctypes.c_uint32(0), ctypes.c_uint32(0), t_min, revol_min, t_max, revol_max)
         except:
-            logging.info('Error when checking range limits of positioners')
+            print('Error when checking range limits of positioners')
             return [None, None, None, None, None, None]
         
         if self.check_status([z_limits_state, y_limits_state, t_limits_state], error_text='Impossible to check limits. ') == 1:
@@ -255,7 +255,7 @@ class smaract_class(object):
         z_status_status, z_status = self.smaract.SA_GetStatus_S(0)
         y_status_status, y_status = self.smaract.SA_GetStatus_S(1)
         t_status_status, t_status = self.smaract.SA_GetStatus_S(2)
-        logging.info('Moving...')
+        print('Moving...')
         while z_status == 4 or y_status == 4 or t_status == 4:
             z_status_status, z_status = self.smaract.SA_GetStatus_S(0)
             y_status_status, y_status = self.smaract.SA_GetStatus_S(1)
@@ -280,13 +280,13 @@ class smaract_class(object):
             t_angle_status, t_angle, t_revol = self.smaract.SA_GetAngle_S()
             t_angle = self.angle_convert_Smaract2SI(t_angle)
         except:
-            logging.info('Error when acquiring postitions')
+            print('Error when acquiring postitions')
             return [None, None, None]
 
         if self.check_status([z_pos_status, y_pos_status, t_angle_status]) == 1:
             return [None, None, None]
 
-        # logging.info('Current position: ' + str([z_pos, y_pos, t_angle]))
+        # print('Current position: ' + str([z_pos, y_pos, t_angle]))
 
         return [z_pos, y_pos, t_angle]
     
@@ -357,6 +357,7 @@ class smaract_class(object):
         try:
             z_setpos_status = self.smaract.SA_GotoPositionRelative_S(0, step[0])
             y_setpos_status = self.smaract.SA_GotoPositionRelative_S(1, step[1])
+            print(step[2], revolution)
             t_setpos_status = self.smaract.SA_GotoAngleRelative_S(      step[2], revolution)
         except:
             print('Error when setting relative position.')
@@ -371,9 +372,12 @@ class smaract_class(object):
         print('Position increased of: ' + str([step[0], step[1], step[2]]))
         return 0
     
+    def set_zero_position(self, channel):
+        self.smaract.SA_SetZeroPosition_S(channel)
+    
 if __name__ == "__main__":
 
-    logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)
+    logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=print)
 
     smaract = smaract_class(calibrate=False)
     print(smaract.getpos())

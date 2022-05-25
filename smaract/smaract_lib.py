@@ -72,6 +72,9 @@ class smaract_lib_server32(Server32):
         revol = ctypes.c_uint32(revol)
         return self.lib.SA_GotoAngleRelative_S(ctypes.c_uint32(0), ctypes.c_uint32(2), ang, revol, ctypes.c_uint32(60000))
 
+    def SA_SetZeroPosition_S(self, channel):
+        return self.lib.SA_SetZeroPosition_S(ctypes.c_uint32(0), ctypes.c_uint32(channel))
+
 class smaract_lib_client64(Client64):
     def __init__(self) -> None:
         super(smaract_lib_client64, self).__init__(module32='smaract/smaract_lib.py', append_environ_path='smaract\lib')

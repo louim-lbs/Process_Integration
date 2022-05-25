@@ -365,13 +365,17 @@ class App(object):
                                           tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                           tilt_end         = int(self.ent_end_tilt.get())*1e6,)
 
-            threading.Thread(target=acqui.tomo).start()
+            self.thread_tomo = threading.Thread(target=acqui.tomo)
+            self.thread_tomo.start()
             if self.check1.get() == True:
-                threading.Thread(target=acqui.f_drift_correction).start()
+                self.thread_drift_correction = threading.Thread(target=acqui.f_drift_correction)
+                self.thread_drift_correction.start()
             if self.check2.get() == True:
-                threading.Thread(target=acqui.f_focus_correction(appPI = self)).start()
+                self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
+                self.thread_focus_correction.start()
             else:
-                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
+                self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
+                self.thread_image_fft.start()
             
         except Exception as e:
             logging.info(str(e))
@@ -398,14 +402,18 @@ class App(object):
                                         tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                         tilt_end         = int(self.ent_end_tilt.get())*1e6)
             time.sleep(0.1)
-            threading.Thread(target=acqui.record).start()
+            self.thread_acqui = threading.Thread(target=acqui.record)
+            self.thread_acqui.start()
             if self.check1.get() == True:
-                threading.Thread(target=acqui.f_drift_correction).start()
+                self.thread_drift_correction = threading.Thread(target=acqui.f_drift_correction)
+                self.thread_drift_correction.start()
             if self.check2.get() == True:
-                threading.Thread(target=acqui.f_focus_correction(appPI = self)).start()
+                self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
+                self.thread_focus_correction.start()
             else:
-                threading.Thread(target=acqui.f_image_fft(appPI = self)).start()
-                
+                self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
+                self.thread_image_fft.start()
+
         except Exception as e:
             logging.info(str(e))
             pass
@@ -418,6 +426,26 @@ class App(object):
         if 'acqui' in globals():
             global acqui
             acqui.flag = 1
+
+        print(self.thread_acqui)
+        try:
+            self.thread_acqui.join()
+            print('acqui joined')
+        except:
+            self.thread_tomo.join()
+            print('tomo joined')
+        
+        if self.check1.get() == True:
+            self.thread_drift_correction.join()
+            print('drift joined')
+        if self.check2.get() == True:
+            self.thread_focus_correction.join()
+            print('focus joined')
+        else:
+            self.thread_image_fft.join()
+            print('fft joined')
+
+
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
         self.lbl_acquisition.config(bg="red")
@@ -428,6 +456,8 @@ class App(object):
         self.lbl_img.configure(image = self.img_0)
         self.lbl_img.photo = self.img_0
         self.lbl_img.update()
+
+        self.microscope.beams.electron_beam.angular_correction.tilt_correction.turn_off()
         return 0
 
 if __name__ == "__main__":

@@ -1,10 +1,5 @@
-INFO: Initialization...
-INFO: Available Systems IDs: [0]
-INFO: No systems detected: 3 SA_NO_SYSTEMS_FOUND_ERROR
-INFO: Check if MCS-3D is turned on. Check USB connexion.
 INFO:Loading faiss with AVX2 support.
 INFO:Could not load library with AVX2 support due to:
 ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
 INFO:Loading faiss.
 INFO:Successfully loaded faiss.
-INFO:Error. 2 SA_NOT_INITIALIZED_ERROR

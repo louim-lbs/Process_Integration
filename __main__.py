@@ -30,6 +30,7 @@ except:
     except:
         SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if not connected
 
+quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
 # Connect to positioner
 # from smaract import connexion_smaract as sm
 # smaract = sm.smaract_class(calibrate=False)
