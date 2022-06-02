@@ -7,3 +7,4 @@ __pycache__/
 !PI_cov-1.tif
 *.cpython
 gui/__pycache__/GUI.cpython-37.pyc
+~$Functions.xlsx
