@@ -6,6 +6,7 @@ from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory, test
 from PIL import ImageTk, Image
 from matplotlib.pyplot import flag
+#from com_functions import microscope
 import scripts_2 as scripts
 from autoscript_sdb_microscope_client.structures import StagePosition
 import threading
@@ -44,6 +45,8 @@ class App(object):
         try:
             self.microscope = microscope
             self.positioner = positioner
+            if positioner == 0:
+                positioner = microscope
         except:
             self.microscope = 0
             self.positioner = 0
@@ -158,10 +161,10 @@ class App(object):
         self.btn_t_down.place(x=242, y=320)
         self.btn_t_zero.place(x=242, y=360)
 
-        positioner_pos = self.positioner.getpos()
-        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[0]) + " nm", justify='left')
-        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[1]) + " nm", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(positioner_pos[2]) + " u°", justify='left')
+        positioner_pos = self.positioner.current_position()
+        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text='{:.2e}'.format(positioner_pos[2]) + " m", justify='left')
+        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text='{:.2e}'.format(positioner_pos[1]) + " m", justify='left')
+        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text='{:.2e}'.format(positioner_pos[3]) + " °", justify='left')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
@@ -259,79 +262,79 @@ class App(object):
     def zero_eucentric(self):
         ''' Reset eucentric point to zero
         '''
-        zed, ygrec, tangle = self.positioner.getpos()
-        if None in (zed, ygrec, tangle):
+        x, y, z, a, b = self.positioner.current_position()
+        if None in (x, y, z, a, b):
             return 1
-        self.positioner.setpos_abs([0, 0, tangle])
-        self.microscope.specimen.stage.relative_move(StagePosition(y=-ygrec*1e-9))
-        self.microscope.beams.electron_beam.working_distance.value += zed*1e-9
+        self.positioner.absolute_move(x, y, 0, a, b)
+        self.microscope.relative_move(0, -y, 0, 0, 0)
+        self.microscope.working_distance(z, 'rel')
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
         return 0
 
     def z_up(self):
         step = int(self.ent_z_step.get())
-        status = self.positioner.setpos_rel([step, 0, 0])
+        status = self.positioner.relative_move(0, 0, step, 0, 0)
         if status != 0:
             return 1
-        self.lbl_z_pos.config(text=str(self.positioner.getpos()[0]) + ' nm')
+        self.lbl_z_pos.config(text=str(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
         return 0
 
     def y_up(self):
         step = int(self.ent_y_step.get())
-        status = self.positioner.setpos_rel([0, step, 0])
+        status = self.positioner.relative_move(0, step, 0, 0, 0)
         if status != 0:
             return 1
-        self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
+        self.lbl_y_pos.config(text=str(self.positioner.current_position()[1]) + ' m')
         self.lbl_y_pos.update()
         return 0
 
     def t_up(self):
         step = int(self.ent_t_step.get())
-        status = self.positioner.setpos_rel([0, 0, step])
+        status = self.positioner.relative_move(0, 0, 0, step, 0)
         if status != 0:
             return 1
-        positioner_pos = self.positioner.getpos()
-        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_pos[2]/1e6)) + ' °')
+        positioner_t_pos = self.positioner.current_position()[3]
+        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_t_pos)) + ' °')
         self.lbl_t_pos.update()
         return 0
     
     def z_down(self):
         step = int(self.ent_z_step.get())
-        status = self.positioner.setpos_rel([-step, 0, 0])
+        status = self.positioner.relative_move(0, 0, -step, 0, 0)
         if status != 0:
             return 1
-        self.lbl_z_pos.config(text=str(self.positioner.getpos()[0]) + ' nm')
+        self.lbl_z_pos.config(text=str(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
         return 0
     
     def y_down(self):
         step = int(self.ent_y_step.get())
-        status = self.positioner.setpos_rel([0, -step, 0])
+        status = self.positioner.relative_move(0, -step, 0, 0, 0)
         if status != 0:
             return 1
-        self.lbl_y_pos.config(text=str(self.positioner.getpos()[1]) + ' nm')
+        self.lbl_y_pos.config(text=str(self.positioner.current_position()[1]) + ' m')
         self.lbl_y_pos.update()
         return 0
     
     def t_down(self):
         step = int(self.ent_t_step.get())
-        status = self.positioner.setpos_rel([0, 0, -step])
+        status = self.positioner.relative_move(0, 0, 0, -step, 0)
         if status != 0:
             return 1
-        positioner_pos = self.positioner.getpos()
-        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_pos[2]/1e6)) + ' °')
+        positioner_t_pos = self.positioner.current_position()[3]
+        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_t_pos)) + ' °')
         self.lbl_t_pos.update()
         return 0
 
     def t_zero(self):
-        zed, ygrec, tangle = self.positioner.getpos()
-        if None in (zed, ygrec, tangle):
+        x, y, z, a, b = self.positioner.current_position()
+        if None in (x, y, z, a, b):
             return 1
-        self.positioner.setpos_abs([zed, ygrec, 0])
-        positioner_pos = self.positioner.getpos()
-        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_pos[2]/1e6)) + ' °')
+        self.positioner.setpos_abs(x, y, z, 0, b)
+        positioner_t_pos = self.positioner.current_position()[3]
+        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_t_pos)) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -359,9 +362,9 @@ class App(object):
                                           self.positioner,
                                           work_folder      = 'data/tomo/',
                                           images_name      = self.ent_name.get(),
-                                          resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                                          resolution       = self.microscope.image_settings[0],
                                           bit_depth        = 16,
-                                          dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                          dwell_time       = self.microscope.image_settings[1],
                                           tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                           tilt_end         = int(self.ent_end_tilt.get())*1e6,)
 
@@ -396,9 +399,9 @@ class App(object):
                                         self.positioner,
                                         work_folder      = 'data/record/',
                                         images_name      = self.ent_name.get(),
-                                        resolution       = self.microscope.beams.electron_beam.scanning.resolution.value,
+                                        resolution       = self.microscope.image_settings[0],
                                         bit_depth        = 16,
-                                        dwell_time       = self.microscope.beams.electron_beam.scanning.dwell_time.value,
+                                        dwell_time       = self.microscope.image_settings[1],
                                         tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                         tilt_end         = int(self.ent_end_tilt.get())*1e6)
             time.sleep(0.1)
@@ -457,7 +460,7 @@ class App(object):
         self.lbl_img.photo = self.img_0
         self.lbl_img.update()
 
-        self.microscope.beams.electron_beam.angular_correction.tilt_correction.turn_off()
+        self.microscope.tilt_correction(False)
         return 0
 
 if __name__ == "__main__":
