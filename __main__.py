@@ -17,10 +17,7 @@ logging.basicConfig(filename='last_execution.log', filemode='w', format='%(level
 active_microscope = com_functions.microscope().f
 active_microscope.import_package_and_connexion()
 
-if active_microscope.microscope_type == 'ESEM':
-    from smaract import connexion_smaract_64bits as sm
-    positioner = sm.smaract_class(calibrate=False)
-elif active_microscope.microscope_type == 'ETEM':
+if active_microscope.microscope_type != 'ESEM':
     positioner = 0
 
 # Lauch GUI

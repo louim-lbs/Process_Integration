@@ -1,6 +1,12 @@
-## Remove before using?
-from microscopes import DigitalMicrograph as DM
+## Only for editing in VSCode. Remove before using?
+import numpy as np
+from microscopes.lib.autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
 
+
+try:
+    from microscopes import DigitalMicrograph as DM
+except:
+    pass
 
 class microscope(object):
     def __init__(self) -> None:
@@ -44,13 +50,13 @@ class FEI_TITAN_ETEM(microscope):
         return DM.Py_Microscope().GetCalibratedFieldOfView(self.camera.GetDeviceLocation(), DM.Py_Microscope().GetCalibrationStateTags(), 2)
 
         
-    def magnification(self, value:int):
-        if not value:
+    def magnification(self, value:int=None):
+        if value==None:
             return DM.Py_Microscope().GetMagnification()
         return DM.Py_Microscope().SetMagIndex(value)
     
-    def working_distance(self, value:float, mode:str):
-        if not value:
+    def working_distance(self, value:float=None, mode:str=None):
+        if value==None:
             return DM.Py_Microscope().GetFocus()
         if mode == 'rel':
             return DM.Py_Microscope().ChangeFocus(value*1e6)
@@ -60,8 +66,8 @@ class FEI_TITAN_ETEM(microscope):
         print('Tilt or angular correction for ETEM is not implemented')
         return
     
-    def beam_shift(self, value_x:float, value_y:float, mode:str):
-        if not value_x and not value_y:
+    def beam_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
+        if value_x==None or value_y==None:
             return DM.Py_Microscope().GetBeamShift()
         if mode == 'rel':
             return DM.Py_Microscope().ChangeBeamShift(value_x*1e6, value_y*1e6)
@@ -79,11 +85,17 @@ class FEI_TITAN_ETEM(microscope):
     def get_image(self):
         return self.camera.GetImage()
     
-    def acquire_frame(self, resolution, dwell_time, bit_depth):
-        # DS_CreateParameters() ?
+    def acquire_frame(self, resolution=None, dwell_time=None, bit_depth=None):
+        if resolution!=None and dwell_time!=None and bit_depth!=None:
+            paramID = DM.DS_CreateParameters(resolution[1], resolution[0], bit_depth, 0, dwell_time, False)
+            DM.DS_SetParametersSignal(paramID, signalIndex=0, dataType=bit_depth, selected=True, imageID=0) # 0 = HAADF
+            DM.DS_SetParametersSignal(paramID, signalIndex=1, dataType=bit_depth, selected=True, imageID=0) # 1 = BF?
+            DM.DS_StartAcquisition(paramID, continuous=False, synchronous=True)
+            DM.FindImageByID()
+            # ?
         return self.camera.AcquireImage()
     
-    def acquire_multiple_frames(self, resolution, dwell_time, bit_depth):
+    def acquire_multiple_frames(self, resolution=None, dwell_time=None, bit_depth=None):
         print('Multiple frames acquisition is not yet implemented')
     
     def image_array(self, image):
@@ -104,44 +116,69 @@ class FEI_QUATTRO_ESEM(microscope):
         from autoscript_sdb_microscope_client import SdbMicroscopeClient
         self.quattro = SdbMicroscopeClient()
         try:
-            quattro.connect() # online connection
+            self.quattro.connect() # online connection
             SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
         except:
             try:
-                quattro.connect('localhost') # local connection (Support PC) or offline scripting
+                self.quattro.connect('localhost') # local connection (Support PC) or offline scripting
                 SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
             except:
                 SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if not connected
 
-        quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
+        self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
 
+        from smaract import connexion_smaract_64bits as sm
+        self.positioner = sm.smaract_class(calibrate=False)
+    
     # Stage Position & Move
     def current_position(self):
-        x, y, z, a, b = self.specimen.stage.current_position()
-        return  x, y, z, a, b
+        z, y, a = self.positioner.getpos()
+        return  None, y, z, a, None
     
     def relative_move(self, dx, dy, dz, da, db):
-        self.specimen.stage.relative_move(StagePosition(x=0,y=0))
-        pass
+        return self.positioner.setpos_rel([dz, dy, da])
     
-    def absolute_move(self):
-        pass
+    def absolute_move(self, dx, dy, dz, da, db):
+        return self.positioner.setpos_abs([dz, dy, da])
     
     # Beam control
-    def horizontal_field_view(self):
+    def horizontal_field_view(self, value:int=None):
+        if value==None:
+            return self.quattro.beams.electron_beam.horizontal_field_width.value
+        self.quattro.beams.electron_beam.horizontal_field_width.value = value
+    
+    def magnification(self, value:int=None):
         pass
     
-    def magnification(self):
-        pass
+    def working_distance(self, value:int=None):
+        if value==None:
+            return self.quattro.beams.electron_beam.working_distance.value
+        self.quattro.beams.electron_beam.working_distance.value = value
     
-    def working_distance(self):
-        pass
+    def tilt_correction(self, ONOFF:bool=None, value:float=None, mode:str=None):
+        if ONOFF == True:
+            self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_on()
+        elif ONOFF == False:
+            self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
+            return
+        if mode == 'rel':
+            self.quattro.beams.electron_beam.angular_correction.specimen_pretilt.value += value*np.pi/180
+        else:
+            self.quattro.beams.electron_beam.angular_correction.specimen_pretilt.value = value*np.pi/180
+        
+    def beam_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
+        if value_x==None or value_y==None:
+            return self.quattro.beams.electron_beam.beam_shift.value
+        if mode == 'rel':
+            actual_shift_x, actual_shift_y =   self.quattro.beams.electron_beam.beam_shift.value
+            shift = Point(x=value_x+actual_shift_x, y=value_y+actual_shift_y)
+            self.quattro.beams.electron_beam.beam_shift.value = shift
+            return
+        else:
+            shift = Point(value_x, value_y)
+            self.quattro.beams.electron_beam.beam_shift.value = shift
+            return
     
-    def tilt_correction(self, ONOFF:bool, value:float, mode:str):
-        pass
-    
-    def beam_shift(self):
-        pass
     
     # Imaging
     def image_settings(self):
@@ -152,13 +189,15 @@ class FEI_QUATTRO_ESEM(microscope):
     def get_image(self):
         pass
     
-    def acquire_frame(self):
-        GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
-        pass
+    def acquire_frame(self, resolution='1536x1024', dwell_time=10e-6, bit_depth=16):
+        settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+        image = self.quattro.imaging.grab_frame(settings)
+        return image
     
-    def acquire_multiple_frames(self):
-        GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
-        pass
+    def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=10e-6, bit_depth=16):
+        settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+        images = self.quattro.imaging.grab_multiple_frames(settings)
+        return images
     
     def image_array(self, image):
         return image.data
@@ -170,7 +209,7 @@ class FEI_QUATTRO_ESEM(microscope):
         pass 
     
     def auto_contras_brightness(self):
-        return auto_functions.run_auto_cb()
+        return self.quattro.auto_functions.run_auto_cb()
 
 if __name__ == "__main__":
     

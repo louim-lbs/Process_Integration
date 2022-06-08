@@ -3,12 +3,10 @@ import time
 import tkinter as tk
 import tkinter.scrolledtext as ScrolledText
 from tkinter.constants import RAISED
-from tkinter.filedialog import askdirectory, test
+from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
-from matplotlib.pyplot import flag
 #from com_functions import microscope
 import scripts_2 as scripts
-from autoscript_sdb_microscope_client.structures import StagePosition
 import threading
 
 class TextHandler(logging.Handler):
