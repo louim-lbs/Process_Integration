@@ -9,6 +9,11 @@ from PIL import ImageTk, Image
 import scripts_2 as scripts
 import threading
 
+def number_format(number):
+    if number == None:
+        return 'None'
+    return '{:.2e}'.format(number)
+
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
     # Adapted from Moshe Kaplan: https://gist.github.com/moshekaplan/c425f861de7bbf28ef06
@@ -43,8 +48,6 @@ class App(object):
         try:
             self.microscope = microscope
             self.positioner = positioner
-            if positioner == 0:
-                positioner = microscope
         except:
             self.microscope = 0
             self.positioner = 0
@@ -160,9 +163,9 @@ class App(object):
         self.btn_t_zero.place(x=242, y=360)
 
         positioner_pos = self.positioner.current_position()
-        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text='{:.2e}'.format(positioner_pos[2]) + " m", justify='left')
-        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text='{:.2e}'.format(positioner_pos[1]) + " m", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text='{:.2e}'.format(positioner_pos[3]) + " °", justify='left')
+        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(number_format(positioner_pos[2])) + " m", justify='left')
+        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(number_format(positioner_pos[1])) + " m", justify='left')
+        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(number_format(positioner_pos[3])) + " °", justify='left')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
@@ -294,7 +297,7 @@ class App(object):
         if status != 0:
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_t_pos)) + ' °')
+        self.lbl_t_pos.config(text=str(number_format(positioner_t_pos)) + ' °')
         self.lbl_t_pos.update()
         return 0
     
@@ -322,7 +325,7 @@ class App(object):
         if status != 0:
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_t_pos)) + ' °')
+        self.lbl_t_pos.config(text=str(number_format(positioner_t_pos)) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -332,7 +335,7 @@ class App(object):
             return 1
         self.positioner.setpos_abs(x, y, z, 0, b)
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=str('{:.2f}'.format(positioner_t_pos)) + ' °')
+        self.lbl_t_pos.config(text=str('{:.2f}'.format(str(positioner_t_pos))) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -360,9 +363,9 @@ class App(object):
                                           self.positioner,
                                           work_folder      = 'data/tomo/',
                                           images_name      = self.ent_name.get(),
-                                          resolution       = self.microscope.image_settings[0],
+                                          resolution       = self.microscope.image_settings()[0],
                                           bit_depth        = 16,
-                                          dwell_time       = self.microscope.image_settings[1],
+                                          dwell_time       = self.microscope.image_settings()[1],
                                           tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                           tilt_end         = int(self.ent_end_tilt.get())*1e6,)
 
@@ -397,9 +400,9 @@ class App(object):
                                         self.positioner,
                                         work_folder      = 'data/record/',
                                         images_name      = self.ent_name.get(),
-                                        resolution       = self.microscope.image_settings[0],
+                                        resolution       = self.microscope.image_settings()[0],
                                         bit_depth        = 16,
-                                        dwell_time       = self.microscope.image_settings[1],
+                                        dwell_time       = self.microscope.image_settings()[1],
                                         tilt_increment   = int(self.ent_tilt_step.get())*1e6,
                                         tilt_end         = int(self.ent_end_tilt.get())*1e6)
             time.sleep(0.1)
@@ -428,23 +431,34 @@ class App(object):
             global acqui
             acqui.flag = 1
 
-        print(self.thread_acqui)
         try:
+            print(self.thread_acqui)
             self.thread_acqui.join()
             print('acqui joined')
         except:
-            self.thread_tomo.join()
-            print('tomo joined')
-        
+            try:
+                self.thread_tomo.join()
+                print('tomo joined')
+            except:
+                print('No thread to join. No acquisition running')
+    
         if self.check1.get() == True:
-            self.thread_drift_correction.join()
-            print('drift joined')
+            try:
+                self.thread_drift_correction.join()
+                print('drift joined')
+            except:
+                pass
         if self.check2.get() == True:
-            self.thread_focus_correction.join()
-            print('focus joined')
-        else:
+            try:
+                self.thread_focus_correction.join()
+                print('focus joined')
+            except:
+                pass
+        try:
             self.thread_image_fft.join()
             print('fft joined')
+        except:
+            pass
 
 
         self.lbl_eucent.config(bg='red')
@@ -458,7 +472,10 @@ class App(object):
         self.lbl_img.photo = self.img_0
         self.lbl_img.update()
 
-        self.microscope.tilt_correction(False)
+        try:
+            self.microscope.tilt_correction(False)
+        except:
+            pass
         return 0
 
 if __name__ == "__main__":

@@ -304,9 +304,14 @@ class smaract_class(object):
                 -> Move to absolute position
         '''
         try:
-            if not self.check_limits(pos):
+            if None in self.getpos():
                 return 1
+            if not self.check_limits(pos):
+                print('Position out of range')
+                return 1
+            print('Moving to position: ' + str(pos))
         except:
+            print('Error when checking limits')
             return 1
         pos[2], revolution = self.angle_convert_SI2Smaract(pos[2])
         
@@ -328,7 +333,7 @@ class smaract_class(object):
         if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
             return 1
 
-        print('Position set to:  ' + str([pos[0], pos[1], pos[2]]))
+        print('Position set to:  ' + str(pos))
 
         return 0
     
@@ -346,9 +351,14 @@ class smaract_class(object):
                 -> Move to previous + relative position
         '''
         try:
-            if not self.check_limits(step):
+            if None in self.getpos():
                 return 1
+            if not self.check_limits(step):
+                print('Position out of range')
+                return 1
+            print('Moving to position: ' + str(step))
         except:
+            print('Error when checking limits')
             return 1
     
         step[2], revolution = self.angle_convert_SI2Smaract(step[2])

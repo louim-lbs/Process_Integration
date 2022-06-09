@@ -297,9 +297,9 @@ def set_eucentric(microscope, positioner) -> int:
     '''
     _, y0, z0, a0, _ = positioner.current_position()
     if z0 == None or y0 == None or a0 == None:
-        s_print('lol')
+        s_print('Error. Positioner is not initialized.')
         return 1
-    hfw             = microscope.GetCalibratedFieldOfView() # meters
+    hfw             = microscope.horizontal_field_view() # meters
     angle_step0     =  1
     angle_step      =  1  # °
     angle_max       = 10  # °
@@ -413,9 +413,7 @@ class acquisition(object):
         '''
         '''
         self.flag = 0
-        
-        self.image_width  = int(resolution[:resolution.find('x')])
-        self.image_height = int(resolution[-resolution.find('x'):])
+        self.image_width, self.image_height = resolution.split('x')
         
         try:
             self.microscope = microscope
@@ -522,7 +520,7 @@ class acquisition(object):
             #     continue
             
             s_print('New image found for drift correction')
-            hfw = self.microscope.GetCalibratedFieldOfView()
+            hfw = self.microscope.horizontal_field_view()
             
             dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
             dx_si                    =   dx_pix * hfw / self.image_width

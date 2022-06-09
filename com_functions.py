@@ -1,8 +1,7 @@
-## Only for editing in VSCode. Remove before using?
 import numpy as np
-from microscopes.lib.autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
+from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
 
-
+## Only for editing in VSCode. Remove before using?
 try:
     from microscopes import DigitalMicrograph as DM
 except:
@@ -14,14 +13,17 @@ class microscope(object):
         try:
             import DigitalMicrograph as DM
             microscope.f = FEI_TITAN_ETEM()
+            microscope.p = microscope.f
         except:
             microscope.f = FEI_QUATTRO_ESEM()
+            microscope.p = SMARACT_MCS_3D()
 
 
 class FEI_TITAN_ETEM(microscope):
     def __init__(self) -> None:
         self.microscope_type = 'ETEM'
-           
+        self.InitState_status = 0
+         
     # Packages & Connexion
     def import_package_and_connexion(self):
         # Already imported by the test
@@ -125,21 +127,21 @@ class FEI_QUATTRO_ESEM(microscope):
             except:
                 SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if not connected
 
-        self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
-
-        from smaract import connexion_smaract_64bits as sm
-        self.positioner = sm.smaract_class(calibrate=False)
-    
+        try:
+            self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
+        except:
+            pass
+        
     # Stage Position & Move
     def current_position(self):
-        z, y, a = self.positioner.getpos()
+        _, y, z, _, _, _ = self.quattro.specimen.stage.current_position()
         return  None, y, z, a, None
     
-    def relative_move(self, dx, dy, dz, da, db):
-        return self.positioner.setpos_rel([dz, dy, da])
+    def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0):
+        return self.quattro.specimen.stage.relative_move(x=dx, y=dy, z=dz, a=da, b=db)
     
-    def absolute_move(self, dx, dy, dz, da, db):
-        return self.positioner.setpos_abs([dz, dy, da])
+    def absolute_move(self, x=None, y=None, z=None, a=None, b=None):
+        return self.quattro.specimen.stage.absolute_move(x=x, y=y, z=z, a=a, b=b)
     
     # Beam control
     def horizontal_field_view(self, value:int=None):
@@ -179,11 +181,10 @@ class FEI_QUATTRO_ESEM(microscope):
             self.quattro.beams.electron_beam.beam_shift.value = shift
             return
     
-    
     # Imaging
     def image_settings(self):
-        resolution = 0
-        dwell_time = 0
+        resolution = self.quattro.beams.electron_beam.scanning.resolution.value
+        dwell_time = self.quattro.beams.electron_beam.scanning.dwell_time.value
         return resolution, dwell_time
     
     def get_image(self):
@@ -210,6 +211,30 @@ class FEI_QUATTRO_ESEM(microscope):
     
     def auto_contras_brightness(self):
         return self.quattro.auto_functions.run_auto_cb()
+
+class SMARACT_MCS_3D(microscope):
+    def __init__(self) -> None:
+        pass
+           
+    # Packages & Connexion
+    def import_package_and_connexion(self):
+        from smaract import connexion_smaract_64bits as sm
+        self.positioner = sm.smaract_class(calibrate=False)
+    
+    # Stage Position & Move
+    def current_position(self):
+        z, y, a = self.positioner.getpos()
+        if None in [z, y, a]:
+            return None, None, None, None, None
+        return  None, y*1e-9, z*1e-9, a*1e-6, None
+    
+    def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0):
+        self.positioner.setpos_rel([dz*1e9, dy*1e9, da*1e6])
+        return
+    
+    def absolute_move(self, x=None, y=None, z=None, a=None, b=None):
+        return self.positioner.setpos_abs([z*1e9, y*1e9, a*1e6])
+
 
 if __name__ == "__main__":
     

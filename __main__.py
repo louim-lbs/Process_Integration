@@ -14,16 +14,16 @@ from gui import GUI
 dir_pi = os.getcwd()
 logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=logging.INFO)
 
-active_microscope = com_functions.microscope().f
-active_microscope.import_package_and_connexion()
+microscope = com_functions.microscope().f
+microscope.import_package_and_connexion()
 
-if active_microscope.microscope_type != 'ESEM':
-    positioner = 0
+positioner = com_functions.microscope().p
+positioner.import_package_and_connexion()
 
 # Lauch GUI
 os.chdir(dir_pi)
 
 root = GUI.tk.Tk()
-GUI.App(root, active_microscope, positioner)
+GUI.App(root, microscope, positioner)
 root.mainloop()
     
