@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
 
 ## Only for editing in VSCode. Remove before using?
@@ -34,15 +35,18 @@ class FEI_TITAN_ETEM(microscope):
     
     # Stage Position & Move
     def current_position(self):
-        x, y, z, a, b = DM.Py_Microscope().GetStagePositions(31)
-        return x*1e-6, y*1e-6, z*1e-6, a, b
+        x, y, z, a, b = DM.Py_Microscope().GetStagePositions(15)
+        print(x, y, z, a)
+        return x*1e-6, y*1e-6, z*1e-6, a, 0
     
     def relative_move(self, dx, dy, dz, da, db):
-        x, y, z, a, b = DM.Py_Microscope().GetStagePositions(31)
-        DM.Py_Microscope().SetStagePositions(31, x+dx*1e6, y+dy*1e6, z+dz*1e6, a+da, b+db)
+        x, y, z, a, b = DM.Py_Microscope().GetStagePositions(15)
+        DM.Py_Microscope().SetStagePositions(15, x+dx*1e6, y+dy*1e6, z+dz*1e6, a+da, b+db)
+        return 0
     
     def absolute_move(self, x, y, z, a, b):
-        DM.Py_Microscope().SetStagePositions(31, x*1e6, y*1e6, z*1e6, a, b)
+        DM.Py_Microscope().SetStagePositions(15, x*1e6, y*1e6, z*1e6, a, b)
+        return 0
     
     # Beam control
     def horizontal_field_view(self):
@@ -61,8 +65,8 @@ class FEI_TITAN_ETEM(microscope):
         if value==None:
             return DM.Py_Microscope().GetFocus()
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeFocus(value*1e6)
-        return DM.Py_Microscope().SetFocus(value*1e6)
+            return DM.Py_Microscope().ChangeFocus(value)
+        return DM.Py_Microscope().SetFocus(value)
     
     def tilt_correction(self, *args):
         print('Tilt or angular correction for ETEM is not implemented')
@@ -72,8 +76,8 @@ class FEI_TITAN_ETEM(microscope):
         if value_x==None or value_y==None:
             return DM.Py_Microscope().GetBeamShift()
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeBeamShift(value_x*1e6, value_y*1e6)
-        return DM.Py_Microscope().SetBeamShift(value_x*1e6, value_y*1e6)
+            return DM.Py_Microscope().ChangeBeamShift(value_x, value_y)
+        return DM.Py_Microscope().SetBeamShift(value_x, value_y)
     
     # Imaging
     def image_settings(self):
@@ -138,10 +142,13 @@ class FEI_QUATTRO_ESEM(microscope):
         return  None, y, z, a, None
     
     def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0):
-        return self.quattro.specimen.stage.relative_move(x=dx, y=dy, z=dz, a=da, b=db)
+        self.quattro.specimen.stage.relative_move(x=dx, y=dy, z=dz, a=da, b=db)
+        return 0
+    
     
     def absolute_move(self, x=None, y=None, z=None, a=None, b=None):
-        return self.quattro.specimen.stage.absolute_move(x=x, y=y, z=z, a=a, b=b)
+        self.quattro.specimen.stage.absolute_move(x=x, y=y, z=z, a=a, b=b)
+        return 0
     
     # Beam control
     def horizontal_field_view(self, value:int=None):

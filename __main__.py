@@ -3,11 +3,18 @@
 Use Python 64-bits
 
 @author: Louis-Marie Lebas
-Updated on May 25 2022  
+Updated on Jun 06 2022  
 '''
 
 import os
 import logging
+
+import sys
+# insert at 1, 0 is the script path (or '' in REPL)
+sys.path.insert(1, r'C:\Users\Public\Documents\Lebas\Process_Integration')
+
+os.chdir(r'C:\Users\Public\Documents\Lebas\Process_Integration')
+
 import com_functions
 from gui import GUI
 
@@ -23,7 +30,13 @@ positioner.import_package_and_connexion()
 # Lauch GUI
 os.chdir(dir_pi)
 
+def on_closing():
+    print('Python closed')
+    root.destroy()
+    exit(0)
+
 root = GUI.tk.Tk()
 GUI.App(root, microscope, positioner)
+root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
-    
+

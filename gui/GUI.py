@@ -9,10 +9,10 @@ from PIL import ImageTk, Image
 import scripts_2 as scripts
 import threading
 
-def number_format(number):
+def number_format(number:float, decimals:int=2):
     if number == None:
         return 'None'
-    return '{:.2e}'.format(number)
+    return str('{:.{}e}'.format(float(number), decimals))
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -59,7 +59,7 @@ class App(object):
         height=screenheight*(65.8/76.8)
         alignstr = '%dx%d+%d+%d' % (width, height, screenwidth/76.8, screenheight*3/76.8)
         root.geometry(alignstr)
-        root.resizable(width=False, height=False)
+        root.resizable(width=True, height=True)
 
         ### Init
         frm_ini = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//4, height=height//4, bg='#202020')
@@ -92,7 +92,7 @@ class App(object):
         self.lbl_smara1 = tk.Label(master=frm_ini, width=1, height=1, bg=self.smara1.get())
         self.lbl_smara1.place(x=180, y=60)
 
-        self.lbl_smara2 = tk.Label(master=frm_ini, width=20, height=1, bg='#2B2B2B', fg='white', text="Smaract Controller", justify='left')
+        self.lbl_smara2 = tk.Label(master=frm_ini, width=20, height=1, bg='#2B2B2B', fg='white', text="Positioner", justify='left')
         self.lbl_smara2.place(x=20, y=60)
 
         self.lbl_folder1 = tk.Label(master=frm_ini, width=20, height=1, bg='#2B2B2B', fg='white', text="Folder", justify='left')
@@ -163,17 +163,17 @@ class App(object):
         self.btn_t_zero.place(x=242, y=360)
 
         positioner_pos = self.positioner.current_position()
-        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(number_format(positioner_pos[2])) + " m", justify='left')
-        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(number_format(positioner_pos[1])) + " m", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=str(number_format(positioner_pos[3])) + " °", justify='left')
+        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=number_format(positioner_pos[2]) + " m", justify='left')
+        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=number_format(positioner_pos[1]) + " m", justify='left')
+        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=number_format(positioner_pos[3]) + " °", justify='left')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
 
-        ent_step_values = tuple(10**i for i in range(10))
-        var1 = tk.IntVar(value=1000)
-        var2 = tk.IntVar(value=1000)
-        var3 = tk.IntVar(value=1000000)
+        ent_step_values = tuple(number_format(1e-9*10**i, 0) for i in range(10))
+        var1 = tk.StringVar(value='1e-6')
+        var2 = tk.StringVar(value='1e-6')
+        var3 = tk.StringVar(value='1')
         self.ent_z_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
         self.ent_y_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
         self.ent_t_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
@@ -274,58 +274,58 @@ class App(object):
         return 0
 
     def z_up(self):
-        step = int(self.ent_z_step.get())
+        step = float(self.ent_z_step.get())
         status = self.positioner.relative_move(0, 0, step, 0, 0)
         if status != 0:
             return 1
-        self.lbl_z_pos.config(text=str(self.positioner.current_position()[2]) + ' m')
+        self.lbl_z_pos.config(text=number_format(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
         return 0
 
     def y_up(self):
-        step = int(self.ent_y_step.get())
+        step = float(self.ent_y_step.get())
         status = self.positioner.relative_move(0, step, 0, 0, 0)
         if status != 0:
             return 1
-        self.lbl_y_pos.config(text=str(self.positioner.current_position()[1]) + ' m')
+        self.lbl_y_pos.config(text=number_format(self.positioner.current_position()[1]) + ' m')
         self.lbl_y_pos.update()
         return 0
 
     def t_up(self):
-        step = int(self.ent_t_step.get())
+        step = float(self.ent_t_step.get())
         status = self.positioner.relative_move(0, 0, 0, step, 0)
         if status != 0:
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=str(number_format(positioner_t_pos)) + ' °')
+        self.lbl_t_pos.config(text=number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()
         return 0
     
     def z_down(self):
-        step = int(self.ent_z_step.get())
+        step = float(self.ent_z_step.get())
         status = self.positioner.relative_move(0, 0, -step, 0, 0)
         if status != 0:
             return 1
-        self.lbl_z_pos.config(text=str(self.positioner.current_position()[2]) + ' m')
+        self.lbl_z_pos.config(text=number_format(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
         return 0
     
     def y_down(self):
-        step = int(self.ent_y_step.get())
+        step = float(self.ent_y_step.get())
         status = self.positioner.relative_move(0, -step, 0, 0, 0)
         if status != 0:
             return 1
-        self.lbl_y_pos.config(text=str(self.positioner.current_position()[1]) + ' m')
+        self.lbl_y_pos.config(text=number_format(self.positioner.current_position()[1]) + ' m')
         self.lbl_y_pos.update()
         return 0
     
     def t_down(self):
-        step = int(self.ent_t_step.get())
+        step = float(self.ent_t_step.get())
         status = self.positioner.relative_move(0, 0, 0, -step, 0)
         if status != 0:
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=str(number_format(positioner_t_pos)) + ' °')
+        self.lbl_t_pos.config(text=number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -333,9 +333,9 @@ class App(object):
         x, y, z, a, b = self.positioner.current_position()
         if None in (x, y, z, a, b):
             return 1
-        self.positioner.setpos_abs(x, y, z, 0, b)
+        self.positioner.absolute_move(x, y, z, 0, b)
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=str('{:.2f}'.format(str(positioner_t_pos))) + ' °')
+        self.lbl_t_pos.config(text=number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()
         return 0
 
