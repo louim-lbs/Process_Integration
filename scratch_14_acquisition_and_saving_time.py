@@ -7,10 +7,10 @@ import numpy as np
 
 # Connect to microscope
 quattro = SdbMicroscopeClient()
-quattro.connect('localhost') # local connection (Support PC) or offline scripting
+quattro.connect() # local connection (Support PC) or offline scripting
 
-settings = GrabFrameSettings(resolution='1536x1024',
-                             dwell_time=1e-6,
+settings = GrabFrameSettings(resolution="512x442",
+                             dwell_time=10e-6,
                              bit_depth=16)
 
 i = 0

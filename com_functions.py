@@ -112,6 +112,10 @@ class FEI_TITAN_ETEM(microscope):
     
     def beam_blanking(self, ONOFF:bool):
         return DM.Py_Microscope().SetBeamBlanked(ONOFF)
+    
+    def start_acquisition(self):
+        ####
+        return
 
 class FEI_QUATTRO_ESEM(microscope):
     def __init__(self) -> None:
@@ -142,12 +146,12 @@ class FEI_QUATTRO_ESEM(microscope):
         return  None, y, z, a, None
     
     def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0):
-        self.quattro.specimen.stage.relative_move(x=dx, y=dy, z=dz, a=da, b=db)
+        self.quattro.specimen.stage.relative_move(StagePosition(x=dx, y=dy, z=dz, r=da))
         return 0
     
     
     def absolute_move(self, x=None, y=None, z=None, a=None, b=None):
-        self.quattro.specimen.stage.absolute_move(x=x, y=y, z=z, a=a, b=b)
+        self.quattro.specimen.stage.absolute_move(StagePosition(x=x, y=y, z=z, r=a))
         return 0
     
     # Beam control
@@ -159,9 +163,12 @@ class FEI_QUATTRO_ESEM(microscope):
     def magnification(self, value:int=None):
         pass
     
-    def working_distance(self, value:int=None):
+    def working_distance(self, value:int=None, mode:str=None):
         if value==None:
             return self.quattro.beams.electron_beam.working_distance.value
+        if mode == 'rel':
+            self.quattro.beams.electron_beam.working_distance.value += value
+            return
         self.quattro.beams.electron_beam.working_distance.value = value
     
     def tilt_correction(self, ONOFF:bool=None, value:float=None, mode:str=None):
@@ -218,6 +225,9 @@ class FEI_QUATTRO_ESEM(microscope):
     
     def auto_contras_brightness(self):
         return self.quattro.auto_functions.run_auto_cb()
+    
+    def start_acquisition(self):
+        return self.quattro.imaging.start_acquisition()
 
 class SMARACT_MCS_3D(microscope):
     def __init__(self) -> None:
@@ -227,6 +237,7 @@ class SMARACT_MCS_3D(microscope):
     def import_package_and_connexion(self):
         from smaract import connexion_smaract_64bits as sm
         self.positioner = sm.smaract_class(calibrate=False)
+        self.InitState_status = 0
     
     # Stage Position & Move
     def current_position(self):
@@ -237,10 +248,11 @@ class SMARACT_MCS_3D(microscope):
     
     def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0):
         self.positioner.setpos_rel([dz*1e9, dy*1e9, da*1e6])
-        return
+        return 0
     
     def absolute_move(self, x=None, y=None, z=None, a=None, b=None):
-        return self.positioner.setpos_abs([z*1e9, y*1e9, a*1e6])
+        self.positioner.setpos_abs([z*1e9, y*1e9, a*1e6])
+        return 0
 
 
 if __name__ == "__main__":

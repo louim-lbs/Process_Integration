@@ -264,9 +264,9 @@ class App(object):
         ''' Reset eucentric point to zero
         '''
         x, y, z, a, b = self.positioner.current_position()
-        if None in (x, y, z, a, b):
+        if None in (y, z, a):
             return 1
-        self.positioner.absolute_move(x, y, 0, a, b)
+        self.positioner.absolute_move(x, 0, 0, a, b)
         self.microscope.relative_move(0, -y, 0, 0, 0)
         self.microscope.working_distance(z, 'rel')
         self.lbl_eucent.config(bg='red')
@@ -305,6 +305,7 @@ class App(object):
         step = float(self.ent_z_step.get())
         status = self.positioner.relative_move(0, 0, -step, 0, 0)
         if status != 0:
+            print('lol1')
             return 1
         self.lbl_z_pos.config(text=number_format(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
@@ -323,6 +324,8 @@ class App(object):
         step = float(self.ent_t_step.get())
         status = self.positioner.relative_move(0, 0, 0, -step, 0)
         if status != 0:
+            print('lol2')
+            print('status', status)
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
         self.lbl_t_pos.config(text=number_format(positioner_t_pos) + ' °')
@@ -331,7 +334,7 @@ class App(object):
 
     def t_zero(self):
         x, y, z, a, b = self.positioner.current_position()
-        if None in (x, y, z, a, b):
+        if None in (y, z, a):
             return 1
         self.positioner.absolute_move(x, y, z, 0, b)
         positioner_t_pos = self.positioner.current_position()[3]

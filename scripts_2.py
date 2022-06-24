@@ -168,7 +168,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     logging.info('direction' + str(direction))
 
     pas    = 1 # 1°
-    alpha  = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1), int(pas/20))]
+    alpha  = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1))]
 
     offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
 
@@ -305,10 +305,10 @@ def set_eucentric(microscope, positioner) -> int:
     angle_max       = 10  # °
     precision       = 5   # pixels
     eucentric_error = 0
-    resolution      = "512x512" # Bigger pixels means less noise and better match
+    resolution      = "512x442" # Bigger pixels means less noise and better match
     image_width     = int(resolution[:resolution.find('x')])
     image_height    = int(resolution[-resolution.find('x'):])
-    dwell_time      = 10e-6
+    dwell_time      = 1e-6
     bit_depth       = 16
     image_euc       = np.zeros((2, image_height, image_width))
     displacement    = [[0,0]]
@@ -323,11 +323,11 @@ def set_eucentric(microscope, positioner) -> int:
 
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
     image_euc[0] = microscope.image_array(img_tmp)
-    img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.getpos()[2])/1000000) + '.tif')
+    img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000) + '.tif')
 
-    positioner.setpos_rel([0, 0, angle_step])
+    positioner.relative_move(0, 0, 0, angle_step, 0)
 
-    while abs(eucentric_error) > precision or positioner.getpos()[2] < angle_max:
+    while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
         # logging.info('eucentric_error =' + str(round(eucentric_error)) + 'precision =' + str(precision) + 'current angle =' + str(positioner.current_position()[3]) + 'angle_max =' + str(angle_max))
         s_print(       'eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.current_position()[3], 'angle_max =', angle_max)
         
@@ -373,7 +373,7 @@ def set_eucentric(microscope, positioner) -> int:
             displacement  = [[0,0]]
             positioner.relative_move(0, 0, 0, direction*angle_step, 0)
             _, ygrec, zed, _, _ = positioner.current_position()
-            positioner.setpos_abs(0, ygrec, zed, direction*angle_max, 0)
+            positioner.absolute_move(0, ygrec, zed, direction*angle_max, 0)
             
             direction      *= -1
             angle           = [positioner.current_position()[3]]

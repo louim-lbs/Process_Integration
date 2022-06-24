@@ -34,6 +34,10 @@ positioner.import_package_and_connexion()
 os.chdir(dir_pi)
 
 def on_closing():
+    try:
+        microscope.start_acquisition()
+    except:
+        pass
     print('Python closed')
     root.destroy()
     exit(0)
