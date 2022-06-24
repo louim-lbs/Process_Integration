@@ -44,7 +44,7 @@ class App(object):
         # Title
         root.title("Tomo Controller for Quattro and Smaract positioner - Alpha version")
         root.iconbitmap('gui/img/PI.ico')
-
+        print(microscope.InitState_status)
         try:
             self.microscope = microscope
             self.positioner = positioner

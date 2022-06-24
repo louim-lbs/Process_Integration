@@ -123,13 +123,13 @@ class FEI_QUATTRO_ESEM(microscope):
         self.quattro = SdbMicroscopeClient()
         try:
             self.quattro.connect() # online connection
-            SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
+            self.InitState_status = 0
         except:
             try:
                 self.quattro.connect('localhost') # local connection (Support PC) or offline scripting
-                SdbMicroscopeClient.InitState_status = property(lambda self: 0) # Or 1 if not connected
+                self.InitState_status = 0
             except:
-                SdbMicroscopeClient.InitState_status = property(lambda self: 1) # Or 0 if not connected
+                self.InitState_status = 1
 
         try:
             self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
