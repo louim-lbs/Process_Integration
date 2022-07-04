@@ -247,7 +247,10 @@ class App(object):
         self.lbl_eucent.config(bg='orange')
         self.lbl_eucent.update()
         # try:
-        set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
+        if self.microscope.microscope_type == 'ESEM':
+            set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
+        else:
+            set_eucentric_status = scripts.set_eucentric2(self.microscope, self.positioner)
         # except:
         #     set_eucentric_status = 1
         #     pass
@@ -268,7 +271,7 @@ class App(object):
             return 1
         self.positioner.absolute_move(x, 0, 0, a, b)
         self.microscope.relative_move(0, -y, 0, 0, 0)
-        self.microscope.working_distance(z, 'rel')
+        self.microscope.focus(z, 'rel')
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
         return 0

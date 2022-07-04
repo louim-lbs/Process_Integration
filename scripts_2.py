@@ -170,10 +170,13 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     pas    = 1 # 1°
     alpha  = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1))]
 
-    offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
+    if microscope.microscope_type == 'ESEM':
+        offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
+        displacement_filt = np.array([i[0]-offset for i in displacement])
+    else:
+        offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][1]
+        displacement_filt = np.array([i[1]-offset for i in displacement])
 
-    displacement_filt = np.array([i[0]-offset for i in displacement])
-    
     finterpa               = interpolate.PchipInterpolator([i/pas for i in angle_sort], displacement_filt)
     displacement_y_interpa = finterpa(alpha)
 
@@ -185,16 +188,35 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(-direction*y0_calc) + '+-' + str(stdevs[1]))# + 'R = ' + str(R_calc) + '+-' + str(stdevs[2]) + 'x2 = ' + str(x2_calc) + '+-' + str(stdevs[3]) + 'x3 = ' + str(x3_calc) + '+-' + str(stdevs[4]))
     s_print('z0 =', z0_calc, 'y0 = ', -direction*y0_calc)
     
-    plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
+    if microscope.microscope_type == 'ESEM':
+        plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
+    else:
+        plt.plot([i/pas for i in angle_sort], [i[1]-offset for i in displacement], 'green')
     plt.plot(alpha, displacement_y_interpa, 'blue')
     plt.plot(alpha, function_displacement(alpha, *res), 'red')
     plt.savefig('data/tmp/' + str(time.time()) + 'correct_eucentric.png')
     plt.show()
 
-    positioner.relative_move(0, -y0_calc, -z0_calc, 0, 0)
-
-    microscope.relative_move(0, y0_calc, 0, 0, 0)
-    microscope.working_distance(z0_calc, 'rel') 
+    if microscope.microscope_type == 'ESEM':
+        positioner.relative_move(0, -y0_calc, -z0_calc, 0, 0)
+        microscope.relative_move(0, y0_calc, 0, 0, 0)
+        microscope.focus(z0_calc, 'rel') 
+    else:
+        positioner.relative_move(0, -y0_calc, z0_calc, 0, 0)
+        plt.plot(alpha, displacement_y_interpa, 'blue')
+        plt.show()
+        microscope.beam_shift(0, y0_calc, 'rel')
+        plt.plot(alpha, displacement_y_interpa, 'blue')
+        plt.show()
+        microscope.image_shift(0, y0_calc, 'rel')
+        microscope.focus(z0_calc, 'rel')
+        plt.plot(alpha, displacement_y_interpa, 'blue')
+        plt.show()
+        #####################
+        #####################
+        #####################
+    
+    
 
 def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0, resize_factor = 1):
     ''' Match two images
@@ -238,26 +260,50 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
             template_patch_yA      = (width_master  - width_template)//2  + (j)*template_patch_size[1]
             template_patch_xB      = (height_master - height_template)//2 + (i+1)*template_patch_size[0]
             template_patch_yB      = (width_master  - width_template)//2  + (j+1)*template_patch_size[1]
+            # print('template_patch_xA,template_patch_xB,template_patch_yA,template_patch_yB,', template_patch_xA,template_patch_xB,template_patch_yA,template_patch_yB)
 
             template_patch         = image_template[int(template_patch_xA):int(template_patch_xB),
                                                     int(template_patch_yA):int(template_patch_yB)]
 
-            corr_scores            = cv.matchTemplate(image_master, template_patch, cv.TM_CCOEFF_NORMED)
+            corr_scores            = cv.matchTemplate(image_master, template_patch, cv.TM_CCOEFF) #TM_CCOEFF_NORMED
 
+            # plt.imshow(corr_scores)
+            # plt.show()
+            
             _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
-
+            
+            
+            # dx                     = (max_loc[1] - j*template_patch_size[0] - (height_master - height_template))*resize_factor
+            # dy                     = (max_loc[0] - i*template_patch_size[1] - (width_master  - width_template ))*resize_factor
+            
+            # dx                     = (height_template//grid_size - max_loc[0])*resize_factor
+            # dy                     = (width_template//grid_size - max_loc[1])*resize_factor
+            
             dx                     = (template_patch_xA - max_loc[1])*resize_factor
             dy                     = (template_patch_yA - max_loc[0])*resize_factor
+            
+            # bottom = (max_loc[1] + template_patch_size[1], max_loc[0] + template_patch_size[0])
+            # image_master = cv.rectangle(image_master, (max_loc[1], max_loc[0]), bottom, 0, 2)
+            
+            # plt.imshow(template_patch)
+            # plt.show()
+            # plt.imshow(image_master)
+            # plt.show()
+            
 
+            # print('max_loc[0]', max_loc[0], 'max_loc[1]', max_loc[1], 'dx', 'dy', dx, dy)
+            
             displacement_vector    = np.append(displacement_vector, [[dx, dy]], axis=0)
             corr_trust             = np.append(corr_trust, max_val)
 
+    corr_trust_x          = np.delete(corr_trust, 0)
+    corr_trust_y          = deepcopy(corr_trust_x)
     displacement_vector = np.delete(displacement_vector,0,0)
     dx_tot              = displacement_vector[:,0]
     dy_tot              = displacement_vector[:,1]
 
-    # plt.plot(dx_tot)
-    # plt.plot(dy_tot)
+    # plt.plot(dx_tot, 'red')
+    # plt.plot(dy_tot, 'green')
 
     for k in range(2): # Delete incoherent values
         mean_x  = np.mean(dx_tot)
@@ -267,19 +313,27 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
         for d in dx_tot:
             if (d < mean_x - stdev_x) or (mean_x + stdev_x < d):
+                corr_trust_x = np.delete(corr_trust_x, np.where(dx_tot==d))
                 dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
         for d in dy_tot:
             if (d < mean_y - stdev_y) or (mean_y + stdev_y < d):
+                corr_trust_y = np.delete(corr_trust_y, np.where(dy_tot==d))
                 dy_tot = np.delete(dy_tot, np.where(dy_tot==d))
 
-    dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
-    dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
+    try:
+        dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
+        dy_tot = cv.blur(dy_tot, (1, dy_tot.shape[0]//4))
+    except:
+        pass
 
-    # plt.plot(dx_tot)
-    # plt.plot(dy_tot)
+    # plt.plot(dx_tot, 'red')
+    # plt.plot(dy_tot, 'green')
     # plt.show()
 
-    return np.mean(dx_tot), np.mean(dy_tot), np.mean(corr_trust)
+    a = np.average(dx_tot.reshape((len(dx_tot),)), weights=corr_trust_x)
+    b = np.average(dy_tot.reshape((len(dy_tot),)), weights=corr_trust_y)
+    c = np.mean(np.array([np.mean(corr_trust_x), np.mean(corr_trust_y)]))
+    return a, b, c
 
 def set_eucentric(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
@@ -295,11 +349,11 @@ def set_eucentric(microscope, positioner) -> int:
         set_eucentric_status = set_eucentric()
             -> 0    
     '''
-    _, y0, z0, a0, _ = positioner.current_position()
+    x0, y0, z0, a0, _ = positioner.current_position()
     if z0 == None or y0 == None or a0 == None:
         s_print('Error. Positioner is not initialized.')
         return 1
-    hfw             = microscope.horizontal_field_view() # meters
+    
     angle_step0     =  1
     angle_step      =  1  # °
     angle_max       = 10  # °
@@ -308,7 +362,10 @@ def set_eucentric(microscope, positioner) -> int:
     resolution      = "512x442" # Bigger pixels means less noise and better match
     image_width     = int(resolution[:resolution.find('x')])
     image_height    = int(resolution[-resolution.find('x'):])
-    dwell_time      = 1e-6
+    if microscope.microscope_type == 'ESEM':
+        dwell_time      = 1e-6
+    else:
+        dwell_time      = 10e-6
     bit_depth       = 16
     image_euc       = np.zeros((2, image_height, image_width))
     displacement    = [[0,0]]
@@ -319,13 +376,15 @@ def set_eucentric(microscope, positioner) -> int:
     # HAADF analysis
     #microscope.imaging.set_active_view(3)
 
-    positioner.absolute_move(0, y0, z0, 0, 0)
+    positioner.absolute_move(x0, y0, z0, 0, 0)
 
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
     image_euc[0] = microscope.image_array(img_tmp)
-    img_tmp.save('data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000) + '.tif')
+    path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
+    microscope.save(img_tmp, path)
 
     positioner.relative_move(0, 0, 0, angle_step, 0)
+    hfw             = microscope.horizontal_field_view() # meters
 
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
         # logging.info('eucentric_error =' + str(round(eucentric_error)) + 'precision =' + str(precision) + 'current angle =' + str(positioner.current_position()[3]) + 'angle_max =' + str(angle_max))
@@ -362,7 +421,10 @@ def set_eucentric(microscope, positioner) -> int:
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.current_position()[3])
 
-        eucentric_error += abs(dx_pix)
+        if microscope.microscope_type == 'ESEM':
+            eucentric_error += abs(dx_pix)
+        else:
+            eucentric_error += abs(dy_pix)
 
         if abs(positioner.current_position()[3]) >= angle_max - 0.01: # 0.010000 degree of freedom
             '''If out of the angle range'''
@@ -372,8 +434,8 @@ def set_eucentric(microscope, positioner) -> int:
             
             displacement  = [[0,0]]
             positioner.relative_move(0, 0, 0, direction*angle_step, 0)
-            _, ygrec, zed, _, _ = positioner.current_position()
-            positioner.absolute_move(0, ygrec, zed, direction*angle_max, 0)
+            ixe, ygrec, zed, _, _ = positioner.current_position()
+            positioner.absolute_move(ixe, ygrec, zed, direction*angle_max, 0)
             
             direction      *= -1
             angle           = [positioner.current_position()[3]]
@@ -400,8 +462,117 @@ def set_eucentric(microscope, positioner) -> int:
         positioner.relative_move(0, 0, 0, direction*angle_step, 0)
         image_euc[0] = np.ndarray.copy(image_euc[1])
 
-    x, y, z, a, b = positioner.current_position()
-    positioner.absolute_move(x, y, z, 0, b)
+    ixe, ygrec, zed, _, _ = positioner.current_position()
+    positioner.absolute_move(ixe, ygrec, zed, 0, 0)
+    # logging.info('Done eucentrixx')
+    s_print(       'Done eucentrixx')
+    copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
+    return 0
+
+def set_eucentric2(microscope, positioner) -> int:
+    ''' Set eucentric point according to the image centered features.
+
+    Input:
+        - Microscope control class (class).
+        - Positioner control class (class).
+
+    Return:
+        - Success or error code (int).
+
+    Exemple:
+        set_eucentric_status = set_eucentric()
+            -> 0    
+    '''
+    x0, y0, z0, a0, _ = positioner.current_position()
+    if z0 == None or y0 == None or a0 == None:
+        s_print('Error. Positioner is not initialized.')
+        return 1
+    
+    angle_step0     =  1
+    angle_step      =  1  # °
+    angle_max       = 10  # °
+    precision       = 5   # pixels
+    eucentric_error = 0
+    resolution      = "512x512" # Bigger pixels means less noise and better match
+    image_width     = int(resolution[:resolution.find('x')])
+    image_height    = int(resolution[-resolution.find('x'):])
+    if microscope.microscope_type == 'ESEM':
+        dwell_time      = 1e-6
+    else:
+        dwell_time      = 10e-6
+    bit_depth       = 16
+    image_euc       = np.zeros((2, image_height, image_width))
+    displacement    = [[0,0]]
+    angle           = [a0]
+
+    positioner.absolute_move(x0, y0, z0, -angle_step, 0)
+    positioner.absolute_move(x0, y0, z0, 0, 0)
+
+    img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
+    image_euc[0] = microscope.image_array(img_tmp)
+    path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
+    microscope.save(img_tmp, path)
+
+    positioner.relative_move(0, 0, 0, angle_step, 0)
+    hfw = microscope.horizontal_field_view() # meters
+
+    while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
+        s_print(       'eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.current_position()[3], 'angle_max =', angle_max)
+        
+        img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
+        image_euc[1] = microscope.image_array(img_tmp)
+        path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
+        microscope.save(img_tmp, path)
+        
+        dx_pix, dy_pix, _ = match(image_euc[1], image_euc[0])
+
+        dx_si = dx_pix*hfw/image_height
+        dy_si = dy_pix*hfw/image_width
+
+        s_print(       'dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
+
+        displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
+        angle.append(positioner.current_position()[3])
+
+        if microscope.microscope_type == 'ESEM':
+            eucentric_error += abs(dx_pix)
+        else:
+            eucentric_error += abs(dy_pix)
+
+        if abs(positioner.current_position()[3]) >= angle_max - 0.01: # 0.010000 degree of freedom
+            '''If out of the angle range'''
+            correct_eucentric(microscope, positioner, displacement, angle)
+            s_print(       'Start again with negative angles')
+            
+            displacement  = [[0,0]]
+            ixe, ygrec, zed, _, _ = positioner.current_position()
+            positioner.absolute_move(ixe, ygrec, zed, -angle_step, 0)
+            positioner.absolute_move(ixe, ygrec, zed, 0, 0)
+            
+            # direction      *= -1
+            angle           = [positioner.current_position()[3]]
+            eucentric_error = 0
+            
+            if microscope.microscope_type == 'ESEM':
+                microscope.auto_contras_brightness()
+            
+            ### Test increase angle
+            if angle_max == 10:
+                angle_max   = 30
+                angle_step  =  2
+            
+            img_tmp = microscope.acquire_frame(resolution, dwell_time, bit_depth)
+            image_euc[0] = microscope.image_array(img_tmp)
+            path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
+            microscope.save(img_tmp, path)
+            positioner.relative_move(0, 0, 0, angle_step, 0)
+            continue
+
+        positioner.relative_move(0, 0, 0, angle_step, 0)
+        image_euc[0] = np.ndarray.copy(image_euc[1])
+
+    ixe, ygrec, zed, _, _ = positioner.current_position()
+    positioner.absolute_move(ixe, ygrec, zed, 0, 0)
     # logging.info('Done eucentrixx')
     s_print(       'Done eucentrixx')
     copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
@@ -453,7 +624,7 @@ class acquisition(object):
         nb_images = int((abs(self.pos[3])+abs(self.tilt_end))/self.tilt_increment + 1)
         s_print('number of images', nb_images)
 
-        if microscope.microscope_type == 'ESEM':
+        if self.microscope.microscope_type == 'ESEM':
             self.microscope.tilt_correction(ONOFF=True, mode='Manual')
         
         for i in range(nb_images):
@@ -463,7 +634,7 @@ class acquisition(object):
             
             tangle = self.positioner.current_position()[3]
             
-            if microscope.microscope_type == 'ESEM':
+            if self.microscope.microscope_type == 'ESEM':
                 self.microscope.tilt_correction(value = tangle*np.pi/180) # Tilt correction for e- beam
 
             # logging.info(str(i) + str(self.positioner.current_position()[3]))
@@ -626,7 +797,7 @@ class acquisition(object):
     def record(self) -> int:
         ''' 
         '''
-        if microscope.microscope_type == 'ESEM':
+        if self.microscope.microscope_type == 'ESEM':
             self.microscope.tilt_correction(ONOFF=True, mode='Manual')
         i = 0
         
@@ -637,12 +808,12 @@ class acquisition(object):
             
             tangle = pos[3]
             
-            if microscope.microscope_type == 'ESEM':
+            if self.microscope.microscope_type == 'ESEM':
                 self.microscope.tilt_correction(value = tangle*np.pi/180) # Tilt correction for e- beam
 
             # logging.info(str(i) + str(self.positioner.getpos()[2]))
-            
-            images = self.microscope.imaging.acquire_frame(self.resolution, self.dwell_time, self.bit_depth)
+
+            images = self.microscope.acquire_frame(self.resolution, self.dwell_time, self.bit_depth)
             # images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             # images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             

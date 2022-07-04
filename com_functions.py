@@ -36,7 +36,6 @@ class FEI_TITAN_ETEM(microscope):
     # Stage Position & Move
     def current_position(self):
         x, y, z, a, b = DM.Py_Microscope().GetStagePositions(15)
-        print(x, y, z, a)
         return x*1e-6, y*1e-6, z*1e-6, a, 0
     
     def relative_move(self, dx, dy, dz, da, db):
@@ -53,31 +52,51 @@ class FEI_TITAN_ETEM(microscope):
         '''
         Read-only
         '''
-        return DM.Py_Microscope().GetCalibratedFieldOfView(self.camera.GetDeviceLocation(), DM.Py_Microscope().GetCalibrationStateTags(), 2)
+        img = DM.GetFrontImage()
+        return img.GetDimensionScale(0)*img.GetDimensionSize(0)*1e-6
 
         
     def magnification(self, value:int=None):
         if value==None:
             return DM.Py_Microscope().GetMagnification()
+        print('Magnififcation changes are not supported with ETEM')
+        return
         return DM.Py_Microscope().SetMagIndex(value)
     
-    def working_distance(self, value:float=None, mode:str=None):
+    def focus(self, value:float=None, mode:str=None):
         if value==None:
-            return DM.Py_Microscope().GetFocus()
+            return DM.Py_Microscope().GetFocus()*1e-9
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeFocus(value)
-        return DM.Py_Microscope().SetFocus(value)
+            return DM.Py_Microscope().ChangeFocus(value*1e9)
+        return DM.Py_Microscope().SetFocus(value*1e9)
     
     def tilt_correction(self, *args):
         print('Tilt or angular correction for ETEM is not implemented')
         return
     
+    def image_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
+        if value_x==None or value_y==None:
+            x, y = DM.Py_Microscope().GetImageShift()
+            return x*1e-9, y*1e-9
+        if mode == 'rel':
+            return DM.Py_Microscope().ChangeImageShift(value_x*1e9, value_y*1e9)
+        return DM.Py_Microscope().SetImageShift(value_x*1e9, value_y*1e9)
+    
     def beam_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
         if value_x==None or value_y==None:
-            return DM.Py_Microscope().GetBeamShift()
+            x, y = DM.Py_Microscope().GetBeamShift()
+            return y*1e-9, x*1e-9
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeBeamShift(value_x, value_y)
-        return DM.Py_Microscope().SetBeamShift(value_x, value_y)
+            return DM.Py_Microscope().ChangeBeamShift(value_y*1e9, value_x*1e9)
+        return DM.Py_Microscope().SetBeamShift(value_y*1e9, value_x*1e9)
+    
+    def projector_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
+        if value_x==None or value_y==None:
+            x, y = DM.Py_Microscope().GetProjectorShift()
+            return x*1e-9, y*1e-9
+        if mode == 'rel':
+            return DM.Py_Microscope().ChangeProjectorShift(value_x*1e9, value_y*1e9)
+        return DM.Py_Microscope().SetProjectorShift(value_x*1e9, value_y*1e9)
     
     # Imaging
     def image_settings(self):
@@ -89,17 +108,18 @@ class FEI_TITAN_ETEM(microscope):
         return resolution, dwell_time
 
     def get_image(self):
-        return self.camera.GetImage()
+        return DM.GetFrontImage()
     
     def acquire_frame(self, resolution=None, dwell_time=None, bit_depth=None):
-        if resolution!=None and dwell_time!=None and bit_depth!=None:
-            paramID = DM.DS_CreateParameters(resolution[1], resolution[0], bit_depth, 0, dwell_time, False)
-            DM.DS_SetParametersSignal(paramID, signalIndex=0, dataType=bit_depth, selected=True, imageID=0) # 0 = HAADF
-            DM.DS_SetParametersSignal(paramID, signalIndex=1, dataType=bit_depth, selected=True, imageID=0) # 1 = BF?
-            DM.DS_StartAcquisition(paramID, continuous=False, synchronous=True)
-            DM.FindImageByID()
-            # ?
-        return self.camera.AcquireImage()
+        if resolution==None and dwell_time==None and bit_depth==None:
+            resolution, dwell_time = self.image_settings()
+        resolution_y, resolution_x = resolution.split('x')
+        paramID = DM.DS_CreateParameters(int(resolution_y), int(resolution_x), 4, 0, dwell_time*1e6, False)
+        DM.DS_SetParametersSignal(paramID, signalIndex=0, dataType=4, selected=True, imageID=0)
+        DM.DS_StartAcquisition(paramID, continuous=False, synchronous=True)
+        ID = DM.DS_GetAcquiredImageID(0)
+        img = DM.FindImageByID(ID)
+        return img
     
     def acquire_multiple_frames(self, resolution=None, dwell_time=None, bit_depth=None):
         print('Multiple frames acquisition is not yet implemented')
@@ -163,7 +183,7 @@ class FEI_QUATTRO_ESEM(microscope):
     def magnification(self, value:int=None):
         pass
     
-    def working_distance(self, value:int=None, mode:str=None):
+    def focus(self, value:int=None, mode:str=None):
         if value==None:
             return self.quattro.beams.electron_beam.working_distance.value
         if mode == 'rel':
