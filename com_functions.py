@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 import os
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
@@ -224,15 +225,60 @@ class FEI_QUATTRO_ESEM(microscope):
     def get_image(self):
         pass
     
-    def acquire_frame(self, resolution='1536x1024', dwell_time=10e-6, bit_depth=16):
-        settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
-        image = self.quattro.imaging.grab_frame(settings)
-        return image
+    def acquire_frame(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16):
+        img = self.quattro.imaging.get_image()
+        img_prev_stamp = img.data[-1,:]
+
+        micro_resolution = self.quattro.beams.electron_beam.scanning.resolution.value
+        micro_dwell_time = self.quattro.beams.electron_beam.scanning.dwell_time.value
+        micro_bit_depth = self.quattro.beams.electron_beam.scanning.bit_depth
+        if [micro_resolution, micro_dwell_time, micro_bit_depth] != [resolution, dwell_time, bit_depth]:
+            self.quattro.beams.electron_beam.scanning.resolution.value = resolution
+            self.quattro.beams.electron_beam.scanning.dwell_time.value = dwell_time
+            self.quattro.beams.electron_beam.scanning.bit_depth = bit_depth
+
+        while (True):
+            img = self.quattro.imaging.get_image()
+            if not (img_prev_stamp == img.data[-1,:]).all():
+                return img
     
-    def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=10e-6, bit_depth=16):
-        settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
-        images = self.quattro.imaging.grab_multiple_frames(settings)
-        return images
+    def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16, windows='123'):
+        # settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
+        # images = self.quattro.imaging.grab_multiple_frames(settings)
+        # return images
+        
+        windows         = [int(s) for s in windows]
+
+        imgs            = [0]*len(windows)
+        img_prev_stamp  = []
+        
+        view = self.quattro.imaging.get_active_view()
+        self.quattro.imaging.set_active_view(view)
+        ind = windows.index(view)
+        imgs[ind] = self.quattro.imaging.get_image()
+        img_prev_stamp = imgs[ind].data[-1,:]
+
+        micro_resolution = self.quattro.beams.electron_beam.scanning.resolution.value
+        micro_dwell_time = self.quattro.beams.electron_beam.scanning.dwell_time.value
+        micro_bit_depth = self.quattro.beams.electron_beam.scanning.bit_depth
+        if [micro_resolution, micro_dwell_time, micro_bit_depth] != [resolution, dwell_time, bit_depth]:
+            self.quattro.beams.electron_beam.scanning.resolution.value = resolution
+            self.quattro.beams.electron_beam.scanning.dwell_time.value = dwell_time
+            self.quattro.beams.electron_beam.scanning.bit_depth = bit_depth
+
+        while (True):
+            imgs[ind] = self.quattro.imaging.get_image()
+            view2 = self.quattro.imaging.get_active_view()
+            if view != view2:
+                view = copy.deepcopy(view2)
+                ind = windows.index(view)
+                imgs[ind] = self.quattro.imaging.get_image()
+                img_prev_stamp = imgs[ind].data[-1,:]
+            if not (img_prev_stamp == imgs[ind].data[-1,:]).all():
+                for j in range(len(windows)):
+                    self.quattro.imaging.set_active_view(windows[j])
+                    imgs[j] = self.quattro.imaging.get_image()
+                return imgs
     
     def image_array(self, image):
         return image.data
@@ -240,10 +286,13 @@ class FEI_QUATTRO_ESEM(microscope):
     def save(self, image, path):
         image.save(path + '.tif')
     
-    def beam_blanking(self):
-        pass 
+    def beam_blanking(self, ONOFF:bool):
+        if ONOFF == True:
+            return self.quattro.beams.electron_beam.blank()
+        elif ONOFF == False:
+            return self.quattro.beams.electron_beam.unblank()
     
-    def auto_contras_brightness(self):
+    def auto_contrast_brightness(self):
         return self.quattro.auto_functions.run_auto_cb()
     
     def start_acquisition(self):

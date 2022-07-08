@@ -198,10 +198,11 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     plt.show()
 
     if microscope.microscope_type == 'ESEM':
-        positioner.relative_move(0, -y0_calc, -z0_calc, 0, 0)
-        microscope.relative_move(0, y0_calc, 0, 0, 0)
+        print('ESEM correction')
+        positioner.relative_move(0, -direction*y0_calc, -z0_calc, 0, 0)
+        microscope.relative_move(0, direction*y0_calc, 0, 0, 0)
         microscope.focus(z0_calc, 'rel') 
-    else:
+    elif microscope.microscope_type == 'ETEM':
         positioner.relative_move(0, -y0_calc, z0_calc, 0, 0)
         plt.plot(alpha, displacement_y_interpa, 'blue')
         plt.show()
@@ -302,8 +303,8 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     dx_tot              = displacement_vector[:,0]
     dy_tot              = displacement_vector[:,1]
 
-    # plt.plot(dx_tot, 'red')
-    # plt.plot(dy_tot, 'green')
+    # plt.plot(dx_tot, '--r')
+    # plt.plot(dy_tot, '--g')
 
     for k in range(2): # Delete incoherent values
         mean_x  = np.mean(dx_tot)
@@ -362,10 +363,7 @@ def set_eucentric(microscope, positioner) -> int:
     resolution      = "512x442" # Bigger pixels means less noise and better match
     image_width     = int(resolution[:resolution.find('x')])
     image_height    = int(resolution[-resolution.find('x'):])
-    if microscope.microscope_type == 'ESEM':
-        dwell_time      = 1e-6
-    else:
-        dwell_time      = 10e-6
+    dwell_time      = 10e-6
     bit_depth       = 16
     image_euc       = np.zeros((2, image_height, image_width))
     displacement    = [[0,0]]
@@ -374,7 +372,9 @@ def set_eucentric(microscope, positioner) -> int:
     # logging.info('z0' + str(z0) + 'y0' + str(y0) + 'hfw' + str(hfw) + 'angle_step0' + str(angle_step0) + 'angle_step' + str(angle_step) + 'angle_max' + str(angle_max) + 'precision' + str(precision) + 'resolution' + str(resolution) + 'settings' + str(settings) + 'angle' + str(angle))
 
     # HAADF analysis
-    #microscope.imaging.set_active_view(3)
+    if microscope.microscope_type == 'ESEM':
+        microscope.quattro.imaging.set_active_view(3)
+    microscope.start_acquisition()
 
     positioner.absolute_move(x0, y0, z0, 0, 0)
 
@@ -442,7 +442,7 @@ def set_eucentric(microscope, positioner) -> int:
             eucentric_error = 0
             
             if microscope.microscope_type == 'ESEM':
-                microscope.auto_contras_brightness()
+                microscope.auto_contrast_brightness()
             
             ### Test increase angle
             if 2*angle_max <= 50:
@@ -507,6 +507,7 @@ def set_eucentric2(microscope, positioner) -> int:
 
     positioner.absolute_move(x0, y0, z0, -angle_step, 0)
     positioner.absolute_move(x0, y0, z0, 0, 0)
+    microscope.start_acquisition()
 
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
     image_euc[0] = microscope.image_array(img_tmp)
@@ -611,7 +612,9 @@ class acquisition(object):
         self.path = work_folder + images_name + '_' + str(round(time.time()))
         os.makedirs(self.path, exist_ok=True)
 
-    def tomo(self):    
+    def tomo(self):
+        self.microscope.start_acquisition()
+
         if self.positioner.current_position()[3] > 0:
             self.direction = -1
             if self.tilt_end > 0:
@@ -797,6 +800,7 @@ class acquisition(object):
     def record(self) -> int:
         ''' 
         '''
+        self.microscope.start_acquisition()
         if self.microscope.microscope_type == 'ESEM':
             self.microscope.tilt_correction(ONOFF=True, mode='Manual')
         i = 0

@@ -303,6 +303,7 @@ class smaract_class(object):
             move_status = smaract.setpos([1242.14, 3456.32, 23.44])
                 -> Move to absolute position
         '''
+        print('pos', pos)
         try:
             if None in self.getpos():
                 return 1
