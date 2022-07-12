@@ -355,6 +355,7 @@ class smaract_class(object):
             if None in self.getpos():
                 return 1
             if not self.check_limits(step):
+                print(step)
                 print('Position out of range')
                 return 1
             print('Moving to position: ' + str(step))

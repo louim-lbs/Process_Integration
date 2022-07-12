@@ -1,8 +1,12 @@
 import matplotlib.pyplot as plt
 import os
 import sys
-sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
-os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')
+try:
+    sys.path.insert(1, r'C:\Users\User\Documents\Process_Integration_2022-07-11')
+    os.chdir(r'C:\Users\User\Documents\Process_Integration_2022-07-11')
+except:
+    sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
+    os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')
 
 from com_functions import SMARACT_MCS_3D
 
@@ -14,7 +18,7 @@ try:
 except:
     print('FAIL. import_package_and_connexion')
 
-micro.relative_move(dy=10e-6)
+micro.absolute_move(0, 0, 0, 50, None)
 exit()
 
 

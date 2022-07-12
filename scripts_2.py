@@ -1,3 +1,5 @@
+import linecache
+import sys
 import numpy as np
 import cv2 as cv
 from scipy import interpolate
@@ -16,6 +18,17 @@ from threading import Lock
 from com_functions import microscope
 
 s_print_lock = Lock()
+
+def PrintException():
+    ''' https://stackoverflow.com/questions/14519177/python-exception-handling-line-number
+    '''
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
 def s_print(*a, **b):
     """Thread safe print function from: https://stackoverflow.com/questions/40356200/python-printing-in-multiple-threads"""
@@ -336,7 +349,7 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     c = np.mean(np.array([np.mean(corr_trust_x), np.mean(corr_trust_y)]))
     return a, b, c
 
-def set_eucentric(microscope, positioner) -> int:
+def set_eucentric_ESEM(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
 
     Input:
@@ -469,7 +482,117 @@ def set_eucentric(microscope, positioner) -> int:
     copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
     return 0
 
-def set_eucentric2(microscope, positioner) -> int:
+def set_eucentric_ESEM_2(microscope, positioner) -> int:
+    ''' Set eucentric point according to the image centered features.
+
+    Input:
+        - Microscope control class (class).
+        - Positioner control class (class).
+
+    Return:
+        - Success or error code (int).
+
+    Exemple:
+        set_eucentric_status = set_eucentric()
+            -> 0    
+    '''
+    x0, y0, z0, a0, _ = positioner.current_position()
+    if z0 == None or y0 == None or a0 == None:
+        s_print('Error. Positioner is not initialized.')
+        return 1
+    
+    angle_step0     =  1
+    angle_step      =  1  # °
+    angle_max       = 10  # °
+    precision       = 5   # pixels
+    eucentric_error = 0
+    resolution      = "512x442" # Bigger pixels means less noise and better match
+    image_width     = int(resolution[:resolution.find('x')])
+    image_height    = int(resolution[-resolution.find('x'):])
+    dwell_time      = 10e-6
+    bit_depth       = 16
+    image_euc       = np.zeros((2, image_height, image_width))
+    displacement    = [[0,0]]
+    angle           = [a0]
+
+    # HAADF analysis
+    if microscope.microscope_type == 'ESEM':
+        microscope.quattro.imaging.set_active_view(3)
+    microscope.start_acquisition()
+
+    positioner.absolute_move(x0, y0, z0, -angle_step, 0)
+    positioner.absolute_move(x0, y0, z0, 0, 0)
+
+    img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
+    image_euc[0] = microscope.image_array(img_tmp)
+    path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
+    microscope.save(img_tmp, path)
+
+    positioner.relative_move(0, 0, 0, angle_step, 0)
+    hfw          = microscope.horizontal_field_view() # meters
+
+    while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
+        s_print(       'eucentric_error =', round(eucentric_error), 'precision =', precision, 'current angle =', positioner.current_position()[3], 'angle_max =', angle_max)
+        
+        img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
+        image_euc[1] = microscope.image_array(img_tmp)
+        path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
+        microscope.save(img_tmp, path)
+        
+        dx_pix, dy_pix, corr_trust = match(image_euc[1], image_euc[0])
+
+        dx_si = dx_pix*hfw/image_width
+        dy_si = dy_pix*hfw/image_width
+
+        s_print(       'dx_pix, dy_pix', dx_pix, dy_pix, 'dx_si, dy_si', dx_si, dy_si)
+
+        displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
+        angle.append(positioner.current_position()[3])
+
+        eucentric_error += abs(dx_pix)
+
+        if abs(positioner.current_position()[3]) >= angle_max - 0.01: # 0.010000 degree of freedom
+            '''If out of the angle range'''
+            correct_eucentric(microscope, positioner, displacement, angle)
+            s_print(       'Start again with negative angles')
+            
+            displacement  = [[0,0]]
+            ixe, ygrec, zed, _, _ = positioner.current_position()
+            positioner.absolute_move(ixe, ygrec, zed, -angle_step, 0)
+            positioner.absolute_move(ixe, ygrec, zed, 0, 0)
+            
+            angle           = [positioner.current_position()[3]]
+            eucentric_error = 0
+            
+            if microscope.microscope_type == 'ESEM':
+                microscope.auto_contrast_brightness()
+            
+            ### Test increase angle
+            if angle_max <= 50:
+                angle_step *= 1.5
+                angle_max  *= 1.5
+            else:
+                angle_max   = 50
+                angle_step  =  2
+            
+            img_tmp = microscope.acquire_frame(resolution, dwell_time, bit_depth)
+            image_euc[0] = microscope.image_array(img_tmp)
+            path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
+            microscope.save(img_tmp, path)
+            positioner.relative_move(0, 0, 0, angle_step, 0)
+            continue
+
+        positioner.relative_move(0, 0, 0, angle_step, 0)
+        image_euc[0] = np.ndarray.copy(image_euc[1])
+
+    ixe, ygrec, zed, _, _ = positioner.current_position()
+    positioner.absolute_move(ixe, ygrec, zed, 0, 0)
+    # logging.info('Done eucentrixx')
+    s_print(       'Done eucentrixx')
+    copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
+    return 0
+
+def set_eucentric_ETEM(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
 
     Input:
@@ -554,9 +677,6 @@ def set_eucentric2(microscope, positioner) -> int:
             angle           = [positioner.current_position()[3]]
             eucentric_error = 0
             
-            if microscope.microscope_type == 'ESEM':
-                microscope.auto_contras_brightness()
-            
             ### Test increase angle
             if angle_max == 10:
                 angle_max   = 30
@@ -584,6 +704,7 @@ class acquisition(object):
     def __init__(self, microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2, tilt_end=60) -> int:
         '''
         '''
+        
         self.flag = 0
         self.image_width, self.image_height = resolution.split('x')
         
@@ -601,7 +722,7 @@ class acquisition(object):
             self.positioner       = 0
 
         self.pos = positioner.current_position()
-        if None in self.pos:
+        if None in self.pos[1:-1]:
             return None
 
         if bit_depth == 16:
@@ -610,6 +731,7 @@ class acquisition(object):
             self.dtype_number = 255
 
         self.path = work_folder + images_name + '_' + str(round(time.time()))
+        print('path = ', self.path)
         os.makedirs(self.path, exist_ok=True)
 
     def tomo(self):
@@ -628,7 +750,7 @@ class acquisition(object):
         s_print('number of images', nb_images)
 
         if self.microscope.microscope_type == 'ESEM':
-            self.microscope.tilt_correction(ONOFF=True, mode='Manual')
+            self.microscope.tilt_correction(ONOFF=True)
         
         for i in range(nb_images):
             if self.flag == 1:
@@ -697,8 +819,8 @@ class acquisition(object):
             hfw = self.microscope.horizontal_field_view()
             
             dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
-            dx_si                    =   dx_pix * hfw / self.image_width
-            dy_si                    =   dy_pix * hfw / self.image_width
+            dx_si                    =   dx_pix * hfw / int(self.image_width)
+            dy_si                    =   dy_pix * hfw / int(self.image_width)
             correction_x             = - dx_si + correction_x
             correction_y             = - dy_si + correction_y
             anticipation_x          +=   correction_x
@@ -719,8 +841,8 @@ class acquisition(object):
         focus_score_list = []*averaging
         dtype_number = 2**self.bit_depth
         
-        image_width  = self.image_width
-        image_height = self.image_height
+        image_width  = int(self.image_width)
+        image_height = int(self.image_height)
         # Create radial alpha/transparency layer. 255 in centre, 0 at edge
         Y = np.linspace(-1, 1, image_height)[None, :]*dtype_number
         X = np.linspace(-1, 1, image_height)[:, None]*dtype_number
@@ -802,10 +924,11 @@ class acquisition(object):
         '''
         self.microscope.start_acquisition()
         if self.microscope.microscope_type == 'ESEM':
-            self.microscope.tilt_correction(ONOFF=True, mode='Manual')
+            self.microscope.tilt_correction(ONOFF=True)
         i = 0
         
         while True:
+            print('Images n°', i)
             if self.flag == 1:
                 return
             pos = self.positioner.current_position()
@@ -841,8 +964,11 @@ class acquisition(object):
                     continue
                 else:
                     img_path_0 = deepcopy(img_path)
-                    
-                img = imread(self.path + '/' + img_path)
+                
+                if self.microscope.microscope_type == 'ESEM':
+                    img = self.microscope.load(self.path + '/' + img_path)
+                else:
+                    img = imread(self.path + '/' + img_path)
                 
                 image_height, image_width  = img.shape
                 img = img[:,(image_width-image_height)//2:(image_width+image_height)//2]
@@ -853,6 +979,7 @@ class acquisition(object):
                 appPI.lbl_img.configure(image = img_0)
                 appPI.lbl_img.photo = img_0
                 appPI.lbl_img.update()
-            except:
+            except Exception as e:
+                PrintException()
                 time.sleep(0.1)
                 continue

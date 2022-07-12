@@ -248,9 +248,9 @@ class App(object):
         self.lbl_eucent.update()
         # try:
         if self.microscope.microscope_type == 'ESEM':
-            set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
+            set_eucentric_status = scripts.set_eucentric_ESEM_2(self.microscope, self.positioner)
         else:
-            set_eucentric_status = scripts.set_eucentric2(self.microscope, self.positioner)
+            set_eucentric_status = scripts.set_eucentric_ETEM(self.microscope, self.positioner)
         # except:
         #     set_eucentric_status = 1
         #     pass
@@ -372,20 +372,20 @@ class App(object):
                                           resolution       = self.microscope.image_settings()[0],
                                           bit_depth        = 16,
                                           dwell_time       = self.microscope.image_settings()[1],
-                                          tilt_increment   = int(self.ent_tilt_step.get())*1e6,
-                                          tilt_end         = int(self.ent_end_tilt.get())*1e6,)
+                                          tilt_increment   = int(self.ent_tilt_step.get()),
+                                          tilt_end         = int(self.ent_end_tilt.get()),)
 
             self.thread_tomo = threading.Thread(target=acqui.tomo)
             self.thread_tomo.start()
             if self.check1.get() == True:
                 self.thread_drift_correction = threading.Thread(target=acqui.f_drift_correction)
                 self.thread_drift_correction.start()
-            if self.check2.get() == True:
-                self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
-                self.thread_focus_correction.start()
-            else:
-                self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
-                self.thread_image_fft.start()
+            # if self.check2.get() == True:
+            #     self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
+            #     self.thread_focus_correction.start()
+            # else:
+            #     self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
+            #     self.thread_image_fft.start()
             
         except Exception as e:
             logging.info(str(e))
@@ -400,36 +400,37 @@ class App(object):
         '''
         self.lbl_record.config(bg='green')
         self.lbl_record.update()
-        try:
-            global acqui
-            acqui = scripts.acquisition(self.microscope,
-                                        self.positioner,
-                                        work_folder      = 'data/record/',
-                                        images_name      = self.ent_name.get(),
-                                        resolution       = self.microscope.image_settings()[0],
-                                        bit_depth        = 16,
-                                        dwell_time       = self.microscope.image_settings()[1],
-                                        tilt_increment   = int(self.ent_tilt_step.get())*1e6,
-                                        tilt_end         = int(self.ent_end_tilt.get())*1e6)
-            time.sleep(0.1)
-            self.thread_acqui = threading.Thread(target=acqui.record)
-            self.thread_acqui.start()
-            if self.check1.get() == True:
-                self.thread_drift_correction = threading.Thread(target=acqui.f_drift_correction)
-                self.thread_drift_correction.start()
-            if self.check2.get() == True:
-                self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
-                self.thread_focus_correction.start()
-            else:
-                self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
-                self.thread_image_fft.start()
-
-        except Exception as e:
-            logging.info(str(e))
+        # try:
+        global acqui
+        acqui = scripts.acquisition(self.microscope,
+                                    self.positioner,
+                                    work_folder      = 'data/record/',
+                                    images_name      = self.ent_name.get(),
+                                    resolution       = self.microscope.image_settings()[0],
+                                    bit_depth        = 16,
+                                    dwell_time       = self.microscope.image_settings()[1],
+                                    tilt_increment   = int(self.ent_tilt_step.get()),
+                                    tilt_end         = int(self.ent_end_tilt.get()))
+        time.sleep(0.1)
+        self.thread_acqui = threading.Thread(target=acqui.record)
+        self.thread_acqui.start()
+        if self.check1.get() == True:
+            self.thread_drift_correction = threading.Thread(target=acqui.f_drift_correction)
+            self.thread_drift_correction.start()
+        # if self.check2.get() == True:
+        #     self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
+        #     self.thread_focus_correction.start()
+        else:
             pass
+            # self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
+            # self.thread_image_fft.start()
+
+        # except Exception as e:
+        #     logging.info(str(e))
+        #     pass
         
-        self.lbl_record.config(bg='red')
-        self.lbl_record.update()
+        # self.lbl_record.config(bg='red')
+        # self.lbl_record.update()
         return 0
 
     def stop(self):
@@ -454,17 +455,17 @@ class App(object):
                 print('drift joined')
             except:
                 pass
-        if self.check2.get() == True:
-            try:
-                self.thread_focus_correction.join()
-                print('focus joined')
-            except:
-                pass
-        try:
-            self.thread_image_fft.join()
-            print('fft joined')
-        except:
-            pass
+        # if self.check2.get() == True:
+        #     try:
+        #         self.thread_focus_correction.join()
+        #         print('focus joined')
+        #     except:
+        #         pass
+        # try:
+        #     self.thread_image_fft.join()
+        #     print('fft joined')
+        # except:
+        #     pass
 
 
         self.lbl_eucent.config(bg='red')

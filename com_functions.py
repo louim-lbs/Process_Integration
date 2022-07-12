@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 import os
-from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition
+from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition, AdornedImage
 
 ## Only for editing in VSCode. Remove before using?
 try:
@@ -194,13 +194,14 @@ class FEI_QUATTRO_ESEM(microscope):
     
     def tilt_correction(self, ONOFF:bool=None, value:float=None, mode:str=None):
         if ONOFF == True:
+            self.quattro.beams.electron_beam.angular_correction.mode = 'Automatic'
             self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_on()
         elif ONOFF == False:
             self.quattro.beams.electron_beam.angular_correction.tilt_correction.turn_off()
             return
-        if mode == 'rel':
+        if value != None and mode == 'rel':
             self.quattro.beams.electron_beam.angular_correction.specimen_pretilt.value += value*np.pi/180
-        else:
+        elif value != None and mode != 'rel':
             self.quattro.beams.electron_beam.angular_correction.specimen_pretilt.value = value*np.pi/180
         
     def beam_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
@@ -285,6 +286,10 @@ class FEI_QUATTRO_ESEM(microscope):
     
     def save(self, image, path):
         image.save(path + '.tif')
+
+    def load(self, path):
+        img = AdornedImage.load(path)
+        return img.data
     
     def beam_blanking(self, ONOFF:bool):
         if ONOFF == True:
