@@ -262,6 +262,7 @@ class FEI_QUATTRO_ESEM(microscope):
         windows         = [int(s) for s in windows]
 
         imgs            = [0]*len(windows)
+        img_prev_stamp  = []
         
         view = self.quattro.imaging.get_active_view()
         self.quattro.imaging.set_active_view(view)

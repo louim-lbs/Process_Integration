@@ -370,7 +370,7 @@ class App(object):
                                           work_folder      = 'data/tomo/',
                                           images_name      = self.ent_name.get(),
                                           resolution       = self.microscope.image_settings()[0],
-                                          bit_depth        = 16,
+                                          bit_depth        = 8,
                                           dwell_time       = self.microscope.image_settings()[1],
                                           tilt_increment   = float(self.ent_tilt_step.get()),
                                           tilt_end         = int(self.ent_end_tilt.get()),)
@@ -407,7 +407,7 @@ class App(object):
                                     work_folder      = 'data/record/',
                                     images_name      = self.ent_name.get(),
                                     resolution       = self.microscope.image_settings()[0],
-                                    bit_depth        = 16,
+                                    bit_depth        = 8,
                                     dwell_time       = self.microscope.image_settings()[1],
                                     tilt_increment   = float(self.ent_tilt_step.get()),
                                     tilt_end         = int(self.ent_end_tilt.get()))
