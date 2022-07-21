@@ -12,8 +12,8 @@ import logging
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
 try:
-    sys.path.insert(1, r'C:\Users\User\Documents\Process_Integration_2022-07-11')
-    os.chdir(r'C:\Users\User\Documents\Process_Integration_2022-07-11')
+    sys.path.insert(1, r'C:\Users\User\Documents\LM Lebas\PI_2022-07-21')
+    os.chdir(r'C:\Users\User\Documents\LM Lebas\PI_2022-07-21')
 except:
     sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
     os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')

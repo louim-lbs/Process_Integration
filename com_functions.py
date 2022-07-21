@@ -1,4 +1,5 @@
 import copy
+import time
 import numpy as np
 import os
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point, StagePosition, AdornedImage
@@ -239,9 +240,19 @@ class FEI_QUATTRO_ESEM(microscope):
             self.quattro.beams.electron_beam.scanning.bit_depth = bit_depth
 
         while (True):
+            # t = time.time()
             img = self.quattro.imaging.get_image()
-            if not (img_prev_stamp == img.data[-1,:]).all():
-                return img
+            # t2 = time.time()
+            # print('while', t2-t)
+            try:
+                # t = time.time()
+                if not np.array_equal(img_prev_stamp, img.data[-1,:]):# (img_prev_stamp == img.data[-1,:]).all():
+                    # t2 = time.time()
+                    # print('try', t2-t)
+                    return img
+            except:
+                print('error acquire frame')
+                pass
     
     def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16, windows='123'):
         # settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)

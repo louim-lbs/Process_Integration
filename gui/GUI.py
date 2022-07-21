@@ -372,7 +372,7 @@ class App(object):
                                           resolution       = self.microscope.image_settings()[0],
                                           bit_depth        = 16,
                                           dwell_time       = self.microscope.image_settings()[1],
-                                          tilt_increment   = int(self.ent_tilt_step.get()),
+                                          tilt_increment   = float(self.ent_tilt_step.get()),
                                           tilt_end         = int(self.ent_end_tilt.get()),)
 
             self.thread_tomo = threading.Thread(target=acqui.tomo)
@@ -409,7 +409,7 @@ class App(object):
                                     resolution       = self.microscope.image_settings()[0],
                                     bit_depth        = 16,
                                     dwell_time       = self.microscope.image_settings()[1],
-                                    tilt_increment   = int(self.ent_tilt_step.get()),
+                                    tilt_increment   = float(self.ent_tilt_step.get()),
                                     tilt_end         = int(self.ent_end_tilt.get()))
         time.sleep(0.1)
         self.thread_acqui = threading.Thread(target=acqui.record)

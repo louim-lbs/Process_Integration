@@ -230,7 +230,6 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         #####################
         #####################
     
-    
 
 def match(image_master, image_template, grid_size = 5, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0, resize_factor = 1):
     ''' Match two images
@@ -268,47 +267,42 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     displacement_vector = np.array([[0,0]])
     corr_trust = np.array(0)
 
+    t_temp = 0
+    t_match = 0
+    t_calc = 0
+    t_append = 0
     for i in range(grid_size):
         for j in range(grid_size):
+            t1 = time.time()
             template_patch_xA      = (height_master - height_template)//2 + (i)*template_patch_size[0]
             template_patch_yA      = (width_master  - width_template)//2  + (j)*template_patch_size[1]
             template_patch_xB      = (height_master - height_template)//2 + (i+1)*template_patch_size[0]
             template_patch_yB      = (width_master  - width_template)//2  + (j+1)*template_patch_size[1]
-            # print('template_patch_xA,template_patch_xB,template_patch_yA,template_patch_yB,', template_patch_xA,template_patch_xB,template_patch_yA,template_patch_yB)
 
             template_patch         = image_template[int(template_patch_xA):int(template_patch_xB),
                                                     int(template_patch_yA):int(template_patch_yB)]
 
+            t2 = time.time()
+            t_temp += t2 - t1
             corr_scores            = cv.matchTemplate(image_master, template_patch, cv.TM_CCOEFF) #TM_CCOEFF_NORMED
-
-            # plt.imshow(corr_scores)
-            # plt.show()
-            
+            t3 = time.time()
+            t_match += t3 - t2
             _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
-            
-            
-            # dx                     = (max_loc[1] - j*template_patch_size[0] - (height_master - height_template))*resize_factor
-            # dy                     = (max_loc[0] - i*template_patch_size[1] - (width_master  - width_template ))*resize_factor
-            
-            # dx                     = (height_template//grid_size - max_loc[0])*resize_factor
-            # dy                     = (width_template//grid_size - max_loc[1])*resize_factor
             
             dx                     = (template_patch_xA - max_loc[1])*resize_factor
             dy                     = (template_patch_yA - max_loc[0])*resize_factor
-            
-            # bottom = (max_loc[1] + template_patch_size[1], max_loc[0] + template_patch_size[0])
-            # image_master = cv.rectangle(image_master, (max_loc[1], max_loc[0]), bottom, 0, 2)
-            
-            # plt.imshow(template_patch)
-            # plt.show()
-            # plt.imshow(image_master)
-            # plt.show()
-            
-
-            # print('max_loc[0]', max_loc[0], 'max_loc[1]', max_loc[1], 'dx', 'dy', dx, dy)
-            
+            t4 = time.time()
+            t_calc += t4 - t3
             displacement_vector    = np.append(displacement_vector, [[dx, dy]], axis=0)
             corr_trust             = np.append(corr_trust, max_val)
+            t5 = time.time()
+            t_append += t5 - t4
+
+    # t_temp = t_temp/(grid_size**2)
+    # t_match = t_match/(grid_size**2)
+    # t_calc = t_calc/(grid_size**2)
+    # t_append = t_append/(grid_size**2)
+    print('t_temp', t_temp, 't_match', t_match, 't_calc', t_calc, 't_append', t_append)
 
     corr_trust_x          = np.delete(corr_trust, 0)
     corr_trust_y          = deepcopy(corr_trust_x)
@@ -520,7 +514,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         microscope.quattro.imaging.set_active_view(3)
     microscope.start_acquisition()
 
-    positioner.absolute_move(x0, y0, z0, -angle_step, 0)
+    positioner.absolute_move(x0, y0, z0, -2*angle_step, 0)
     positioner.absolute_move(x0, y0, z0, 0, 0)
 
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
@@ -735,7 +729,7 @@ class acquisition(object):
         os.makedirs(self.path, exist_ok=True)
 
     def tomo(self):
-        self.microscope.start_acquisition()
+        #self.microscope.start_acquisition()
 
         if self.positioner.current_position()[3] > 0:
             self.direction = -1
@@ -784,15 +778,17 @@ class acquisition(object):
         correction_y     = 0
         img_path_0       = ''
         img_prev_path_0  = ''
+        hfw = self.microscope.horizontal_field_view()
 
         while True:
+            # t1 = time.time()
             if self.flag == 1:
                 return
             # Load two most recent images
             # try:
             list_of_imgs  = [file for file in os.listdir(self.path) if 'HAADF' in file]
             if len(list_of_imgs) < 2:
-                s_print('Not enough images yet')
+                print('Not enough images yet')
                 time.sleep(0.1)
                 continue
 
@@ -807,7 +803,7 @@ class acquisition(object):
             else:
                 img_path_0      = deepcopy(img_path)
                 img_prev_path_0 = deepcopy(img_prev_path)
-            
+
             img       = imread(self.path + '/' + img_path)
             img_prev  = imread(self.path + '/' + img_prev_path)
             # except:
@@ -815,23 +811,44 @@ class acquisition(object):
             #     time.sleep(0.1)
             #     continue
             
-            s_print('New image found for drift correction')
-            hfw = self.microscope.horizontal_field_view()
-            
-            dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
+            print('New image found for drift correction')
+            # t = time.time()
+
+            img                    = np.float32(img)
+            img_prev               = np.float32(img_prev)
+            shape                  = img_prev.shape
+            corr_scores            = cv.matchTemplate(img, img_prev, cv.TM_CCOEFF) #TM_CCOEFF_NORMED
+            _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
+            print(corr_scores)
+            print(shape, max_loc, max_val)
+            dx_pix                 = shape[1]//2 - max_loc[1]
+            dy_pix                 = shape[0]//2 - max_loc[0]
+        
+
+            # dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
+            # print('** Match', time.time()-t)
             dx_si                    =   dx_pix * hfw / int(self.image_width)
             dy_si                    =   dy_pix * hfw / int(self.image_width)
             correction_x             = - dx_si + correction_x
             correction_y             = - dy_si + correction_y
             anticipation_x          +=   correction_x
             anticipation_y          +=   correction_y
-            s_print('dy_pix', dy_pix)
+
+            # t = time.time()
+
+            print('dx_pix', dx_pix, 'dy_pix', dy_pix)
             if dy_pix != 0:
-                self.microscope.beam_shift(value_x = correction_x + anticipation_x,
-                                           value_y = correction_y + anticipation_y,
-                                           mode = 'rel')
-                s_print('Correction Done')
-    
+                value_x = correction_x + anticipation_x
+                value_y = correction_y + anticipation_y
+                print('value_x, value_y', value_x, value_y)
+                if self.microscope.microscope_type == 'ESEM':
+                    self.microscope.beam_shift(-value_x, value_y, mode = 'rel')
+                else:
+                    self.microscope.beam_shift(value_x, value_y, mode = 'rel')
+                # print('** Correction', time.time()-t)
+                # print('** Total', time.time()-t1)
+                print('Correction Done')
+                
     def f_focus_correction(self, appPI):
         '''
         '''
