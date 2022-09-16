@@ -814,21 +814,21 @@ class acquisition(object):
             print('New image found for drift correction')
             # t = time.time()
 
-            img                    = np.float32(img)
-            img_prev               = np.float32(img_prev)
-            shape                  = img_prev.shape
-            corr_scores            = cv.matchTemplate(img, img_prev, cv.TM_CCOEFF) #TM_CCOEFF_NORMED
-            _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
-            print(corr_scores)
-            print(shape, max_loc, max_val)
-            dx_pix                 = shape[1]//2 - max_loc[1]
-            dy_pix                 = shape[0]//2 - max_loc[0]
+            # img                    = np.float32(img)
+            # img_prev               = np.float32(img_prev)
+            # shape                  = img_prev.shape
+            # corr_scores            = cv.matchTemplate(img, img_prev, cv.TM_CCOEFF) #TM_CCOEFF_NORMED
+            # _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
+            # print(corr_scores)
+            # print(shape, max_loc, max_val)
+            # dx_pix                 = shape[1]//2 - max_loc[1]
+            # dy_pix                 = shape[0]//2 - max_loc[0]
         
 
-            # dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
+            dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=0.5)
             # print('** Match', time.time()-t)
             dx_si                    =   dx_pix * hfw / int(self.image_width)
-            dy_si                    =   dy_pix * hfw / int(self.image_width)
+            dy_si                    =   dy_pix * hfw / int(self.image_height)
             correction_x             = - dx_si + correction_x
             correction_y             = - dy_si + correction_y
             anticipation_x          +=   correction_x
