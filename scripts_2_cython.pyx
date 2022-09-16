@@ -1,6 +1,7 @@
 import linecache
 import sys
 import numpy as np
+cimport numpy as np
 import cv2 as cv
 from scipy import interpolate
 from scipy.optimize import curve_fit
@@ -22,6 +23,10 @@ s_print_lock = Lock()
 def PrintException():
     ''' https://stackoverflow.com/questions/14519177/python-exception-handling-line-number
     '''
+    cdef:
+        int lineno
+        str filename 
+        str line
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
     lineno = tb.tb_lineno
@@ -42,15 +47,27 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
     from:
     https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape
     '''
+    cdef:
+        np.ndarray[np.uint8_t, ndim=1] hist
+        int hist_size
+        list accumulator = [0] * hist_size
+        int index
+        float maximum
+        float clip_hist_percent
+        float minimum_gray
+        float maximum_gray
+        float alpha
+        float beta
+        np.ndarray[np.uint16_t, ndim=2] auto_result
+
     # Calculate grayscale histogram
     hist = cv.calcHist([image],[0],None,[256],[0,256])
     hist_size = len(hist)
     
     # Calculate cumulative distribution from the histogram
-    accumulator = []
-    accumulator.append(float(hist[0]))
+    accumulator[0] = float(hist[0])
     for index in range(1, hist_size):
-        accumulator.append(accumulator[index -1] + float(hist[index]))
+        accumulator[index] = accumulator[index - 1] + float(hist[index])
     
     # Locate points to clip
     maximum = accumulator[-1]
@@ -75,6 +92,20 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
     return auto_result
 
 def fft(img):
+
+    cdef:
+        double rows
+        double cols
+        double nrows
+        double ncols
+        double right
+        double bottom
+        np.ndarray[np.uint16_t, ndim=2] image_fft
+        np.ndarray[np.uint16_t, ndim=2] image_fft_mag
+        int value
+        int flags
+        int borderType
+
     rows, cols = img.shape
     nrows = cv.getOptimalDFTSize(rows)
     ncols = cv.getOptimalDFTSize(cols)
@@ -88,6 +119,9 @@ def fft(img):
     return image_fft_mag
 
 def find_ellipse(img, save=False):
+    cdef:
+        np.ndarray[np.uint16_t, ndim=2] img
+
     if save:
         plt.imshow(img, 'gray')
     
@@ -148,7 +182,11 @@ def find_ellipse(img, save=False):
     return ((0, 0), (0, 0), 0)
 
 def function_displacement(x, z, y, R):#, x2, x3):
-    x = [i*np.pi/180 for i in x]
+    cdef:
+        double l = len(x)
+        int i
+        
+    x = [x[i]*np.pi/180 for i in range(l)]
     return y*(1-np.cos(x)) + z*np.sin(x) + R*(1-np.sin(x))#np.multiply(x, x2))) + x3
 
 def correct_eucentric(microscope, positioner, displacement, angle):
