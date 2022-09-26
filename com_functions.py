@@ -6,7 +6,7 @@ from autoscript_sdb_microscope_client.structures import GrabFrameSettings, Point
 
 ## Only for editing in VSCode. Remove before using?
 try:
-    from microscopes import DigitalMicrograph as DM
+    from microscopes import DigitalMicrograph as DM, DM34
 except:
     pass
 
@@ -26,6 +26,7 @@ class FEI_TITAN_ETEM(microscope):
     def __init__(self) -> None:
         self.microscope_type = 'ETEM'
         self.InitState_status = 0
+        self.imgID = 0
          
     # Packages & Connexion
     def import_package_and_connexion(self):
@@ -73,7 +74,7 @@ class FEI_TITAN_ETEM(microscope):
         return DM.Py_Microscope().SetFocus(value*1e9)
     
     def tilt_correction(self, *args):
-        print('Tilt or angular correction for ETEM is not implemented')
+        #print('Tilt or angular correction for ETEM is not implemented')
         return
     
     def image_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
@@ -102,6 +103,15 @@ class FEI_TITAN_ETEM(microscope):
     
     # Imaging
     def image_settings(self):
+        ID = DM.DS_GetAcquiredImageID(0)
+        img = DM.FindImageByID(ID)
+        x_resol = int(img.GetImgWidth())
+        y_resol = int(img.GetImgHeight())
+        resolution = str(y_resol) + 'x' + str(x_resol)
+        resolution = '2048x2048'
+        dwell_time = 0.2e-6
+        return resolution, dwell_time
+    
         exposure, xBin, yBin, _, top, left, bottom, right = self.camera.GetDefaultParameters()
         x_resol = int((right - left)/xBin)
         y_resol = int((bottom - top)/yBin)
@@ -113,21 +123,39 @@ class FEI_TITAN_ETEM(microscope):
         return DM.GetFrontImage()
     
     def acquire_frame(self, resolution=None, dwell_time=None, bit_depth=None):
-        if resolution==None and dwell_time==None and bit_depth==None:
+        
+        if resolution==None and dwell_time==None:
             resolution, dwell_time = self.image_settings()
         resolution_y, resolution_x = resolution.split('x')
         paramID = DM.DS_CreateParameters(int(resolution_y), int(resolution_x), 4, 0, dwell_time*1e6, False)
-        DM.DS_SetParametersSignal(paramID, signalIndex=0, dataType=4, selected=True, imageID=0)
+        DM.DS_SetParametersSignal(paramID, signalIndex=0, dataType=4, selected=True, imageID=self.imgID)
         DM.DS_StartAcquisition(paramID, continuous=False, synchronous=True)
-        ID = DM.DS_GetAcquiredImageID(0)
-        img = DM.FindImageByID(ID)
+        self.imgID = DM.DS_GetAcquiredImageID(0)
+        img = DM.FindImageByID(self.imgID)
         return img
     
+        img_data = img.GetNumArray()
+        img_prev_stamp = img_data[-1,:]
+
+        while (True):
+            img = DM.FindImageByID(imgID)
+            try:
+                if not np.array_equal(img_prev_stamp, img.data[-1,:]):
+                    return img
+            except:
+                print('error acquire frame')
+                pass
+    
     def acquire_multiple_frames(self, resolution=None, dwell_time=None, bit_depth=None):
-        print('Multiple frames acquisition is not yet implemented')
+        #print('Multiple frames acquisition is not yet implemented')
+        return
     
     def image_array(self, image):
         return image.GetNumArray()
+    
+    def load(self, path):
+        img, _, _, _ = DM34.dm_load(path)
+        return np.float32(img)
     
     def save(self, image, path):
         image.SaveAsGatan(path + '.dm4')
@@ -136,7 +164,7 @@ class FEI_TITAN_ETEM(microscope):
         return DM.Py_Microscope().SetBeamBlanked(ONOFF)
     
     def start_acquisition(self):
-        ####
+        #DM.DS_InvokeAcquisitionButton(1)
         return
 
 class FEI_QUATTRO_ESEM(microscope):
@@ -300,6 +328,7 @@ class FEI_QUATTRO_ESEM(microscope):
 
     def load(self, path):
         img = AdornedImage.load(path)
+        # imread(self.path + '/' + img_path)
         return img.data
     
     def beam_blanking(self, ONOFF:bool):

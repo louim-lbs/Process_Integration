@@ -9,10 +9,6 @@ from PIL import ImageTk, Image
 import scripts_2 as scripts
 import threading
 
-def number_format(number:float, decimals:int=2):
-    if number == None:
-        return 'None'
-    return str('{:.{}e}'.format(float(number), decimals))
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -44,7 +40,7 @@ class App(object):
         # Title
         root.title("Tomo Controller for Quattro and Smaract positioner - Alpha version")
         root.iconbitmap('gui/img/PI.ico')
-        print(microscope.InitState_status)
+        
         try:
             self.microscope = microscope
             self.positioner = positioner
@@ -163,14 +159,14 @@ class App(object):
         self.btn_t_zero.place(x=242, y=360)
 
         positioner_pos = self.positioner.current_position()
-        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=number_format(positioner_pos[2]) + " m", justify='left')
-        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=number_format(positioner_pos[1]) + " m", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=number_format(positioner_pos[3]) + " °", justify='left')
+        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[2]) + " m", justify='left')
+        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[1]) + " m", justify='left')
+        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[3]) + " °", justify='left')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
 
-        ent_step_values = tuple(number_format(1e-9*10**i, 0) for i in range(10))
+        ent_step_values = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
         var1 = tk.StringVar(value='1e-6')
         var2 = tk.StringVar(value='1e-6')
         var3 = tk.StringVar(value='1')
@@ -281,7 +277,7 @@ class App(object):
         status = self.positioner.relative_move(0, 0, step, 0, 0)
         if status != 0:
             return 1
-        self.lbl_z_pos.config(text=number_format(self.positioner.current_position()[2]) + ' m')
+        self.lbl_z_pos.config(text=scripts.number_format(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
         return 0
 
@@ -290,7 +286,7 @@ class App(object):
         status = self.positioner.relative_move(0, step, 0, 0, 0)
         if status != 0:
             return 1
-        self.lbl_y_pos.config(text=number_format(self.positioner.current_position()[1]) + ' m')
+        self.lbl_y_pos.config(text=scripts.number_format(self.positioner.current_position()[1]) + ' m')
         self.lbl_y_pos.update()
         return 0
 
@@ -300,7 +296,7 @@ class App(object):
         if status != 0:
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=number_format(positioner_t_pos) + ' °')
+        self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()
         return 0
     
@@ -310,7 +306,7 @@ class App(object):
         if status != 0:
             print('lol1')
             return 1
-        self.lbl_z_pos.config(text=number_format(self.positioner.current_position()[2]) + ' m')
+        self.lbl_z_pos.config(text=scripts.number_format(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
         return 0
     
@@ -319,7 +315,7 @@ class App(object):
         status = self.positioner.relative_move(0, -step, 0, 0, 0)
         if status != 0:
             return 1
-        self.lbl_y_pos.config(text=number_format(self.positioner.current_position()[1]) + ' m')
+        self.lbl_y_pos.config(text=scripts.number_format(self.positioner.current_position()[1]) + ' m')
         self.lbl_y_pos.update()
         return 0
     
@@ -331,7 +327,7 @@ class App(object):
             print('status', status)
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=number_format(positioner_t_pos) + ' °')
+        self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -341,7 +337,7 @@ class App(object):
             return 1
         self.positioner.absolute_move(x, y, z, 0, b)
         positioner_t_pos = self.positioner.current_position()[3]
-        self.lbl_t_pos.config(text=number_format(positioner_t_pos) + ' °')
+        self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()
         return 0
 
@@ -364,8 +360,9 @@ class App(object):
         self.lbl_acquisition.update()
 
         try:
-            global acqui
-            acqui = scripts.acquisition(self.microscope,
+            global imgID
+            imgID = 0
+            self.acqui = scripts.acquisition(self.microscope,
                                           self.positioner,
                                           work_folder      = 'data/tomo/',
                                           images_name      = self.ent_name.get(),
@@ -375,16 +372,16 @@ class App(object):
                                           tilt_increment   = float(self.ent_tilt_step.get()),
                                           tilt_end         = int(self.ent_end_tilt.get()),)
 
-            self.thread_tomo = threading.Thread(target=acqui.tomo)
+            self.thread_tomo = threading.Thread(target=self.acqui.tomo)
             self.thread_tomo.start()
             if self.check1.get() == True:
-                self.thread_drift_correction = threading.Thread(target=acqui.f_drift_correction)
+                self.thread_drift_correction = threading.Thread(target=self.acqui.f_drift_correction)
                 self.thread_drift_correction.start()
             # if self.check2.get() == True:
-            #     self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
+            #     self.thread_focus_correction = threading.Thread(target=self.acqui.f_focus_correction, args=(self,))
             #     self.thread_focus_correction.start()
             # else:
-            #     self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
+            #     self.thread_image_fft = threading.Thread(target=self.acqui.f_image_fft, args=(self,))
             #     self.thread_image_fft.start()
             
         except Exception as e:
@@ -401,8 +398,7 @@ class App(object):
         self.lbl_record.config(bg='green')
         self.lbl_record.update()
         # try:
-        global acqui
-        acqui = scripts.acquisition(self.microscope,
+        self.acqui = scripts.acquisition(self.microscope,
                                     self.positioner,
                                     work_folder      = 'data/record/',
                                     images_name      = self.ent_name.get(),
@@ -412,61 +408,61 @@ class App(object):
                                     tilt_increment   = float(self.ent_tilt_step.get()),
                                     tilt_end         = int(self.ent_end_tilt.get()))
         time.sleep(0.1)
-        self.thread_acqui = threading.Thread(target=acqui.record)
+        self.thread_acqui = threading.Thread(target=self.acqui.record)
         self.thread_acqui.start()
         if self.check1.get() == True:
-            self.thread_drift_correction = threading.Thread(target=acqui.f_drift_correction)
+            self.thread_drift_correction = threading.Thread(target=self.acqui.f_drift_correction)
             self.thread_drift_correction.start()
         # if self.check2.get() == True:
-        #     self.thread_focus_correction = threading.Thread(target=acqui.f_focus_correction, args=(self,))
+        #     self.thread_focus_correction = threading.Thread(target=self.acqui.f_focus_correction, args=(self,))
         #     self.thread_focus_correction.start()
         else:
             pass
-            # self.thread_image_fft = threading.Thread(target=acqui.f_image_fft, args=(self,))
+            # self.thread_image_fft = threading.Thread(target=self.acqui.f_image_fft, args=(self,))
             # self.thread_image_fft.start()
 
         # except Exception as e:
         #     logging.info(str(e))
         #     pass
         
-        # self.lbl_record.config(bg='red')
-        # self.lbl_record.update()
+        self.lbl_record.config(bg='red')
+        self.lbl_record.update()
         return 0
 
     def stop(self):
-        if 'acqui' in globals():
-            global acqui
-            acqui.flag = 1
-
-        try:
-            print(self.thread_acqui)
-            self.thread_acqui.join()
-            print('acqui joined')
-        except:
+        if hasattr(self, 'acqui') and self.acqui.flag == 0:
+            self.acqui.flag = 1
+            self.acqui.c.acquire()
+            self.acqui.c.notify_all()
+            self.acqui.c.release()
+       
             try:
-                self.thread_tomo.join()
-                print('tomo joined')
+                self.thread_acqui.join()
+                print('Acquisition thread joined')
             except:
-                print('No thread to join. No acquisition running')
-    
-        if self.check1.get() == True:
-            try:
-                self.thread_drift_correction.join()
-                print('drift joined')
-            except:
-                pass
-        # if self.check2.get() == True:
-        #     try:
-        #         self.thread_focus_correction.join()
-        #         print('focus joined')
-        #     except:
-        #         pass
-        # try:
-        #     self.thread_image_fft.join()
-        #     print('fft joined')
-        # except:
-        #     pass
-
+                try:
+                    self.thread_tomo.join()
+                    print('Tomography thread joined')
+                except:
+                    print('No thread to join. No acquisition running')
+        
+            if self.check1.get() == True:
+                try:
+                    self.thread_drift_correction.join()
+                    print('Drift correction thread joined')
+                except:
+                    pass
+            # if self.check2.get() == True:
+            #     try:
+            #         self.thread_focus_correction.join()
+            #         print('Focus correction thread joined')
+            #     except:
+            #         pass
+            # try:
+            #     self.thread_image_fft.join()
+            #     print('FFT thread joined')
+            # except:
+            #     pass
 
         self.lbl_eucent.config(bg='red')
         self.lbl_eucent.update()
@@ -479,10 +475,8 @@ class App(object):
         self.lbl_img.photo = self.img_0
         self.lbl_img.update()
 
-        try:
-            self.microscope.tilt_correction(False)
-        except:
-            pass
+        self.microscope.tilt_correction(False)
+        
         return 0
 
 if __name__ == "__main__":
