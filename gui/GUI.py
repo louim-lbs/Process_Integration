@@ -7,6 +7,7 @@ from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 #from com_functions import microscope
 import scripts_2 as scripts
+# import scripts_2_cython as scripts
 import threading
 
 

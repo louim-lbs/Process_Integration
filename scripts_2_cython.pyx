@@ -35,10 +35,10 @@ def PrintException():
     line = linecache.getline(filename, lineno, f.f_globals)
     print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
-def s_print(*a, **b):
+def s_print(*a):
     """Thread safe print function from: https://stackoverflow.com/questions/40356200/python-printing-in-multiple-threads"""
     s_print_lock.acquire()
-    print(*a, **b)
+    print(*a)
     s_print_lock.release()
 
 # Automatic brightness and contrast optimization with optional histogram clipping
@@ -50,10 +50,9 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
     cdef:
         np.ndarray[np.uint8_t, ndim=1] hist
         int hist_size
-        list accumulator = [0] * hist_size
+        list accumulator
         int index
         float maximum
-        float clip_hist_percent
         float minimum_gray
         float maximum_gray
         float alpha
@@ -65,6 +64,7 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
     hist_size = len(hist)
     
     # Calculate cumulative distribution from the histogram
+    accumulator = [0] * hist_size
     accumulator[0] = float(hist[0])
     for index in range(1, hist_size):
         accumulator[index] = accumulator[index - 1] + float(hist[index])
@@ -120,7 +120,20 @@ def fft(img):
 
 def find_ellipse(img, save=False):
     cdef:
-        np.ndarray[np.uint16_t, ndim=2] img
+        int ind
+        #contours
+        #cont
+        #elps
+        double u
+        double v
+        double a
+        double b
+        double t_rot
+        np.ndarray[np.uint16_t, ndim=1] t
+        np.ndarray[np.uint16_t, ndim=2] Ell
+        np.ndarray[np.uint16_t, ndim=2] R_rot
+        #Ell_rot
+
 
     if save:
         plt.imshow(img, 'gray')
@@ -183,7 +196,7 @@ def find_ellipse(img, save=False):
 
 def function_displacement(x, z, y, R):#, x2, x3):
     cdef:
-        double l = len(x)
+        long l = len(x)
         int i
         
     x = [x[i]*np.pi/180 for i in range(l)]
@@ -1038,3 +1051,6 @@ class acquisition(object):
                 PrintException()
                 time.sleep(0.1)
                 continue
+
+if __name__ == "__main__":
+    print('lol')
