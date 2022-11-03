@@ -255,7 +255,7 @@ class FEI_QUATTRO_ESEM(microscope):
     def get_image(self):
         pass
     
-    def acquire_frame(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16):
+    def acquire_frame(self, resolution='2048x1768', dwell_time=1e-6, bit_depth=16):
         img = self.quattro.imaging.get_image()
         img_prev_stamp = img.data[-1,:]
 
@@ -268,15 +268,9 @@ class FEI_QUATTRO_ESEM(microscope):
             self.quattro.beams.electron_beam.scanning.bit_depth = bit_depth
 
         while (True):
-            # t = time.time()
             img = self.quattro.imaging.get_image()
-            # t2 = time.time()
-            # print('while', t2-t)
             try:
-                # t = time.time()
                 if not np.array_equal(img_prev_stamp, img.data[-1,:]):# (img_prev_stamp == img.data[-1,:]).all():
-                    # t2 = time.time()
-                    # print('try', t2-t)
                     return img
             except:
                 print('error acquire frame')

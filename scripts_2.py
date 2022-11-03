@@ -349,6 +349,58 @@ def match(image_master, image_template, grid_size = 3, ratio_template_master = 0
     c = np.mean(np.array([np.mean(corr_trust_x), np.mean(corr_trust_y)]))
     return a, b, c
 
+def match_by_features(img_template, img_master, mid_strips_template=0, mid_strips_master=0, resize=205, MIN_MATCH_COUNT = 20):
+    if resize != -1:
+        resize_factor = resize/img_master.shape[1]
+
+        img_master   = cv.resize(img_master,   (0, 0), fx=resize_factor, fy=resize_factor)
+        img_template = cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor)
+    else:
+        resize_factor = 1
+
+    w, h = img_template.shape[::-1]
+    sift = cv.SIFT_create()
+
+    img_master = cv.cvtColor(img_master, cv.IMREAD_GRAYSCALE)
+
+    t = time.time()
+    sift = cv.SIFT_create(nfeatures=500)
+
+    kp1, des1 = sift.detectAndCompute(img_template,None)
+    kp2, des2 = sift.detectAndCompute(img_master,None)
+
+    FLANN_INDEX_KDTREE = 1
+    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+    search_params = dict(checks = 1)
+    flann = cv.FlannBasedMatcher(index_params, search_params)
+    matches = flann.knnMatch(des1,des2,k=2)
+
+    good = []
+    for m,n in matches:
+        if m.distance < 0.9*n.distance:
+            good.append(m)
+
+    if len(good)>MIN_MATCH_COUNT:
+        src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1,1,2)
+        dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,1,2)
+        M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
+        disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)/resize_factor
+        
+    else:
+        print('Not enough match to perform homography')
+        return None
+    
+    return round(-disp[0,0,0]), round(disp[0,0,1]+mid_strips_master-mid_strips_template)
+
+def remove_strips(img, dwell_time):
+    img = np.asarray( img, dtype='int32')
+    w, h = img.shape
+    scores = np.zeros(w, dtype='int32')
+    for i in range(w-1):
+        scores[i] = np.sum(abs(img[i+1] - img[i]))
+    mid_strips = np.argmax(scores) + int(0.0512/(dwell_time*w)) # 0.0512 is the time before the movement stabilizes itself. Empirically determined.
+    return np.array(img[mid_strips:,:], dtype='uint8'), mid_strips
+
 def set_eucentric_ESEM(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
 
@@ -539,7 +591,10 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
         microscope.save(img_tmp, path)
         
-        dx_pix, dy_pix, corr_trust = match(image_euc[1], image_euc[0])
+        img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
+        img_template, mid_strips_template = remove_strips(image_euc[1], dwell_time)
+        
+        dx_pix, dy_pix = match_by_features(img_template, img_master, mid_strips_template, mid_strips_master, resize=-1)
 
         dx_si = dx_pix*hfw/image_width
         dy_si = dy_pix*hfw/image_width
@@ -647,7 +702,10 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
         path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
         microscope.save(img_tmp, path)
         
-        dx_pix, dy_pix, _ = match(image_euc[1], image_euc[0])
+        img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
+        img_template, mid_strips_template = remove_strips(image_euc[1], dwell_time)
+        
+        dx_pix, dy_pix = match_by_features(img_template, img_master, mid_strips_template, mid_strips_master, resize=-1)
 
         dx_si = dx_pix*hfw/image_height
         dy_si = dy_pix*hfw/image_width
@@ -863,7 +921,13 @@ class acquisition(object):
             # dy_pix                 = shape[0]//2 - max_loc[0]
         
 
-            dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=1)
+            #dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=1)
+            
+            img_master, mid_strips_master = remove_strips(img_prev, self.dwell_time)
+            img_template, mid_strips_template = remove_strips(img, self.dwell_time)
+            
+            dx_pix, dy_pix = match_by_features(img_template, img_master, mid_strips_template, mid_strips_master, resize=500)
+            
             # print('** Match', time.time()-t)
             dx_si                    =   dx_pix * hfw / int(self.image_width)
             dy_si                    =   dy_pix * hfw / int(self.image_height)

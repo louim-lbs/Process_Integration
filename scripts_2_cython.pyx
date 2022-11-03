@@ -42,13 +42,13 @@ def s_print(*a):
     s_print_lock.release()
 
 # Automatic brightness and contrast optimization with optional histogram clipping
-def automatic_brightness_and_contrast(image, clip_hist_percent=1):
+def automatic_brightness_and_contrast(np.ndarray[double, ndim=2] image, double clip_hist_percent=1):
     '''
     from:
     https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape
     '''
     cdef:
-        np.ndarray[np.uint8_t, ndim=1] hist
+        np.ndarray[double, ndim=1] hist
         int hist_size
         list accumulator
         int index
@@ -57,7 +57,7 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
         float maximum_gray
         float alpha
         float beta
-        np.ndarray[np.uint16_t, ndim=2] auto_result
+        np.ndarray[double, ndim=2] auto_result
 
     # Calculate grayscale histogram
     hist = cv.calcHist([image],[0],None,[256],[0,256])
@@ -100,8 +100,8 @@ def fft(img):
         double ncols
         double right
         double bottom
-        np.ndarray[np.uint16_t, ndim=2] image_fft
-        np.ndarray[np.uint16_t, ndim=2] image_fft_mag
+        np.ndarray[double, ndim=2] image_fft
+        np.ndarray[double, ndim=2] image_fft_mag
         int value
         int flags
         int borderType
@@ -129,9 +129,9 @@ def find_ellipse(img, save=False):
         double a
         double b
         double t_rot
-        np.ndarray[np.uint16_t, ndim=1] t
-        np.ndarray[np.uint16_t, ndim=2] Ell
-        np.ndarray[np.uint16_t, ndim=2] R_rot
+        np.ndarray[double, ndim=1] t
+        np.ndarray[double, ndim=2] Ell
+        np.ndarray[double, ndim=2] R_rot
         #Ell_rot
 
 
@@ -196,7 +196,7 @@ def find_ellipse(img, save=False):
 
 def function_displacement(x, z, y, R):#, x2, x3):
     cdef:
-        long l = len(x)
+        int l = len(x)
         int i
         
     x = [x[i]*np.pi/180 for i in range(l)]
@@ -219,6 +219,19 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         z0, y0 = correct_eucentric(microscope, positioner, displacement, angle)
             -> z0 = 0.000001, y0 = 0.000001
     '''
+    cdef:
+        int direction
+        double pas
+        np.ndarray[double, ndim=1] alpha
+        double offset
+        np.ndarray[double, ndim=1] displacement_filt
+        #finterpa
+        np.ndarray[double, ndim=1] displacement_y_interpa
+        np.ndarray[double, ndim=1] res
+        np.ndarray[double, ndim=2] cov
+        double z0_calc, y0_calc, R_calc
+        double stdevs
+
     logging.info('displacement' + str(displacement))
     logging.info('angle' + str(angle))
     
@@ -302,6 +315,21 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
         s_print(res)
             -> ([20.0, 20.0], 0.9900954802437584)
     '''
+    cdef:
+        double height_master, width_master, height_template, width_template
+        np.array[double, dim=1] template_patch_size
+        np.array[double, dim=2] displacement_vector
+        np.array[double, dim=1] corr_trust
+        double t_temp, t_match, t_calc, t_append, t1, t2, t3, t4, t5, t_calc, t_append
+        double template_patch_xA, template_patch_yA, template_patch_xB, template_patch_yB
+        np.array[double, dim=2] template_patch
+        double max_val, max_loc
+        double dx, dy
+        np.array[double, dim=1] corr_trust_x, corr_trust_y
+        np.array[double, dim=1] dx_tot, dy_tot
+        double mean_x, mean_y, std_x, std_y
+        double a, b, c
+
     image_master   = cv.resize(image_master,   (0, 0), fx=resize_factor, fy=resize_factor)
     image_template = cv.resize(image_template, (0, 0), fx=resize_factor, fy=resize_factor)
 
@@ -312,11 +340,10 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
     height_template, width_template = int(ratio_template_master*height_master), int(ratio_template_master*width_master)
 
-    template_patch_size = (height_template//grid_size,
-                            width_template//grid_size)
+    template_patch_size = np.array([height_template//grid_size, width_template//grid_size])
 
-    displacement_vector = np.array([[0,0]])
-    corr_trust = np.array(0)
+    displacement_vector = [[0,0]]*grid_size
+    corr_trust = [0]*grid_size
 
     t_temp = 0
     t_match = 0
@@ -344,8 +371,8 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
             dy                     = (template_patch_yA - max_loc[0])*resize_factor
             t4 = time.time()
             t_calc += t4 - t3
-            displacement_vector    = np.append(displacement_vector, [[dx, dy]], axis=0)
-            corr_trust             = np.append(corr_trust, max_val)
+            displacement_vector[i*grid_size+j] =  [dx, dy]
+            corr_trust[i*grid_size+j]          =  max_val
             t5 = time.time()
             t_append += t5 - t4
 
@@ -355,9 +382,9 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
     # t_append = t_append/(grid_size**2)
     print('t_temp', t_temp, 't_match', t_match, 't_calc', t_calc, 't_append', t_append)
 
-    corr_trust_x          = np.delete(corr_trust, 0)
-    corr_trust_y          = deepcopy(corr_trust_x)
-    displacement_vector = np.delete(displacement_vector,0,0)
+    corr_trust_x        = corr_trust[1:]
+    corr_trust_y        = deepcopy(corr_trust_x)
+    displacement_vector = displacement_vector[1:]
     dx_tot              = displacement_vector[:,0]
     dy_tot              = displacement_vector[:,1]
 
@@ -372,12 +399,12 @@ def match(image_master, image_template, grid_size = 5, ratio_template_master = 0
 
         for d in dx_tot:
             if (d < mean_x - stdev_x) or (mean_x + stdev_x < d):
-                corr_trust_x = np.delete(corr_trust_x, np.where(dx_tot==d))
-                dx_tot = np.delete(dx_tot, np.where(dx_tot==d))
+                corr_trust_x = corr_trust_x[np.arange(len(corr_trust_x))!=np.where(dx_tot==d)]
+                dx_tot = dx_tot[np.arange(len(dx_tot))!=np.where(dx_tot==d)]
         for d in dy_tot:
             if (d < mean_y - stdev_y) or (mean_y + stdev_y < d):
-                corr_trust_y = np.delete(corr_trust_y, np.where(dy_tot==d))
-                dy_tot = np.delete(dy_tot, np.where(dy_tot==d))
+                corr_trust_y = corr_trust_y[np.arange(len(corr_trust_y))!=np.where(dy_tot==d)]
+                dy_tot = dy_tot[np.arange(len(dy_tot))!=np.where(dy_tot==d)]
 
     try:
         dx_tot = cv.blur(dx_tot, (1, dx_tot.shape[0]//4))
@@ -408,6 +435,23 @@ def set_eucentric_ESEM(microscope, positioner) -> int:
         set_eucentric_status = set_eucentric()
             -> 0    
     '''
+    cdef:
+        double x0, y0, z0, a0, ixe, ygrec, zed
+        double angle_step0, angle_step, angle_max, precision, eucentric_error
+        str resolution
+        int image_width, image_height
+        double dwell_time
+        int bit_depth
+        np.array[double, dim=2] image_euc
+        list displacement
+        list angle
+        int direction
+        #AdornedImage img_tmp
+        str path
+        double hfw
+        double dx_pix, dy_pix, corr_trust
+        double dx_si, dy_si
+
     x0, y0, z0, a0, _ = positioner.current_position()
     if z0 == None or y0 == None or a0 == None:
         s_print('Error. Positioner is not initialized.')
@@ -541,6 +585,23 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         set_eucentric_status = set_eucentric()
             -> 0    
     '''
+    cdef:
+        double x0, y0, z0, a0, ixe, ygrec, zed
+        double angle_step0, angle_step, angle_max, precision, eucentric_error
+        str resolution
+        int image_width, image_height
+        double dwell_time
+        int bit_depth
+        np.array[double, dim=2] image_euc
+        list displacement
+        list angle
+        int direction
+        #AdornedImage img_tmp
+        str path
+        double hfw
+        double dx_pix, dy_pix, corr_trust
+        double dx_si, dy_si
+    
     x0, y0, z0, a0, _ = positioner.current_position()
     if z0 == None or y0 == None or a0 == None:
         s_print('Error. Positioner is not initialized.')
@@ -651,6 +712,23 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
         set_eucentric_status = set_eucentric()
             -> 0    
     '''
+    cdef:
+        double x0, y0, z0, a0, ixe, ygrec, zed
+        double angle_step0, angle_step, angle_max, precision, eucentric_error
+        str resolution
+        int image_width, image_height
+        double dwell_time
+        int bit_depth
+        np.array[double, dim=2] image_euc
+        list displacement
+        list angle
+        int direction
+        #AdornedImage img_tmp
+        str path
+        double hfw
+        double dx_pix, dy_pix, corr_trust
+        double dx_si, dy_si
+    
     x0, y0, z0, a0, _ = positioner.current_position()
     if z0 == None or y0 == None or a0 == None:
         s_print('Error. Positioner is not initialized.')
