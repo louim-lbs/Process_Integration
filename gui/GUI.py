@@ -371,7 +371,9 @@ class App(object):
                                           bit_depth        = 8,
                                           dwell_time       = self.microscope.image_settings()[1],
                                           tilt_increment   = float(self.ent_tilt_step.get()),
-                                          tilt_end         = int(self.ent_end_tilt.get()),)
+                                          tilt_end         = int(self.ent_end_tilt.get()),
+                                          drift_correction = self.check1.get(),
+                                          focus_correction = self.check2.get())
 
             self.thread_tomo = threading.Thread(target=self.acqui.tomo)
             self.thread_tomo.start()
@@ -407,7 +409,9 @@ class App(object):
                                     bit_depth        = 8,
                                     dwell_time       = self.microscope.image_settings()[1],
                                     tilt_increment   = float(self.ent_tilt_step.get()),
-                                    tilt_end         = int(self.ent_end_tilt.get()))
+                                    tilt_end         = int(self.ent_end_tilt.get()),
+                                    drift_correction = self.check1.get(),
+                                    focus_correction = self.check2.get())
         time.sleep(0.1)
         self.thread_acqui = threading.Thread(target=self.acqui.record)
         self.thread_acqui.start()
@@ -453,6 +457,8 @@ class App(object):
                     print('Drift correction thread joined')
                 except:
                     pass
+            else:
+                print('No drift correction to join.')
             # if self.check2.get() == True:
             #     try:
             #         self.thread_focus_correction.join()

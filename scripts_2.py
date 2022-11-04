@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import cv2 as cv
 from scipy import interpolate
+from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import os
 import matplotlib.pyplot as plt
@@ -394,11 +395,28 @@ def match_by_features(img_template, img_master, mid_strips_template=0, mid_strip
 
 def remove_strips(img, dwell_time):
     img = np.asarray( img, dtype='int32')
-    w, h = img.shape
-    scores = np.zeros(w, dtype='int32')
-    for i in range(w-1):
+    w, _ = img.shape
+    scores = np.zeros(w//2, dtype='int32')
+    for i in range(w//2-1):
         scores[i] = np.sum(abs(img[i+1] - img[i]))
-    mid_strips = np.argmax(scores) + int(0.0512/(dwell_time*w)) # 0.0512 is the time before the movement stabilizes itself. Empirically determined.
+    min_val = np.min(scores)
+    max_val = np.max(scores)
+    scores = (scores[:-1] - min_val) / (max_val - min_val)
+    scores_peaks, _ = find_peaks(scores, prominence=(0.4,1))
+    if len(scores_peaks) == 0:
+        mid_strips = 0
+    else:
+        mid_strips = scores_peaks[-1] + int(0.0512/(dwell_time*w)) # 0.0512 is the time before the movement stabilizes itself. Empirically determined.
+
+    # mid_strips = np.argmax(scores) + int(0.0512/(dwell_time*w)) # 0.0512 is the time before the movement stabilizes itself. Empirically determined.
+    
+    print('mid_strips', mid_strips)
+    # plt.plot(scores)
+    # plt.axvline(x = mid_strips, color = 'r')
+    # path = 'data/strips/'
+    # plt.savefig(path + str(round(time.time(),3))+'.png')
+    # plt.close()
+    
     return np.array(img[mid_strips:,:], dtype='uint8'), mid_strips
 
 def set_eucentric_ESEM(microscope, positioner) -> int:
@@ -758,7 +776,18 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
 
 class acquisition(object):
     
-    def __init__(self, microscope, positioner, work_folder='data/tomo/', images_name='image', resolution='1536x1024', bit_depth=16, dwell_time=0.2e-6, tilt_increment=2, tilt_end=60) -> int:
+    def __init__(self,
+                microscope,
+                positioner,
+                work_folder='data/tomo/',
+                images_name='image',
+                resolution='1536x1024',
+                bit_depth=16,
+                dwell_time=0.2e-6,
+                tilt_increment=2,
+                tilt_end=60,
+                drift_correction=False,
+                focus_correction=False) -> int:
         '''
         '''
         
@@ -779,6 +808,8 @@ class acquisition(object):
             self.dwell_time = dwell_time
             self.tilt_increment = tilt_increment
             self.tilt_end = tilt_end
+            self.drift_correction = drift_correction
+            self.focus_correction = focus_correction
         except:
             self.microscope       = 0
             self.positioner       = 0
@@ -849,18 +880,7 @@ class acquisition(object):
         '''
         '''
         self.c.acquire()
-        # i=0
-        # while True:
-        #     if self.flag == 1:
-        #         self.c.notify_all()
-        #         self.c.release()
-        #         return
-        #     s_print('i', i)
-        #     i+=1
-        #     self.c.notify_all()
-        #     self.c.wait()
-        
-        
+
         anticipation_x   = 0
         anticipation_y   = 0
         correction_x     = 0
@@ -870,65 +890,33 @@ class acquisition(object):
         hfw = self.microscope.horizontal_field_view()
 
         while True:
-            # t1 = time.time()
             if self.flag == 1:
                 self.c.notify_all()
                 self.c.release()
                 return
             # Load two most recent images
-            # try:
             list_of_imgs  = [file for file in os.listdir(self.path) if 'HAADF' in file]
-            if len(list_of_imgs) < 2:
+            if len(list_of_imgs) == 0:
                 print('Not enough images yet')
-                #time.sleep(0.1)
                 self.c.notify_all()
                 self.c.wait()
                 continue
-
-            img_path      = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
-            list_of_imgs.remove(img_path)
-            img_prev_path = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
-
-            if img_path == img_path_0 or img_prev_path == img_prev_path_0:
-                "Waiting for a new image..."
-                #time.sleep(0.1)
+            if len(list_of_imgs) == 1:
+                img_prev_path = list_of_imgs[0]
+                img_prev  = self.microscope.load(self.path + '/' + img_prev_path)
+                img_master, mid_strips_master = remove_strips(img_prev, self.dwell_time)
+                print('One image detected')
                 self.c.notify_all()
                 self.c.wait()
                 continue
-            else:
-                img_path_0      = deepcopy(img_path)
-                img_prev_path_0 = deepcopy(img_prev_path)
-
             
-            img       = self.microscope.load(self.path + '/' + img_path)
-            img_prev  = self.microscope.load(self.path + '/' + img_prev_path)
-            # except:
-            #     s_print('Sleeping', time.time())
-            #     time.sleep(0.1)
-            #     continue
-            
-            print('New image found for drift correction')
-            # t = time.time()
+            img_path = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
+            img      = self.microscope.load(self.path + '/' + img_path)
 
-            # img                    = np.float32(img)
-            # img_prev               = np.float32(img_prev)
-            # shape                  = img_prev.shape
-            # corr_scores            = cv.matchTemplate(img, img_prev, cv.TM_CCOEFF) #TM_CCOEFF_NORMED
-            # _, max_val, _, max_loc = cv.minMaxLoc(corr_scores)
-            # print(corr_scores)
-            # print(shape, max_loc, max_val)
-            # dx_pix                 = shape[1]//2 - max_loc[1]
-            # dy_pix                 = shape[0]//2 - max_loc[0]
-        
-
-            #dy_pix, dx_pix, _        =   match(img, img_prev, resize_factor=1)
-            
-            img_master, mid_strips_master = remove_strips(img_prev, self.dwell_time)
             img_template, mid_strips_template = remove_strips(img, self.dwell_time)
             
-            dx_pix, dy_pix = match_by_features(img_template, img_master, mid_strips_template, mid_strips_master, resize=500)
+            dx_pix, dy_pix = match_by_features(img_template, img_master, mid_strips_template, mid_strips_master, resize=205)
             
-            # print('** Match', time.time()-t)
             dx_si                    =   dx_pix * hfw / int(self.image_width)
             dy_si                    =   dy_pix * hfw / int(self.image_height)
             correction_x             = - dx_si + correction_x
@@ -936,21 +924,25 @@ class acquisition(object):
             anticipation_x          +=   correction_x
             anticipation_y          +=   correction_y
 
-            # t = time.time()
-
-            print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
             if dy_pix != 0:
                 value_x = correction_x + anticipation_x
                 value_y = correction_y + anticipation_y
-                print('value_x, value_y', number_format(value_x), number_format(value_y))
                 if self.microscope.microscope_type == 'ESEM':
-                    self.microscope.beam_shift(-value_x, value_y, mode = 'rel')
+                    self.microscope.beam_shift(value_x, value_y, mode = 'rel')
                 else:
                     self.microscope.beam_shift(-value_y, value_x, mode = 'rel')
-                # print('** Correction', time.time()-t)
-                # print('** Total', time.time()-t1)
+                print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
+                print('value_x, value_y', number_format(value_x), number_format(value_y))
                 print('Correction Done')
-                
+            else:
+                print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
+            img_master = deepcopy(img_template)
+            mid_strips_master = deepcopy(mid_strips_template)
+            print('Waiting fot a knew image after correction')
+            self.c.notify_all()
+            self.c.wait()
+            continue
+
     def f_focus_correction(self, appPI):
         '''
         '''
@@ -1062,9 +1054,7 @@ class acquisition(object):
                 self.microscope.tilt_correction(value = tangle*np.pi/180) # Tilt correction for e- beam
 
             # logging.info(str(i) + str(self.positioner.getpos()[2]))
-
-            self.c.notify_all()
-            self.c.wait()
+            
             images = self.microscope.acquire_frame(self.resolution, self.dwell_time, self.bit_depth)
             
             # images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
@@ -1074,6 +1064,9 @@ class acquisition(object):
             self.microscope.save(images, path)
             
             i += 1
+            if self.drift_correction == True or self.focus_correction == True:
+                self.c.notify_all()
+                self.c.wait()
     
     def f_image_fft(self, appPI):
         '''
