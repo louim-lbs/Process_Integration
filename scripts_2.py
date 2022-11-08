@@ -632,6 +632,22 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
 
         dx_pix, dy_pix = match_by_features(kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master)
 
+        # matchesMask = mask.ravel().tolist()
+        # img_master = cv2.polylines(img_master,[np.int32(disp)],True,255,3, cv2.LINE_AA)
+        # draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+        #             singlePointColor = None,
+        #             matchesMask = matchesMask, # draw only inliers
+        #             flags = 2)
+        
+        # img3 = cv2.drawMatches(img_template,kp1,img_master,kp2,good,None,**draw_params)
+        
+        # plt.imshow(img3)
+        
+        # index = filename.find('HAADF')
+        # filename = filename[:index] + 'matchs/' + str(resize_factor) + filename[index:]
+        # plt.savefig(filename, format='png')
+        # plt.close()
+
         dx_si = dx_pix*hfw/image_width
         dy_si = dy_pix*hfw/image_width
 
