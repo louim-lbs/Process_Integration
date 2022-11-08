@@ -243,14 +243,11 @@ class App(object):
         '''
         self.lbl_eucent.config(bg='orange')
         self.lbl_eucent.update()
-        # try:
+
         if self.microscope.microscope_type == 'ESEM':
             set_eucentric_status = scripts.set_eucentric_ESEM_2(self.microscope, self.positioner)
         else:
             set_eucentric_status = scripts.set_eucentric_ETEM(self.microscope, self.positioner)
-        # except:
-        #     set_eucentric_status = 1
-        #     pass
         
         if set_eucentric_status == 0:
             self.lbl_eucent.config(bg='green')
