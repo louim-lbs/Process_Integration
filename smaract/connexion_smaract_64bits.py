@@ -255,7 +255,6 @@ class smaract_class(object):
         z_status_status, z_status = self.smaract.SA_GetStatus_S(0)
         y_status_status, y_status = self.smaract.SA_GetStatus_S(1)
         t_status_status, t_status = self.smaract.SA_GetStatus_S(2)
-        print('Moving...')
         while z_status == 4 or y_status == 4 or t_status == 4:
             z_status_status, z_status = self.smaract.SA_GetStatus_S(0)
             y_status_status, y_status = self.smaract.SA_GetStatus_S(1)
@@ -303,14 +302,12 @@ class smaract_class(object):
             move_status = smaract.setpos([1242.14, 3456.32, 23.44])
                 -> Move to absolute position
         '''
-        print('pos', pos)
         try:
             if None in self.getpos():
                 return 1
             if not self.check_limits(pos):
                 print('Position out of range')
                 return 1
-            print('Moving to position: ' + str(pos))
         except:
             print('Error when checking limits')
             return 1

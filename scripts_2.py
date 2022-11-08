@@ -190,8 +190,8 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     alpha  = [i/pas for i in range(int(angle_sort[0]), int(angle_sort[-1]+1))]
 
     if microscope.microscope_type == 'ESEM':
-        offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][0]
-        displacement_filt = np.array([i[0]-offset for i in displacement])
+        offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][1]
+        displacement_filt = np.array([i[1]-offset for i in displacement])
     else:
         offset = displacement[min(range(len(angle_sort)), key=lambda i: abs(angle_sort[i]))][1]
         displacement_filt = np.array([i[1]-offset for i in displacement])
@@ -208,7 +208,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     s_print('z0 =', z0_calc, 'y0 = ', -direction*y0_calc)
     
     if microscope.microscope_type == 'ESEM':
-        plt.plot([i/pas for i in angle_sort], [i[0]-offset for i in displacement], 'green')
+        plt.plot([i/pas for i in angle_sort], [i[1]-offset for i in displacement], 'green')
     else:
         plt.plot([i/pas for i in angle_sort], [i[1]-offset for i in displacement], 'green')
     plt.plot(alpha, displacement_y_interpa, 'blue')
@@ -220,6 +220,8 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         print('ESEM correction')
         positioner.relative_move(0, -direction*y0_calc, -z0_calc, 0, 0)
         microscope.relative_move(0, direction*y0_calc, 0, 0, 0)
+        ###########################
+        ########### To verify
         microscope.focus(z0_calc, 'rel') 
     elif microscope.microscope_type == 'ETEM':
         positioner.relative_move(0, -y0_calc, z0_calc, 0, 0)
@@ -372,7 +374,6 @@ def cv2_copy(keypoints):
     return keypoints_copy
 
 def match_by_features_SIFT_create(img, resize_factor=1):
-    
     img_ret = cv.resize(img, (0, 0), fx=resize_factor, fy=resize_factor)
     
     sift = cv.SIFT_create()
@@ -381,7 +382,7 @@ def match_by_features_SIFT_create(img, resize_factor=1):
     kp, des = sift.detectAndCompute(img_ret, None)
     return kp, des
 
-def match_by_features(kp1, des1, kp2, des2, resize_factor, mid_strips_template=0, mid_strips_master=0, MIN_MATCH_COUNT = 20):
+def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template=0, mid_strips_master=0, MIN_MATCH_COUNT = 20):
     FLANN_INDEX_KDTREE = 1
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 1)
@@ -398,15 +399,26 @@ def match_by_features(kp1, des1, kp2, des2, resize_factor, mid_strips_template=0
         dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,1,2)
         M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
         disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)/resize_factor
-        
     else:
         print('Not enough match to perform homography')
         return None
     
+    # matchesMask = mask.ravel().tolist()
+    # img_master = cv.polylines(img_master,[np.int32(disp)],True,255,3, cv.LINE_AA)
+    # draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+    #             singlePointColor = None,
+    #             matchesMask = matchesMask, # draw only inliers
+    #             flags = 2)
+    
+    # img3 = cv.drawMatches(img_template,kp1,img_master,kp2,good,None,**draw_params)
+    
+    # plt.imshow(img3)
+    # plt.show()
+
     return round(-disp[0,0,0]), round(disp[0,0,1]+mid_strips_master-mid_strips_template)
 
 def remove_strips(img, dwell_time):
-    img = np.asarray( img, dtype='int32')
+    img = np.asarray(img, dtype='int32')
     w, _ = img.shape
     scores = np.zeros(w//2, dtype='int32')
     for i in range(w//2-1):
@@ -429,6 +441,8 @@ def remove_strips(img, dwell_time):
     # plt.savefig(path + str(round(time.time(),3))+'.png')
     # plt.close()
     
+    img8 = (img[mid_strips:,:]/256).astype('uint8')
+    return img8, mid_strips
     return np.array(img[mid_strips:,:], dtype='uint8'), mid_strips
 
 def set_eucentric_ESEM(microscope, positioner) -> int:
@@ -610,6 +624,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
     
     resize_factor = 1
     img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
+
     kp2, des2 = match_by_features_SIFT_create(img_master, resize_factor)     
 
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
@@ -630,23 +645,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         img_template, mid_strips_template = remove_strips(image_euc[1], dwell_time)
         kp1, des1 = match_by_features_SIFT_create(img_template, resize_factor)
 
-        dx_pix, dy_pix = match_by_features(kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master)
-
-        # matchesMask = mask.ravel().tolist()
-        # img_master = cv2.polylines(img_master,[np.int32(disp)],True,255,3, cv2.LINE_AA)
-        # draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-        #             singlePointColor = None,
-        #             matchesMask = matchesMask, # draw only inliers
-        #             flags = 2)
-        
-        # img3 = cv2.drawMatches(img_template,kp1,img_master,kp2,good,None,**draw_params)
-        
-        # plt.imshow(img3)
-        
-        # index = filename.find('HAADF')
-        # filename = filename[:index] + 'matchs/' + str(resize_factor) + filename[index:]
-        # plt.savefig(filename, format='png')
-        # plt.close()
+        dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master)
 
         dx_si = dx_pix*hfw/image_width
         dy_si = dy_pix*hfw/image_width
@@ -656,11 +655,11 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.current_position()[3])
 
-        eucentric_error += abs(dx_pix)
+        eucentric_error += abs(dy_pix)
 
         if abs(positioner.current_position()[3]) >= angle_max - 0.01: # 0.010000 degree of freedom
             '''If out of the angle range'''
-            correct_eucentric(microscope, positioner, displacement, angle)
+            correct_eucentric(microscope, positioner, displacement[1:], angle[1:])
             s_print(       'Start again with negative angles')
             
             displacement  = [[0,0]]
@@ -694,6 +693,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         mid_strips_master = deepcopy(mid_strips_template)
         kp2 = cv2_copy(kp1)
         des2 = deepcopy(des1)
+        img_master = deepcopy(img_template)
 
     ixe, ygrec, zed, _, _ = positioner.current_position()
     positioner.absolute_move(ixe, ygrec, zed, 0, 0)
