@@ -597,7 +597,6 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         s_print('Error. Positioner is not initialized.')
         return 1
     
-    angle_step0     =  1
     angle_step      =  1  # °
     angle_max       = 10  # °
     precision       = 5   # pixels
@@ -621,10 +620,8 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
 
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
     image_euc[0] = microscope.image_array(img_tmp)
-    
     resize_factor = 1
     img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
-
     kp2, des2 = match_by_features_SIFT_create(img_master, resize_factor)     
 
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
@@ -632,7 +629,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
 
     positioner.relative_move(0, 0, 0, angle_step, 0)
     hfw          = microscope.horizontal_field_view() # meters
-    print(hfw)
+
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
         s_print(       'eucentric_error =', number_format(eucentric_error), 'precision =', number_format(precision), 'current angle =', number_format(positioner.current_position()[3]), 'angle_max =', number_format(angle_max))
         
@@ -683,6 +680,9 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
             
             img_tmp = microscope.acquire_frame(resolution, dwell_time, bit_depth)
             image_euc[0] = microscope.image_array(img_tmp)
+            resize_factor = 1
+            img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
+            kp2, des2 = match_by_features_SIFT_create(img_master, resize_factor)     
             path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
             microscope.save(img_tmp, path)
             positioner.relative_move(0, 0, 0, angle_step, 0)
