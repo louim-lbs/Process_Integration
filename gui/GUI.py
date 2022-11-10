@@ -245,7 +245,7 @@ class App(object):
         self.lbl_eucent.update()
 
         if self.microscope.microscope_type == 'ESEM':
-            set_eucentric_status = scripts.set_eucentric_ESEM_2(self.microscope, self.positioner)
+            # set_eucentric_status = scripts.set_eucentric_ESEM_2(self.microscope, self.positioner)
             self.eucentric_ESEM = threading.Thread(target=scripts.set_eucentric_ESEM_2,
                                                    args=(self.microscope, self.positioner))
             self.eucentric_ESEM.start()
@@ -305,7 +305,6 @@ class App(object):
         step = float(self.ent_z_step.get())
         status = self.positioner.relative_move(0, 0, -step, 0, 0)
         if status != 0:
-            print('lol1')
             return 1
         self.lbl_z_pos.config(text=scripts.number_format(self.positioner.current_position()[2]) + ' m')
         self.lbl_z_pos.update()
@@ -324,8 +323,6 @@ class App(object):
         step = float(self.ent_t_step.get())
         status = self.positioner.relative_move(0, 0, 0, -step, 0)
         if status != 0:
-            print('lol2')
-            print('status', status)
             return 1
         positioner_t_pos = self.positioner.current_position()[3]
         self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
