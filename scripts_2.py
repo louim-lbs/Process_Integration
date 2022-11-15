@@ -231,6 +231,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         #####################
         #####################
         #####################
+    plt.clf()
     
 
 def match(image_master, image_template, grid_size = 3, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0, resize_factor = 1):
@@ -407,6 +408,7 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
     img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor),kp1,img_master,kp2,good,None,**draw_params)
     plt.imshow(img3)
     plt.savefig('data/record' + str(time.time()) + '.png')
+    plt.clf()
 
     return round(-disp[0,0,0]), round(disp[0,0,1]+mid_strips_master-mid_strips_template)
 
@@ -609,7 +611,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         microscope.quattro.imaging.set_active_view(3)
     microscope.start_acquisition()
 
-    positioner.absolute_move(x0, y0, z0, -2*angle_step, 0)
+    # positioner.absolute_move(x0, y0, z0, -2*angle_step, 0)
     positioner.absolute_move(x0, y0, z0, 0, 0)
 
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
