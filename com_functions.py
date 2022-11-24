@@ -366,8 +366,7 @@ class SMARACT_MCS_3D(microscope):
         return 0
     
     def absolute_move(self, x=None, y=None, z=None, a=None, b=None):
-        self.positioner.setpos_abs([z*1e9, y*1e9, a*1e6])
-        return 0
+        return self.positioner.setpos_abs([z*1e9, y*1e9, a*1e6])
 
 
 if __name__ == "__main__":

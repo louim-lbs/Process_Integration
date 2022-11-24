@@ -355,7 +355,7 @@ class smaract_class(object):
                 print(step)
                 print('Position out of range')
                 return 1
-            print('Moving to position: ' + str(step))
+            # print('Moving to position: ' + str(step))
         except:
             print('Error when checking limits')
             return 1
@@ -366,7 +366,6 @@ class smaract_class(object):
         try:
             z_setpos_status = self.smaract.SA_GotoPositionRelative_S(0, step[0])
             y_setpos_status = self.smaract.SA_GotoPositionRelative_S(1, step[1])
-            print(step[2], revolution)
             t_setpos_status = self.smaract.SA_GotoAngleRelative_S(      step[2], revolution)
         except:
             print('Error when setting relative position.')
@@ -378,7 +377,7 @@ class smaract_class(object):
         if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
             return 1
 
-        print('Position increased of: ' + str([step[0], step[1], step[2]]))
+        print('Position increased of: ' + str([step[0], step[1], self.angle_convert_Smaract2SI(step[2])]))
         return 0
     
     def set_zero_position(self, channel):
