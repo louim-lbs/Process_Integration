@@ -407,7 +407,7 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
     
     img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor),kp1,img_master,kp2,good,None,**draw_params)
     plt.imshow(img3)
-    plt.savefig('data/record' + str(time.time()) + '.png')
+    plt.savefig('data/match/' + str(time.time()) + '.png')
     plt.clf()
 
     return round(-disp[0,0,0]), round(disp[0,0,1]+mid_strips_master-mid_strips_template)
@@ -604,7 +604,8 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
     bit_depth       = 16
     image_euc       = np.zeros((2, image_height, image_width))
     displacement    = [[0,0]]
-    angle           = [a0]
+    angle           = [0]
+    resize_factor   = 1
 
     # HAADF analysis
     if microscope.microscope_type == 'ESEM':
@@ -616,15 +617,15 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
 
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
     image_euc[0] = microscope.image_array(img_tmp)
-    resize_factor = 1
-    img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
-    kp2, des2 = match_by_features_SIFT_create(img_master, mid_strips_master, resize_factor)     
+    
+    img_master = image_euc[0].astype('uint8')
+    kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
 
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
     microscope.save(img_tmp, path)
 
     positioner.relative_move(0, 0, 0, angle_step, 0)
-    hfw          = microscope.horizontal_field_view() # meters
+    hfw = microscope.horizontal_field_view() # meters
 
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
         s_print(       'eucentric_error =', number_format(eucentric_error), 'precision =', number_format(precision), 'current angle =', number_format(positioner.current_position()[3]), 'angle_max =', number_format(angle_max))
@@ -635,10 +636,10 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
         microscope.save(img_tmp, path)
         
-        img_template, mid_strips_template = remove_strips(image_euc[1], dwell_time)
-        kp1, des1 = match_by_features_SIFT_create(img_template, mid_strips_template, resize_factor)
+        img_template = image_euc[1].astype('uint8')
+        kp1, des1 = match_by_features_SIFT_create(img_template, 0, resize_factor)
 
-        dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master)
+        dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, 0, 0)
 
         dx_si = dx_pix*hfw/image_width
         dy_si = dy_pix*hfw/image_width
@@ -652,14 +653,13 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
 
         if abs(positioner.current_position()[3]) >= angle_max - 0.01: # 0.010000 degree of freedom
             '''If out of the angle range'''
-            correct_eucentric(microscope, positioner, displacement[1:], angle[1:])
-            s_print(       'Start again with negative angles')
+            correct_eucentric(microscope, positioner, displacement, angle)
             
-            displacement  = [[0,0]]
             ixe, ygrec, zed, _, _ = positioner.current_position()
-            positioner.absolute_move(ixe, ygrec, zed, -angle_step, 0)
+            positioner.absolute_move(ixe, ygrec, zed, -2*angle_step, 0)
             positioner.absolute_move(ixe, ygrec, zed, 0, 0)
             
+            displacement  = [[0,0]]
             angle           = [positioner.current_position()[3]]
             eucentric_error = 0
             
@@ -669,24 +669,21 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
             ### Test increase angle
             if angle_max <= 50:
                 angle_step *= 1.5
-                angle_max  *= 1.5
+                angle_max  *= 2
             else:
                 angle_max   = 50
                 angle_step  =  2
             
             img_tmp = microscope.acquire_frame(resolution, dwell_time, bit_depth)
             image_euc[0] = microscope.image_array(img_tmp)
-            resize_factor = 1
-            img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
-            kp2, des2 = match_by_features_SIFT_create(img_master, mid_strips_master, resize_factor)     
+            img_master = image_euc[0].astype('uint8')
+            kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
             path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
             microscope.save(img_tmp, path)
             positioner.relative_move(0, 0, 0, angle_step, 0)
             continue
 
         positioner.relative_move(0, 0, 0, angle_step, 0)
-        # image_euc[0] = np.ndarray.copy(image_euc[1])
-        mid_strips_master = deepcopy(mid_strips_template)
         kp2 = cv2_copy(kp1)
         des2 = deepcopy(des1)
         img_master = deepcopy(img_template)
