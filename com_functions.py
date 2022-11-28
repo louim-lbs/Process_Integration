@@ -267,27 +267,16 @@ class FEI_QUATTRO_ESEM(microscope):
             self.quattro.beams.electron_beam.scanning.dwell_time.value = dwell_time
             self.quattro.beams.electron_beam.scanning.bit_depth = bit_depth
 
-        # i = 0
-        # t = time.time()
         while (True):
             img = self.quattro.imaging.get_image()
-            # h = time.time() - t
-            # print('####################################################', i, round(h, 3), round(1/h, 3))
-            # t = time.time()
-            # img.save(path + '.tif')
             try:
-                if not np.array_equal(img_prev_stamp, img.data[-1,:]):# (img_prev_stamp == img.data[-1,:]).all():
+                if not np.array_equal(img_prev_stamp, img.data[-1,:]):
                     return img
             except:
                 print('error acquire frame')
                 pass
-            # i += 1
     
-    def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16, windows='123'):
-        # settings = GrabFrameSettings(resolution=resolution, dwell_time=dwell_time, bit_depth=bit_depth)
-        # images = self.quattro.imaging.grab_multiple_frames(settings)
-        # return images
-        
+    def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16, windows='123'):        
         windows         = [int(s) for s in windows]
 
         imgs            = [0]*len(windows)
