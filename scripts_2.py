@@ -447,6 +447,32 @@ def remove_strips(img, dwell_time):
         img_ret = (img[mid_strips:,:]).astype('uint8')
     return img_ret, mid_strips
 
+def blob_detection(img, mid_strips, resize_factor):
+    if np.max(img) > 255:
+        img_ret = (img[mid_strips:,:]/256).astype('uint8')
+    else:
+        img_ret = (img[mid_strips:,:]).astype('uint8')
+    img_ret = cv.resize(img_ret, (0, 0), fx=resize_factor, fy=resize_factor)
+    width, height = img_ret.shape
+    img_roi = img_ret[width//4:3*width//4, height//4:3*height//4]
+    
+    img_roi = cv.threshold(img_roi, np.max(img)-50, 255, cv.THRESH_BINARY_INV)
+    kernel = np.ones((5,5),np.uint8)
+    img_roi = cv.morphologyEx(img_roi, cv.MORPH_OPEN, kernel)
+    
+    _, contours, _ = cv.findContours(img_roi, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        
+    if len(contours) > 0:
+        areas = [cv.contourArea(c) for c in contours]
+        max_index = np.argmax(areas)
+        cnt = contours[max_index]
+        M = cv.moments(cnt)
+        cx = int(M['m10']/M['m00'])
+        cy = int(M['m01']/M['m00'])
+    else:
+        cx, cy = 0, 0
+    return cx, cy
+
 def set_eucentric_ESEM(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
 
@@ -1000,11 +1026,15 @@ class acquisition(object):
             anticipation_y          +=   correction_y
             
             if dx_pix != 0 and dy_pix != 0:
-                value_x = correction_x + anticipation_x
-                value_y = correction_y + anticipation_y
+                
+                blob_x, blob_y = blob_detection(img_template, mid_strips_template, resize_factor)
+                
+                value_x = correction_x + anticipation_x - blob_x
+                value_y = correction_y + anticipation_y - blob_y
                 print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
                 print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
                 print('value_x, value_y', number_format(value_x), number_format(value_y))
+                
                 
                 if self.microscope.microscope_type == 'ESEM':
                     self.microscope.beam_shift(value_x, value_y, mode = 'rel')
