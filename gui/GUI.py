@@ -151,6 +151,7 @@ class App(object):
         self.btn_t_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.t_up)
         self.btn_t_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.t_down)
         self.btn_t_zero = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="0", justify='left', command=self.t_zero)
+        self.btn_t_angle = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="Go", justify='left', command=self.t_angle)
         self.btn_z_up.place(x=22, y=210)
         self.btn_z_down.place(x=22, y=320)
         self.btn_y_up.place(x=132, y=210)
@@ -158,22 +159,27 @@ class App(object):
         self.btn_t_up.place(x=242, y=210)
         self.btn_t_down.place(x=242, y=320)
         self.btn_t_zero.place(x=242, y=360)
+        self.btn_t_angle.place(x=352, y=320)
 
-        positioner_pos = self.positioner.current_position()
-        self.lbl_z_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[2]) + " m", justify='left')
-        self.lbl_y_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[1]) + " m", justify='left')
-        self.lbl_t_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[3]) + " °", justify='left')
+        positioner_pos   = self.positioner.current_position()
+        self.lbl_z_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[2]) + " m", justify='left')
+        self.lbl_y_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[1]) + " m", justify='left')
+        self.lbl_t_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[3]) + " °", justify='left')
+        text1  = tk.StringVar(master=self.frm_mov, value='0')
+        self.ent_t_angle = tk.Entry(master=self.frm_mov, width=13, bg='#2B2B2B', fg='white', textvariable=text1, justify='center')
         self.lbl_z_pos.place(x=20, y=250)
         self.lbl_y_pos.place(x=130, y=250)
         self.lbl_t_pos.place(x=240, y=250)
+        self.ent_t_angle.place(x=350, y=280)
 
-        ent_step_values = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
+        ent_step_values1 = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
+        ent_step_values2 = (1, 2, 5, 10, 20, 50)
         var1 = tk.StringVar(value='1e-6')
         var2 = tk.StringVar(value='1e-6')
         var3 = tk.StringVar(value='1')
-        self.ent_z_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
-        self.ent_y_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
-        self.ent_t_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values, justify='center', state='readonly', wrap=True)
+        self.ent_z_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
+        self.ent_y_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
+        self.ent_t_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values2, justify='center', state='readonly', wrap=True)
         self.ent_z_step.config(textvariable=var1)
         self.ent_y_step.config(textvariable=var2)
         self.ent_t_step.config(textvariable=var3)
@@ -333,7 +339,19 @@ class App(object):
         x, y, z, a, b = self.positioner.current_position()
         if None in (y, z, a):
             return 1
+        self.positioner.absolute_move(x, y, z, -2, b)
         self.positioner.absolute_move(x, y, z, 0, b)
+        positioner_t_pos = self.positioner.current_position()[3]
+        self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
+        self.lbl_t_pos.update()
+        return 0
+    
+    def t_angle(self):
+        angle = float(self.ent_t_angle.get())
+        x, y, z, a, b = self.positioner.current_position()
+        if None in (y, z, a):
+            return 1
+        scripts.absolute_move_with_autocorrect(self.positioner, y, z, angle)
         positioner_t_pos = self.positioner.current_position()[3]
         self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()

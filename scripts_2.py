@@ -7,6 +7,7 @@ from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import os
 import matplotlib.pyplot as plt
+# plt.switch_backend('agg')
 import logging
 import time
 from shutil import copyfile
@@ -370,14 +371,13 @@ def cv2_copy(keypoints):
 
 def match_by_features_SIFT_create(img, mid_strips=0, resize_factor=1):
     img_ret = cv.resize(img[mid_strips:], (0, 0), fx=resize_factor, fy=resize_factor)
-    
     sift = cv.SIFT_create()
     img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
     sift = cv.SIFT_create(nfeatures=1000)
     kp, des = sift.detectAndCompute(img_ret, None)
     return kp, des
 
-def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master, MIN_MATCH_COUNT = 20):
+def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master, MIN_MATCH_COUNT = 20, path='data/tmp/'):
     FLANN_INDEX_KDTREE = 1
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 1)
@@ -389,28 +389,34 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
         if m.distance < 0.9*n.distance:
             good.append(m)
 
-    if len(good)>MIN_MATCH_COUNT:
+    if len(good)>=MIN_MATCH_COUNT:
         src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1,1,2)
         dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,1,2)
         M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
         disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)/resize_factor
     else:
-        print('Not enough match to perform homography')
+        print('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
         return 0, 0
     
     matchesMask = mask.ravel().tolist()
-    img_master = cv.polylines(cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor),[np.int32(disp)],True,255,3, cv.LINE_AA)
+    img_master = cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor)
     draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-                singlePointColor = None,
-                matchesMask = matchesMask, # draw only inliers
-                flags = 2)
+                       singlePointColor = None,
+                       matchesMask = matchesMask, # draw only inliers
+                       flags = 2)
     
-    img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor),kp1,img_master,kp2,good,None,**draw_params)
+    img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor), kp1,
+                                    img_master, kp2,
+                                    good, None, **draw_params)
     plt.imshow(img3)
-    plt.savefig('data/match/' + str(time.time()) + '.png')
+    plt.savefig(path + '/' + str(time.time()) + '.png')
     plt.clf()
 
-    return round(-disp[0,0,0]), round(disp[0,0,1]+mid_strips_master-mid_strips_template)
+    match_x = round(-disp[0,0,0])
+    match_y = round(disp[0,0,1] + 2*mid_strips_master - 2*mid_strips_template) # 2* for mid-strips AND SIFT create
+    print('match_x', -disp[0,0,0], 'match_y', disp[0,0,1])
+    print('match_x2', match_x, 'match_y2', match_y)
+    return match_x, match_y
 
 def remove_strips(img, dwell_time):
     img = np.asarray(img, dtype='int32')
@@ -438,7 +444,7 @@ def remove_strips(img, dwell_time):
     if np.max(img) > 255:
         img_ret = (img[mid_strips:,:]/256).astype('uint8')
     else:
-        img_ret = (img).astype('uint8')
+        img_ret = (img[mid_strips:,:]).astype('uint8')
     return img_ret, mid_strips
 
 def set_eucentric_ESEM(microscope, positioner) -> int:
@@ -594,7 +600,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         return 1
     
     angle_step      =  1  # °
-    angle_max       = 10  # °
+    angle_max       = 20  # °
     precision       = 5   # pixels
     eucentric_error = 0
     resolution      = "512x442" # Bigger pixels means less noise and better match
@@ -618,7 +624,10 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
     image_euc[0] = microscope.image_array(img_tmp)
     
-    img_master = image_euc[0].astype('uint8')
+    if np.max(image_euc[0]) > 255:
+        img_master = (image_euc[0]/256).astype('uint8')
+    else:
+        img_master = image_euc[0].astype('uint8')
     kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
 
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
@@ -636,7 +645,10 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
         path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
         microscope.save(img_tmp, path)
         
-        img_template = image_euc[1].astype('uint8')
+        if np.max(image_euc[1]) > 255:
+            img_template = (image_euc[1]/256).astype('uint8')
+        else:
+            img_template = image_euc[1].astype('uint8')
         kp1, des1 = match_by_features_SIFT_create(img_template, 0, resize_factor)
 
         dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, 0, 0)
@@ -667,7 +679,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
                 microscope.auto_contrast_brightness()
             
             ### Test increase angle
-            if angle_max <= 50:
+            if angle_max <= 25:
                 angle_step *= 1.5
                 angle_max  *= 2
             else:
@@ -676,7 +688,10 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
             
             img_tmp = microscope.acquire_frame(resolution, dwell_time, bit_depth)
             image_euc[0] = microscope.image_array(img_tmp)
-            img_master = image_euc[0].astype('uint8')
+            if np.max(image_euc[0]) > 255:
+                img_master = (image_euc[0]/256).astype('uint8')
+            else:
+                img_master = image_euc[0].astype('uint8')
             kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
             path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
             microscope.save(img_tmp, path)
@@ -804,6 +819,25 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
     copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
     return 0
 
+def absolute_move_with_autocorrect(positioner, y, z, a):
+    """
+    Move to a position with autocorrect
+    """
+    positioner.absolute_move(y=y, z=z, a=a)
+    _, _, _, alpha2, _ = positioner.current_position()
+    
+    increment = 100e-6
+    i = 0
+    while (alpha2 < a-0.1 or alpha2 > a+0.1) and abs(i*increment) < 0.003:
+        print("Autocorrecting")
+        positioner.absolute_move(y=y, z=z - i*increment, a=alpha2)
+        positioner.absolute_move(y=y, z=z - i*increment, a=a)
+        _, _, zed, alpha2, _ = positioner.current_position()
+        i += 1
+    if i != 0:
+        positioner.absolute_move(y=y, z=zed, a=a)
+    return
+
 class acquisition(object):
     
     def __init__(self,
@@ -917,7 +951,7 @@ class acquisition(object):
         correction_x     = 0
         correction_y     = 0
 
-        resize = 205 # width of images for match analysis
+        resize = 410 # width of images for match analysis
         if resize != -1:
             resize_factor = resize/float(self.image_width)
         else:
@@ -931,7 +965,7 @@ class acquisition(object):
                 self.c.release()
                 return
             # Load two most recent images
-            list_of_imgs  = [file for file in os.listdir(self.path) if 'HAADF' in file]
+            list_of_imgs  = [file for file in os.listdir(self.path) if '.tif' in file]
             if len(list_of_imgs) == 0:
                 self.c.notify_all()
                 self.c.wait()
@@ -949,10 +983,14 @@ class acquisition(object):
             img      = self.microscope.load(self.path + '/' + img_path)
 
             img_template, mid_strips_template = remove_strips(img, self.dwell_time)
+            # if mid_strips_template != 0:
+            #     plt.imshow(img_template)
+            #     plt.show()
+
             kp1, des1 = match_by_features_SIFT_create(img_template, mid_strips_template, resize_factor)
-            # for i in (img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master):
-            #     print(i)
-            dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master)
+            
+            print('mid_strips_master', 'mid_strips_template', mid_strips_master, mid_strips_template)
+            dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master, path = self.path)
 
             dx_si                    =   dx_pix * hfw / int(self.image_width)
             dy_si                    =   dy_pix * hfw / int(self.image_height)
@@ -961,27 +999,26 @@ class acquisition(object):
             anticipation_x          +=   correction_x
             anticipation_y          +=   correction_y
             
-            if dy_pix != 0:
+            if dx_pix != 0 and dy_pix != 0:
                 value_x = correction_x + anticipation_x
                 value_y = correction_y + anticipation_y
                 print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
+                print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
                 print('value_x, value_y', number_format(value_x), number_format(value_y))
                 
                 if self.microscope.microscope_type == 'ESEM':
                     self.microscope.beam_shift(value_x, value_y, mode = 'rel')
                 else:
                     self.microscope.beam_shift(-value_y, value_x, mode = 'rel')
-                # print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
-                # print('value_x, value_y', number_format(value_x), number_format(value_y))
                 print('Correction Done')
             else:
                 print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
+                print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
 
             mid_strips_master = deepcopy(mid_strips_template)
             kp2 = cv2_copy(kp1)
             des2 = deepcopy(des1)
             img_master = deepcopy(img_template)
-            # print('Waiting fot a knew image after correction')
 
             self.c.notify_all()
             self.c.wait()

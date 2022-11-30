@@ -236,15 +236,50 @@ class FEI_QUATTRO_ESEM(microscope):
     def beam_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
         if value_x==None or value_y==None:
             return self.quattro.beams.electron_beam.beam_shift.value
+        
+        limits = self.quattro.beams.electron_beam.beam_shift.limits
+        limit_x_min = limits.limits_x.min
+        limit_x_max = limits.limits_x.max
+        limit_y_min = limits.limits_y.min
+        limit_y_max = limits.limits_y.max
+
+        limits_extra = 1e-4 # 100 um
+
         if mode == 'rel':
             actual_shift_x, actual_shift_y =   self.quattro.beams.electron_beam.beam_shift.value
-            shift = Point(x=value_x+actual_shift_x, y=value_y+actual_shift_y)
-            self.quattro.beams.electron_beam.beam_shift.value = shift
-            return
+            x = actual_shift_x + value_x
+            y = actual_shift_y + value_y
+            if limit_x_min < x < limit_x_max or limit_y_min < y < limit_y_max:
+                shift = Point(x, y)
+                self.quattro.beams.electron_beam.beam_shift.value = shift
+                print('Only beam shift')
+                return
+            elif -limits_extra < y < limits_extra:
+                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0)
+                shift = Point(0, 0)
+                self.quattro.beams.electron_beam.beam_shift.value = shift
+                print('Beam shift + stage')
+                return
+            else:
+                print('Beam shift out of range')
+                return
         else:
-            shift = Point(value_x, value_y)
-            self.quattro.beams.electron_beam.beam_shift.value = shift
-            return
+            if limit_x_min < value_x < limit_x_max or limit_y_min < value_y < limit_y_max:
+                shift = Point(value_x, value_y)
+                self.quattro.beams.electron_beam.beam_shift.value = shift
+                return
+            elif -limits_extra < value_y < limits_extra:
+                actual_shift_x, actual_shift_y =   self.quattro.beams.electron_beam.beam_shift.value
+                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0)
+                shift = Point(0, 0)
+                self.quattro.beams.electron_beam.beam_shift.value = shift
+                print('Beam shift + stage')
+                return
+            else:
+                print('Beam shift out of range')
+                return
+
+
     
     # Imaging
     def image_settings(self):

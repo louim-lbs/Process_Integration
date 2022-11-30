@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
     path = 'data/tmp/'
     #list all files in the directory if they are images
-    files = [f for f in os.listdir(path) if f.lower().endswith(('.tif', '.png', '.jpg', '.jpeg'))]
+    files = [f for f in os.listdir(path) if f.lower().endswith(('.tif'))]
     img_tmp = cv.imread(path + files[0], cv.IMREAD_GRAYSCALE)
 
     image_euc[0] = img_tmp
