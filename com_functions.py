@@ -261,7 +261,7 @@ class FEI_QUATTRO_ESEM(microscope):
                 print('Beam shift + stage')
                 return
             else:
-                print('Beam shift out of range')
+                print('Beam shift out of range. Actual shift y + value = ', y)
                 return
         else:
             if limit_x_min < value_x < limit_x_max or limit_y_min < value_y < limit_y_max:

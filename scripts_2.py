@@ -449,29 +449,41 @@ def remove_strips(img, dwell_time):
 
 def blob_detection(img, mid_strips, resize_factor):
     if np.max(img) > 255:
-        img_ret = (img[mid_strips:,:]/256).astype('uint8')
+        img_ret = (img/256).astype('uint8')
     else:
-        img_ret = (img[mid_strips:,:]).astype('uint8')
-    img_ret = cv.resize(img_ret, (0, 0), fx=resize_factor, fy=resize_factor)
-    width, height = img_ret.shape
-    img_roi = img_ret[width//4:3*width//4, height//4:3*height//4]
-    
-    img_roi = cv.threshold(img_roi, np.max(img)-50, 255, cv.THRESH_BINARY_INV)
-    kernel = np.ones((5,5),np.uint8)
-    img_roi = cv.morphologyEx(img_roi, cv.MORPH_OPEN, kernel)
-    
-    _, contours, _ = cv.findContours(img_roi, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        
+        img_ret = (img).astype('uint8')
+    # img_ret2 = cv.resize(img_ret, (0, 0), fx=resize_factor, fy=resize_factor)
+    img_ret2 = img_ret
+    height, width = img_ret2.shape
+    img_roi = img_ret2[height//4:3*height//4, width//4:3*width//4]
+    height, width = img_roi.shape
+
+    _, img_roi_tresh = cv.threshold(img_roi, np.max(img)-30, 255, cv.THRESH_BINARY_INV)
+
+    kernel = np.ones((10,10),np.uint8)
+    img_roi_tresh_morph = cv.morphologyEx(img_roi_tresh, cv.MORPH_OPEN, kernel)
+
+    contours = cv.findContours(img_roi_tresh_morph, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    cntsSorted = sorted(contours[0], key=lambda x: cv.contourArea(x))
     if len(contours) > 0:
-        areas = [cv.contourArea(c) for c in contours]
-        max_index = np.argmax(areas)
-        cnt = contours[max_index]
+        # areas = [cv.contourArea(c) for c in contours]
+        # max_index = np.argmax(areas)
+        # max_index = np.argmax(areas[:max_index]+areas[max_index+1:])
+        # cnt = contours[max_index]
+        cnt = cntsSorted[-2]
         M = cv.moments(cnt)
         cx = int(M['m10']/M['m00'])
         cy = int(M['m01']/M['m00'])
+        # img_roi_tresh_morph = cv.cvtColor(img_roi_tresh_morph, cv.COLOR_GRAY2RGB)
+        # cv.drawContours(img_roi_tresh_morph, cnt, -1, (0, 0, 255), 3)
+        # cv.circle(img_roi_tresh_morph, (cx, cy), 5, (255, 0, 0), -1)
+        # plt.imshow(img_roi_tresh_morph)
     else:
         cx, cy = 0, 0
-    return cx, cy
+    cx = cx - width//2#*resize_factor
+    cy = cy - height//2#*resize_factor
+    # plt.show()
+    return cx, -cy
 
 def set_eucentric_ESEM(microscope, positioner) -> int:
     ''' Set eucentric point according to the image centered features.
@@ -1017,33 +1029,34 @@ class acquisition(object):
             
             print('mid_strips_master', 'mid_strips_template', mid_strips_master, mid_strips_template)
             dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master, path = self.path)
+            # blob_x_pix, blob_y_pix = blob_detection(img_template, mid_strips_template, resize_factor)
+            blob_x_pix = 0
+            blob_y_pix = 0
 
             dx_si                    =   dx_pix * hfw / int(self.image_width)
             dy_si                    =   dy_pix * hfw / int(self.image_height)
+            blob_x_si                =   blob_x_pix * hfw / int(self.image_width)
+            blob_y_si                =   blob_y_pix * hfw / int(self.image_height)
+
             correction_x             = - dx_si + correction_x
             correction_y             = - dy_si + correction_y
-            anticipation_x          +=   correction_x
-            anticipation_y          +=   correction_y
+            anticipation_x          +=   correction_x - blob_x_si
+            anticipation_y          +=   correction_y - blob_y_si
             
-            if dx_pix != 0 and dy_pix != 0:
-                
-                blob_x, blob_y = blob_detection(img_template, mid_strips_template, resize_factor)
-                
-                value_x = correction_x + anticipation_x - blob_x
-                value_y = correction_y + anticipation_y - blob_y
+            print('blob_x', 'blob_y', blob_x_pix, blob_y_pix)
+            
+            if (dx_pix != 0 and dy_pix != 0) or (blob_x_pix != 0 and blob_y_pix != 0):
+                value_x = correction_x + anticipation_x
+                value_y = correction_y + anticipation_y
                 print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
                 print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
                 print('value_x, value_y', number_format(value_x), number_format(value_y))
-                
                 
                 if self.microscope.microscope_type == 'ESEM':
                     self.microscope.beam_shift(value_x, value_y, mode = 'rel')
                 else:
                     self.microscope.beam_shift(-value_y, value_x, mode = 'rel')
                 print('Correction Done')
-            else:
-                print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
-                print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
 
             mid_strips_master = deepcopy(mid_strips_template)
             kp2 = cv2_copy(kp1)
