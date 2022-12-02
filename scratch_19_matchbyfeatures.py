@@ -138,7 +138,7 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
     plt.savefig('data/tmp/' + str(time.time()) + '.png')
     plt.clf()
 
-    return round(-disp[0,0,0]), round(disp[0,0,1]+mid_strips_master-mid_strips_template)
+    return round(-disp[0,0,0]), round(disp[0,0,1]+2*mid_strips_master - 2*mid_strips_template)
 
 def remove_strips(img, dwell_time):
     img = np.asarray(img, dtype='int32')
@@ -148,10 +148,6 @@ def remove_strips(img, dwell_time):
         scores[i] = np.sum(abs(img[i+1] - img[i]))
     min_val = np.min(scores)
     max_val = np.max(scores)
-    if max_val - min_val == 0:
-        print(scores)
-        plt.imshow(img)
-        plt.show()
     scores = (scores[:-1] - min_val) / (max_val - min_val)
     scores_peaks, _ = find_peaks(scores, prominence=(0.4,1))
     if len(scores_peaks) == 0:
@@ -163,6 +159,7 @@ def remove_strips(img, dwell_time):
         img_ret = (img[mid_strips:,:]/256).astype('uint8')
     else:
         img_ret = (img).astype('uint8')
+    print('mid_strips =', mid_strips)
     return img_ret, mid_strips
 
 
@@ -171,10 +168,10 @@ if __name__ == '__main__':
     angle_max       = 10  # °
     precision       = 5   # pixels
     eucentric_error = 0
-    resolution      = "512x442" # Bigger pixels means less noise and better match
+    resolution      = "2048x1768" # Bigger pixels means less noise and better match
     image_width     = int(resolution[:resolution.find('x')])
     image_height    = int(resolution[-resolution.find('x'):])
-    dwell_time      = 10e-6
+    dwell_time      = 1e-07
     bit_depth       = 16
     image_euc       = np.zeros((2, image_height, image_width))
     displacement    = [[0,0]]
@@ -186,28 +183,32 @@ if __name__ == '__main__':
     files = [f for f in os.listdir(path) if f.lower().endswith(('.tif'))]
     img_tmp = cv.imread(path + files[0], cv.IMREAD_GRAYSCALE)
 
-    image_euc[0] = img_tmp
-    resize_factor = 1
-    # img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
-    img_master = image_euc[0].astype('uint8')
-    mid_strips_master = 0
-    kp2, des2 = match_by_features_SIFT_create(img_master, mid_strips_master, resize_factor)     
-    
     img = tifffile.TiffFile(path + files[0])
     metadata = img.__str__(detail=3, width=79)
     hfw = metadata[metadata.find('HFW'):]
     hfw = hfw[:hfw.find(',')]
     hfw = float(hfw[hfw.find(':')+1:])
+    
+    image_euc[0] = img_tmp
+    resize = 410 # width of images for match analysis
+    if resize != -1:
+        resize_factor = resize/float(image_width)
+    else:
+        resize_factor = 1
+    # img_master, mid_strips_master = remove_strips(image_euc[0], dwell_time)
+    img_master = image_euc[0].astype('uint8')
+    mid_strips_master = 0
+    img_master, mid_strips_master = remove_strips(img_master, dwell_time)
+    kp2, des2 = match_by_features_SIFT_create(img_master, mid_strips_master, resize_factor)     
 
-    print(len(files))
     for i in range(len(files)-1):
-        print('eucentric_error =', number_format(eucentric_error), 'precision =', number_format(precision), 'current angle =', number_format(i), 'angle_max =', number_format(angle_max))
+        # print('eucentric_error =', number_format(eucentric_error), 'precision =', number_format(precision), 'current angle =', number_format(i), 'angle_max =', number_format(angle_max))
         
         image_euc[1] = cv.imread(path + files[i+1], cv.IMREAD_GRAYSCALE)
     
-        # img_template, mid_strips_template = remove_strips(image_euc[1], dwell_time)
-        img_template = image_euc[1].astype('uint8')
-        mid_strips_template = 0
+        img_template, mid_strips_template = remove_strips(image_euc[1], dwell_time)
+        img_template = img_template.astype('uint8')
+        # mid_strips_template = 0
         kp1, des1 = match_by_features_SIFT_create(img_template, mid_strips_template, resize_factor)
 
         dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master)
@@ -229,7 +230,10 @@ if __name__ == '__main__':
 
     print('Done calculation')
     
-    correct_eucentric(displacement[:], angle[:])
+    plt.plot(angle, [i[0] for i in displacement])
+    plt.plot(angle, [i[1] for i in displacement])
+    plt.show()
+    #correct_eucentric(displacement[:], angle[:])
     
     exit()
 
