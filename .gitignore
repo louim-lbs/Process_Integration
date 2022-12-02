@@ -3,6 +3,7 @@ __pycache__/
 /__pycache__
 *.pyc
 *.tif
+*.png
 !Cell_norm.tif
 !PI_cov-1.tif
 *.cpython

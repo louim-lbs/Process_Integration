@@ -382,7 +382,10 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 1)
     flann = cv.FlannBasedMatcher(index_params, search_params)
-    matches = flann.knnMatch(des1,des2,k=2)
+    try:
+        matches = flann.knnMatch(des1, des2, k=2)
+    except:
+        return 0, 0
 
     good = []
     for m,n in matches:
@@ -398,19 +401,19 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
         print('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
         return 0, 0
     
-    matchesMask = mask.ravel().tolist()
-    img_master = cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor)
-    draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-                       singlePointColor = None,
-                       matchesMask = matchesMask, # draw only inliers
-                       flags = 2)
+    # matchesMask = mask.ravel().tolist()
+    # img_master = cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor)
+    # draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+    #                    singlePointColor = None,
+    #                    matchesMask = matchesMask, # draw only inliers
+    #                    flags = 2)
     
-    img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor), kp1,
-                                    img_master, kp2,
-                                    good, None, **draw_params)
-    plt.imshow(img3)
-    plt.savefig(path + '/' + str(time.time()) + '.png')
-    plt.clf()
+    # img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor), kp1,
+    #                                 img_master, kp2,
+    #                                 good, None, **draw_params)
+    # plt.imshow(img3)
+    # plt.savefig(path + '/' + str(time.time()) + '.png')
+    # plt.clf()
 
     match_x = round(-disp[0,0,0])
     match_y = round(disp[0,0,1] + 2*mid_strips_master - 2*mid_strips_template) # 2* for mid-strips AND SIFT create
@@ -959,7 +962,7 @@ class acquisition(object):
             s_print('Image {} / {}. Current tilt angle = {}'.format(i, nb_images, number_format(tangle)))
             
             if self.microscope.microscope_type == 'ESEM':
-                self.microscope.tilt_correction(value = tangle*np.pi/180) # Tilt correction for e- beam
+                self.microscope.tilt_correction(value = -tangle*np.pi/180) # Tilt correction for e- beam
 
             # logging.info(str(i) + str(self.positioner.current_position()[3]))
             images = self.microscope.acquire_frame(self.resolution, self.dwell_time, self.bit_depth)
@@ -1015,6 +1018,7 @@ class acquisition(object):
                 kp2, des2 = match_by_features_SIFT_create(img_master, mid_strips_master, resize_factor)
                 self.c.notify_all()
                 self.c.wait()
+                beam_shift_previous = self.microscope.beam_shift()
                 continue
             
             img_path = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
@@ -1033,8 +1037,10 @@ class acquisition(object):
             blob_x_pix = 0
             blob_y_pix = 0
 
-            dx_si                    =   dx_pix * hfw / int(self.image_width)
-            dy_si                    =   dy_pix * hfw / int(self.image_height)
+            beam_shift_actual = self.microscope.beam_shift()
+            beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
+            dx_si                    =   dx_pix * hfw / int(self.image_width) - beam_shift_difference[0]
+            dy_si                    =   dy_pix * hfw / int(self.image_height) - beam_shift_difference[1]
             blob_x_si                =   blob_x_pix * hfw / int(self.image_width)
             blob_y_si                =   blob_y_pix * hfw / int(self.image_height)
 
@@ -1057,7 +1063,8 @@ class acquisition(object):
                 else:
                     self.microscope.beam_shift(-value_y, value_x, mode = 'rel')
                 print('Correction Done')
-
+            
+            beam_shift_previous = self.microscope.beam_shift()
             mid_strips_master = deepcopy(mid_strips_template)
             kp2 = cv2_copy(kp1)
             des2 = deepcopy(des1)
