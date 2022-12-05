@@ -928,7 +928,7 @@ class acquisition(object):
         elif bit_depth == 8:
             self.dtype_number = 255
 
-        self.path = work_folder + images_name + '_' + str(round(time.time()))
+        self.path = work_folder + images_name + '_' + str(round(time.time())) + '_resol_' + str(resolution) + '_dwell_' + str(dwell_time) + 's_tiltstep' + str(tilt_increment) + '_drift_' + str(drift_correction) + '_focus_' + str(focus_correction)
         print('path = ', self.path)
         os.makedirs(self.path, exist_ok=True)
 
