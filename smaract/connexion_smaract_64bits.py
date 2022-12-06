@@ -335,7 +335,7 @@ class smaract_class(object):
 
         return 0
     
-    def setpos_rel(self, step:vector) -> int:
+    def setpos_rel(self, step:vector, hold=True) -> int:
         ''' Move the nanocontrollers from Smaract device (Z, Y and T channels) to desired relative [z, y, t] position.
 
         Input:
@@ -349,13 +349,10 @@ class smaract_class(object):
                 -> Move to previous + relative position
         '''
         try:
-            if None in self.getpos():
-                return 1
             if not self.check_limits(step):
                 print(step)
                 print('Position out of range')
                 return 1
-            # print('Moving to position: ' + str(step))
         except:
             print('Error when checking limits')
             return 1
@@ -364,20 +361,22 @@ class smaract_class(object):
 
         step = [int(step[0]), int(step[1]), int(step[2])]
         try:
+            t_setpos_status = self.smaract.SA_GotoAngleRelative_S(step[2], revolution)
             z_setpos_status = self.smaract.SA_GotoPositionRelative_S(0, step[0])
             y_setpos_status = self.smaract.SA_GotoPositionRelative_S(1, step[1])
-            t_setpos_status = self.smaract.SA_GotoAngleRelative_S(      step[2], revolution)
         except:
             print('Error when setting relative position.')
             return 1
         if self.check_status([z_setpos_status, y_setpos_status, t_setpos_status]) == 1:
             return 1
 
-        z_status_status, y_status_status, t_status_status = self.hold_during_move()
-        if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
-            return 1
-
-        print('Position increased of: ' + str([step[0], step[1], self.angle_convert_Smaract2SI(step[2])]))
+        if hold == True:
+            z_status_status, y_status_status, t_status_status = self.hold_during_move()
+            if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
+                return 1
+            print('Position increased of: ' + str([step[0], step[1], self.angle_convert_Smaract2SI(step[2])]))
+        else:
+            print('Position increasing of: ' + str([step[0], step[1], self.angle_convert_Smaract2SI(step[2])]))
         return 0
     
     def set_zero_position(self, channel):
