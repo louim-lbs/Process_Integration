@@ -969,9 +969,11 @@ class acquisition(object):
             # images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             # images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             
+            a = self.positioner.relative_move(0, 0, 0, self.direction*self.tilt_increment, 0)
+            
             path = self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle))
             self.microscope.save(images, path)
-            a = self.positioner.relative_move(0, 0, 0, self.direction*self.tilt_increment, 0)
+
             if self.drift_correction == True or self.focus_correction == True:
                 self.c.notify_all()
                 self.c.wait()
