@@ -41,7 +41,7 @@ class FEI_TITAN_ETEM(microscope):
         x, y, z, a, b = DM.Py_Microscope().GetStagePositions(15)
         return x*1e-6, y*1e-6, z*1e-6, a, 0
     
-    def relative_move(self, dx, dy, dz, da, db):
+    def relative_move(self, dx, dy, dz, da, db, hold=True):
         x, y, z, a, b = DM.Py_Microscope().GetStagePositions(15)
         DM.Py_Microscope().SetStagePositions(15, x+dx*1e6, y+dy*1e6, z+dz*1e6, a+da, b+db)
         return 0
@@ -195,7 +195,7 @@ class FEI_QUATTRO_ESEM(microscope):
         _, y, z, _, _, _ = self.quattro.specimen.stage.current_position()
         return  None, y, z, a, None
     
-    def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0):
+    def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0, hold=True):
         self.quattro.specimen.stage.relative_move(StagePosition(x=dx, y=dy, z=dz, r=da))
         return 0
     
@@ -255,7 +255,7 @@ class FEI_QUATTRO_ESEM(microscope):
                 print('Only beam shift')
                 return
             elif -limits_extra < y < limits_extra:
-                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0)
+                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0, hold=True)
                 shift = Point(0, 0)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
                 print('Beam shift + stage')
@@ -270,7 +270,7 @@ class FEI_QUATTRO_ESEM(microscope):
                 return
             elif -limits_extra < value_y < limits_extra:
                 actual_shift_x, actual_shift_y =   self.quattro.beams.electron_beam.beam_shift.value
-                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0)
+                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0, hold=True)
                 shift = Point(0, 0)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
                 print('Beam shift + stage')
@@ -385,8 +385,8 @@ class SMARACT_MCS_3D(microscope):
             return None, None, None, None, None
         return  None, y*1e-9, z*1e-9, a*1e-6, None
     
-    def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0):
-        self.positioner.setpos_rel([dz*1e9, dy*1e9, da*1e6])
+    def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0, hold=True):
+        self.positioner.setpos_rel([dz*1e9, dy*1e9, da*1e6], hold)
         return 0
     
     def absolute_move(self, x=None, y=None, z=None, a=None, b=None):

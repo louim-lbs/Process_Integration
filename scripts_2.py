@@ -215,11 +215,11 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     plt.show()
 
     if microscope.microscope_type == 'ESEM':
-        positioner.relative_move(0, y0_calc, z0_calc, 0, 0)
-        microscope.relative_move(0, y0_calc, 0, 0, 0)
+        positioner.relative_move(0, y0_calc, z0_calc, 0, 0, hold=True)
+        microscope.relative_move(0, y0_calc, 0, 0, 0, hold=True)
         microscope.focus(z0_calc, 'rel') 
     elif microscope.microscope_type == 'ETEM':
-        positioner.relative_move(0, -y0_calc, z0_calc, 0, 0)
+        positioner.relative_move(0, -y0_calc, z0_calc, 0, 0, hold=True)
         plt.plot(alpha, displacement_y_interpa, 'blue')
         plt.show()
         microscope.beam_shift(0, y0_calc, 'rel')
@@ -535,7 +535,7 @@ def set_eucentric_ESEM(microscope, positioner) -> int:
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
     microscope.save(img_tmp, path)
 
-    positioner.relative_move(0, 0, 0, angle_step, 0)
+    positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
     hfw             = microscope.horizontal_field_view() # meters
 
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
@@ -556,8 +556,8 @@ def set_eucentric_ESEM(microscope, positioner) -> int:
                 # logging.info('Decrease angle step')
                 s_print(       'Decrease angle step')
                 '''Decrease angle step up to 0.1 degree'''
-                positioner.relative_move(0, 0, 0, -2*direction*angle_step, 0)
-                positioner.relative_move(0, 0, 0, +1*direction*angle_step, 0) # Two moves to prevent direction-change approximations
+                positioner.relative_move(0, 0, 0, -2*direction*angle_step, 0, hold=True)
+                positioner.relative_move(0, 0, 0, +1*direction*angle_step, 0, hold=True) # Two moves to prevent direction-change approximations
                 angle_step /= 2
             else:
                 # logging.info('Error doing eucentric. Tips: check your acquisition parameters (mainly dwell time) or angle range.')
@@ -585,7 +585,7 @@ def set_eucentric_ESEM(microscope, positioner) -> int:
             s_print(       'Start again with negative angles')
             
             displacement  = [[0,0]]
-            positioner.relative_move(0, 0, 0, direction*angle_step, 0)
+            positioner.relative_move(0, 0, 0, direction*angle_step, 0, hold=True)
             ixe, ygrec, zed, _, _ = positioner.current_position()
             positioner.absolute_move(ixe, ygrec, zed, direction*angle_max, 0)
             
@@ -608,10 +608,10 @@ def set_eucentric_ESEM(microscope, positioner) -> int:
             image_euc[0] = microscope.image_array(img_tmp)
             path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
             microscope.save(img_tmp, path)
-            positioner.relative_move(0, 0, 0, direction*angle_step, 0)
+            positioner.relative_move(0, 0, 0, direction*angle_step, 0, hold=True)
             continue
 
-        positioner.relative_move(0, 0, 0, direction*angle_step, 0)
+        positioner.relative_move(0, 0, 0, direction*angle_step, 0, hold=True)
         image_euc[0] = np.ndarray.copy(image_euc[1])
 
     ixe, ygrec, zed, _, _ = positioner.current_position()
@@ -674,7 +674,7 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
     microscope.save(img_tmp, path)
 
-    positioner.relative_move(0, 0, 0, angle_step, 0)
+    positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
     hfw = microscope.horizontal_field_view() # meters
 
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
@@ -736,10 +736,10 @@ def set_eucentric_ESEM_2(microscope, positioner) -> int:
             kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
             path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
             microscope.save(img_tmp, path)
-            positioner.relative_move(0, 0, 0, angle_step, 0)
+            positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
             continue
 
-        positioner.relative_move(0, 0, 0, angle_step, 0)
+        positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
         kp2 = cv2_copy(kp1)
         des2 = deepcopy(des1)
         img_master = deepcopy(img_template)
@@ -794,7 +794,7 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
     microscope.save(img_tmp, path)
 
-    positioner.relative_move(0, 0, 0, angle_step, 0)
+    positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
     hfw = microscope.horizontal_field_view() # meters
     
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
@@ -847,10 +847,10 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
             image_euc[0] = microscope.image_array(img_tmp)
             path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
             microscope.save(img_tmp, path)
-            positioner.relative_move(0, 0, 0, angle_step, 0)
+            positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
             continue
         
-        positioner.relative_move(0, 0, 0, angle_step, 0)
+        positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
         image_euc[0] = np.ndarray.copy(image_euc[1])
 
     ixe, ygrec, zed, _, _ = positioner.current_position()
@@ -928,7 +928,7 @@ class acquisition(object):
         elif bit_depth == 8:
             self.dtype_number = 255
 
-        self.path = work_folder + images_name + '_' + str(round(time.time()))
+        self.path = work_folder + images_name + '_' + str(round(time.time())) + '_resol_' + str(resolution) + '_dwell_' + str(dwell_time) + 's_tiltstep' + str(tilt_increment) + '_drift_' + str(drift_correction) + '_focus_' + str(focus_correction)
         print('path = ', self.path)
         os.makedirs(self.path, exist_ok=True)
 
