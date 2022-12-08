@@ -308,7 +308,7 @@ class FEI_QUATTRO_ESEM(microscope):
                 if not np.array_equal(img_prev_stamp, img.data[-1,:]):
                     return img
             except:
-                print('error acquire frame')
+                print('Error acquiring frame')
                 pass
     
     def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16, windows='123'):        

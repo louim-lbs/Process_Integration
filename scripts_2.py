@@ -951,7 +951,7 @@ class acquisition(object):
         if self.microscope.microscope_type == 'ESEM':
             self.microscope.tilt_correction(ONOFF=True)
         
-        for i in range(nb_images):
+        for i in range(1, nb_images+1):
             if self.flag == 1:
                 self.c.notify_all()
                 self.c.release()
@@ -970,7 +970,7 @@ class acquisition(object):
             # images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             
             a = self.positioner.relative_move(0, 0, 0, self.direction*self.tilt_increment, 0)
-            
+
             path = self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle))
             self.microscope.save(images, path)
 

@@ -2,6 +2,7 @@ import ctypes
 import logging
 from typing import List
 from smaract.smaract_lib import smaract_lib_client64
+import time
 
 vector = List[int]
 
