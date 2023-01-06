@@ -252,11 +252,10 @@ class App(object):
 
         if self.microscope.microscope_type == 'ESEM':
             # set_eucentric_status = scripts.set_eucentric_ESEM_2(self.microscope, self.positioner)
-            self.eucentric_ESEM = threading.Thread(target=scripts.set_eucentric_ESEM_2,
-                                                   args=(self.microscope, self.positioner))
+            self.eucentric_ESEM = threading.Thread(target=scripts.set_eucentric, args=(self.microscope, self.positioner))
             self.eucentric_ESEM.start()
         else:
-            set_eucentric_status = scripts.set_eucentric_ETEM(self.microscope, self.positioner)
+            set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
         
         if set_eucentric_status == 0:
             self.lbl_eucent.config(bg='green')
