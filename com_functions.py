@@ -73,8 +73,18 @@ class FEI_TITAN_ETEM(microscope):
             return DM.Py_Microscope().ChangeFocus(value*1e9)
         return DM.Py_Microscope().SetFocus(value*1e9)
     
-    def tilt_correction(self, *args):
-        #print('Tilt or angular correction for ETEM is not implemented')
+    def tilt_correction(self, ONOFF:bool=None, value:float=None, mode:str=None):     
+        if ONOFF == False:
+            try:
+                DM.ChangeBeamTilt(0, 0)
+            except:
+                return
+        if value != None and mode == 'rel':
+            self.quattro.beams.electron_beam.angular_correction.specimen_pretilt.value += value*np.pi/180
+            DM.ChangeBeamTilt(0, 0)
+        elif value != None and mode != 'rel':
+            self.quattro.beams.electron_beam.angular_correction.specimen_pretilt.value = value*np.pi/180
+            DM.ChangeBeamTilt(0, 0)
         return
     
     def image_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
@@ -90,7 +100,10 @@ class FEI_TITAN_ETEM(microscope):
             x, y = DM.Py_Microscope().GetBeamShift()
             return y*1e-9, x*1e-9
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeBeamShift(value_y*1e9, value_x*1e9)
+            try:
+                return DM.Py_Microscope().ChangeBeamShift(value_y*1e9, value_x*1e9)
+            except:
+                pass
         return DM.Py_Microscope().SetBeamShift(value_y*1e9, value_x*1e9)
     
     def projector_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
@@ -108,8 +121,8 @@ class FEI_TITAN_ETEM(microscope):
         x_resol = int(img.GetImgWidth())
         y_resol = int(img.GetImgHeight())
         resolution = str(y_resol) + 'x' + str(x_resol)
-        resolution = '2048x2048'
-        dwell_time = 0.2e-6
+        resolution = '1024x1024'
+        dwell_time = 2e-6
         return resolution, dwell_time
     
         exposure, xBin, yBin, _, top, left, bottom, right = self.camera.GetDefaultParameters()

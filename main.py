@@ -11,6 +11,7 @@ import logging
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
+
 try:
     sys.path.insert(1, r'C:\Users\Public\Documents\Lebas\Process_Integration')
     os.chdir(r'C:\Users\Public\Documents\Lebas\Process_Integration')

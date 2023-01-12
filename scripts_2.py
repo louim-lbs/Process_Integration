@@ -370,9 +370,11 @@ def cv2_copy(keypoints):
     return keypoints_copy
 
 def match_by_features_SIFT_create(img, mid_strips=0, resize_factor=1):
-    img_ret = cv.resize(img[mid_strips:], (0, 0), fx=resize_factor, fy=resize_factor)
+    #img_ret = cv.resize(img[mid_strips:], (0, 0), fx=resize_factor, fy=resize_factor)
+    #img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
+    img_ret = img
+    # img_ret = cv.fastNlMeansDenoising(img, None, h=10, templateWindowSize=7, searchWindowSize=21)
     sift = cv.SIFT_create()
-    img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
     sift = cv.SIFT_create(nfeatures=1000)
     kp, des = sift.detectAndCompute(img_ret, None)
     return kp, des
@@ -401,24 +403,25 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
         print('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
         return 0, 0
     
-    # matchesMask = mask.ravel().tolist()
-    # img_master = cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor)
-    # draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-    #                    singlePointColor = None,
-    #                    matchesMask = matchesMask, # draw only inliers
-    #                    flags = 2)
+    matchesMask = mask.ravel().tolist()
+    img_master = cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor)
+    draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+                       singlePointColor = None,
+                       matchesMask = matchesMask, # draw only inliers
+                       flags = 2)
     
-    # img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor), kp1,
-    #                                 img_master, kp2,
-    #                                 good, None, **draw_params)
-    # plt.imshow(img3)
-    # plt.savefig(path + '/' + str(time.time()) + '.png')
-    # plt.clf()
+    img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor), kp1,
+                                    img_master, kp2,
+                                    good, None, **draw_params)
+    plt.imshow(img3)
+    plt.savefig(path + '/' + str(time.time()) + '.png')
+    print(path)
+    plt.clf()
 
     match_x = round(-disp[0,0,0])
     match_y = round(disp[0,0,1] + 2*mid_strips_master - 2*mid_strips_template) # 2* for mid-strips AND SIFT create
-    print('match_x', -disp[0,0,0], 'match_y', disp[0,0,1])
-    print('match_x2', match_x, 'match_y2', match_y)
+    # print('match_x', -disp[0,0,0], 'match_y', disp[0,0,1])
+    # print('match_x2', match_x, 'match_y2', match_y)
     return match_x, match_y
 
 def remove_strips(img, dwell_time):
@@ -444,10 +447,8 @@ def remove_strips(img, dwell_time):
     # path = 'data/strips/'
     # plt.savefig(path + str(round(time.time(),3))+'.png')
     # plt.close()
-    if np.max(img) > 255:
-        img_ret = (img[mid_strips:,:]/256).astype('uint8')
-    else:
-        img_ret = (img[mid_strips:,:]).astype('uint8')
+    img_2 = img[mid_strips:,:]
+    img_ret = np.asarray(255*(img_2 - np.min(img_2))/(np.max(img_2)-np.min(img_2)), dtype='uint8')
     return img_ret, mid_strips
 
 def blob_detection(img, mid_strips, resize_factor):
@@ -528,14 +529,15 @@ def set_eucentric(microscope, positioner) -> int:
 
     # positioner.absolute_move(x0, y0, z0, -2*angle_step, 0)
     positioner.absolute_move(x0, y0, z0, 0, 0)
-
+    
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
     image_euc[0] = microscope.image_array(img_tmp)
-    
+
     if np.max(image_euc[0]) > 255:
         img_master = (image_euc[0]/256).astype('uint8')
     else:
         img_master = image_euc[0].astype('uint8')
+        
     kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
 
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
@@ -795,7 +797,7 @@ class acquisition(object):
         elif bit_depth == 8:
             self.dtype_number = 255
 
-        self.path = work_folder + images_name + '_' + str(round(time.time())) + '_resol_' + str(resolution) + '_dwell_' + str(dwell_time) + 's_tiltstep' + str(tilt_increment) + '_drift_' + str(drift_correction) + '_focus_' + str(focus_correction)
+        self.path = work_folder + images_name + '_' + str(round(time.time())) + '_res_' + str(resolution) + '_dw_' + str(dwell_time) + 's_stp' + str(tilt_increment) + '_dri_' + str(drift_correction) + '_foc_' + str(focus_correction)
         print('path = ', self.path)
         os.makedirs(self.path, exist_ok=True)
 
@@ -861,13 +863,17 @@ class acquisition(object):
         correction_x     = 0
         correction_y     = 0
 
-        resize = 410 # width of images for match analysis
+        if self.microscope.microscope_type == 'ESEM':
+            resize = 410 # width of images for match analysis
+        else:
+            resize = -1
         if resize != -1:
             resize_factor = resize/float(self.image_width)
         else:
             resize_factor = 1
 
         hfw = self.microscope.horizontal_field_view()
+        print('hfw = ', hfw)
 
         while True:
             if self.flag == 1:
@@ -875,7 +881,7 @@ class acquisition(object):
                 self.c.release()
                 return
             # Load two most recent images
-            list_of_imgs  = [file for file in os.listdir(self.path) if '.tif' in file]
+            list_of_imgs  = [file for file in os.listdir(self.path) if '.tif' or '.dm4' in file]
             if len(list_of_imgs) == 0:
                 self.c.notify_all()
                 self.c.wait()
@@ -889,7 +895,6 @@ class acquisition(object):
                 self.c.wait()
                 beam_shift_previous = self.microscope.beam_shift()
                 continue
-            
             img_path = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
             img      = self.microscope.load(self.path + '/' + img_path)
 
@@ -918,7 +923,7 @@ class acquisition(object):
             anticipation_x          +=   correction_x - blob_x_si
             anticipation_y          +=   correction_y - blob_y_si
             
-            print('blob_x', 'blob_y', blob_x_pix, blob_y_pix)
+            #print('blob_x', 'blob_y', blob_x_pix, blob_y_pix)
             
             if (dx_pix != 0 and dy_pix != 0) or (blob_x_pix != 0 and blob_y_pix != 0):
                 value_x = correction_x + anticipation_x
@@ -930,7 +935,7 @@ class acquisition(object):
                 if self.microscope.microscope_type == 'ESEM':
                     self.microscope.beam_shift(value_x, value_y, mode = 'rel')
                 else:
-                    self.microscope.beam_shift(-value_y, value_x, mode = 'rel')
+                    self.microscope.beam_shift(value_x, -value_y, mode = 'rel')
                 print('Correction Done')
             
             beam_shift_previous = self.microscope.beam_shift()
