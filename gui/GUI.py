@@ -227,6 +227,9 @@ class App(object):
 
         self.btn_stop = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Stop", justify='center', command=self.stop)
         self.btn_stop.place(x=100, y=340)
+        
+        self.btn_pause = tk.Button(master=self.frm_sav, width=20, height=1, bg='#373737', fg='white', text="Pause", justify='center', command=self.pause)
+        self.btn_pause.place(x=100, y=390)
 
         self.acquisition_col = tk.StringVar(value='red')
         self.lbl_acquisition = tk.Label(master=self.frm_sav, width=1, height=1, bg=self.acquisition_col.get())
@@ -355,7 +358,7 @@ class App(object):
         self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()
         return 0
-
+  
     # def freeze_btn(self):
     #     self.btn_acquisition.config(state=tk.DISABLED)
     #     self.btn_record.config(state=tk.DISABLED)
@@ -497,8 +500,21 @@ class App(object):
         self.lbl_img.update()
 
         self.microscope.tilt_correction(False)
-        
         return 0
+    
+    def pause(self):
+        txt = self.btn_pause.cget('text')
+        if txt == 'Pause':
+            self.btn_pause.config(text='Resume')
+            self.lbl_y_pos.update()
+            if hasattr(self, 'acqui') and self.acqui.flag == 0:
+                self.acqui.c.acquire()
+        else:
+            self.btn_pause.config(text='Pause')
+            self.lbl_y_pos.update()
+            if hasattr(self, 'acqui') and self.acqui.flag == 0:
+                self.acqui.c.release()
+        return
 
 if __name__ == "__main__":
     root = tk.Tk()
