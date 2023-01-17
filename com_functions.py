@@ -56,7 +56,12 @@ class FEI_TITAN_ETEM(microscope):
         Read-only
         '''
         img = DM.GetFrontImage()
-        return img.GetDimensionScale(0)*img.GetDimensionSize(0)*1e-6
+        # if DM.Py_Microscope().GetMagnification() <= 1e5:
+        #     hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*1e-6
+        # else:
+        hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*1e-9
+        return hfw
+            
 
         
     def magnification(self, value:int=None):
@@ -122,7 +127,7 @@ class FEI_TITAN_ETEM(microscope):
         y_resol = int(img.GetImgHeight())
         resolution = str(y_resol) + 'x' + str(x_resol)
         resolution = '1024x1024'
-        dwell_time = 2e-6
+        dwell_time = 1e-6
         return resolution, dwell_time
     
         exposure, xBin, yBin, _, top, left, bottom, right = self.camera.GetDefaultParameters()

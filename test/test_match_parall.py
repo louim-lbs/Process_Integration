@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import image
-from scrath_parallelism import parallel_task
+# from test.scrath_parallelism import parallel_task
 from scripts import match, set_eucentric
 import os
 import logging

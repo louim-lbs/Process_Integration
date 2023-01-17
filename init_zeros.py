@@ -1,9 +1,3 @@
-
-import numpy as np
-from matplotlib import image
-
-from scripts import match, set_eucentric
-
 import os
 import logging
 

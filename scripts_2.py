@@ -372,8 +372,7 @@ def cv2_copy(keypoints):
 def match_by_features_SIFT_create(img, mid_strips=0, resize_factor=1):
     #img_ret = cv.resize(img[mid_strips:], (0, 0), fx=resize_factor, fy=resize_factor)
     #img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
-    img_ret = img
-    # img_ret = cv.fastNlMeansDenoising(img, None, h=10, templateWindowSize=7, searchWindowSize=21)
+    img_ret = cv.fastNlMeansDenoising(img, None, h=20, templateWindowSize=7, searchWindowSize=21)
     sift = cv.SIFT_create()
     sift = cv.SIFT_create(nfeatures=1000)
     kp, des = sift.detectAndCompute(img_ret, None)
@@ -865,15 +864,13 @@ class acquisition(object):
 
         if self.microscope.microscope_type == 'ESEM':
             resize = 410 # width of images for match analysis
-        else:
-            resize = -1
-        if resize != -1:
             resize_factor = resize/float(self.image_width)
         else:
-            resize_factor = 1
+            resize = -1
+            resize_factor = 1            
 
-        hfw = self.microscope.horizontal_field_view()
-        print('hfw = ', hfw)
+        # hfw = self.microscope.horizontal_field_view()
+        # print('hfw = ', hfw)
 
         while True:
             if self.flag == 1:
@@ -894,6 +891,8 @@ class acquisition(object):
                 self.c.notify_all()
                 self.c.wait()
                 beam_shift_previous = self.microscope.beam_shift()
+                hfw = self.microscope.horizontal_field_view()
+                print('hfw = ', hfw)
                 continue
             img_path = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
             img      = self.microscope.load(self.path + '/' + img_path)
@@ -913,6 +912,8 @@ class acquisition(object):
 
             beam_shift_actual = self.microscope.beam_shift()
             beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
+            if self.microscope.microscope_type == 'ETEM':
+                beam_shift_difference[1] *= -1
             dx_si                    =   dx_pix * hfw / int(self.image_width) - beam_shift_difference[0]
             dy_si                    =   dy_pix * hfw / int(self.image_height) - beam_shift_difference[1]
             blob_x_si                =   blob_x_pix * hfw / int(self.image_width)

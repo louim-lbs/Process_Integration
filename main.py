@@ -37,6 +37,7 @@ os.chdir(dir_pi)
 def on_closing():
     try:
         microscope.start_acquisition()
+        microscope.beam_shift(0, 0)
     except:
         pass
     print('Python closed')
