@@ -824,6 +824,9 @@ class acquisition(object):
                 self.c.notify_all()
                 self.c.release()
                 return
+            if self.flag == 2:
+                self.c.wait()
+
             
             tangle = self.positioner.current_position()[3]
             
@@ -877,6 +880,9 @@ class acquisition(object):
                 self.c.notify_all()
                 self.c.release()
                 return
+            if self.flag == 2:
+                self.c.wait()
+
             # Load two most recent images
             list_of_imgs  = [file for file in os.listdir(self.path) if '.tif' or '.dm4' in file]
             if len(list_of_imgs) == 0:
@@ -1052,6 +1058,9 @@ class acquisition(object):
                 self.c.notify_all()
                 self.c.release()
                 return
+            if self.flag == 2:
+                self.c.wait()
+
             pos = self.positioner.current_position()
             
             tangle = pos[3]

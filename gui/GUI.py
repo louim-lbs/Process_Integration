@@ -508,11 +508,15 @@ class App(object):
             self.btn_pause.config(text='Resume')
             self.lbl_y_pos.update()
             if hasattr(self, 'acqui') and self.acqui.flag == 0:
-                self.acqui.c.acquire()
+                self.acqui.flag = 2
+                print('Pause')
         else:
             self.btn_pause.config(text='Pause')
             self.lbl_y_pos.update()
-            if hasattr(self, 'acqui') and self.acqui.flag == 0:
+            if hasattr(self, 'acqui') and self.acqui.flag == 2:
+                self.acqui.flag = 0
+                self.acqui.c.acquire()
+                self.acqui.c.notify_all()
                 self.acqui.c.release()
         return
 
