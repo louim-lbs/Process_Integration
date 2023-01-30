@@ -370,10 +370,9 @@ def cv2_copy(keypoints):
     return keypoints_copy
 
 def match_by_features_SIFT_create(img, mid_strips=0, resize_factor=1):
-    #img_ret = cv.resize(img[mid_strips:], (0, 0), fx=resize_factor, fy=resize_factor)
-    #img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
-    img_ret = cv.fastNlMeansDenoising(img, None, h=20, templateWindowSize=7, searchWindowSize=21)
-    sift = cv.SIFT_create()
+    img_ret = cv.resize(img, (0, 0), fx=resize_factor, fy=resize_factor)
+    # img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
+    # img_ret = cv.fastNlMeansDenoising(img_ret, None, h=20, templateWindowSize=7, searchWindowSize=21)
     sift = cv.SIFT_create(nfeatures=1000)
     kp, des = sift.detectAndCompute(img_ret, None)
     return kp, des
@@ -397,30 +396,36 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
         src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1,1,2)
         dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,1,2)
         M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
+        # disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)
         disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)/resize_factor
     else:
         print('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
         return 0, 0
     
     matchesMask = mask.ravel().tolist()
-    img_master = cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor)
+    
     draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
     
-    img3 = cv.drawMatches(cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor), kp1,
-                                    img_master, kp2,
-                                    good, None, **draw_params)
+    img_master = cv.resize(img_master, (0, 0), fx=resize_factor, fy=resize_factor)
+    img_template = cv.resize(img_template, (0, 0), fx=resize_factor, fy=resize_factor)
+
+    img3 = cv.drawMatches(img_template, kp1, img_master, kp2, good, None, **draw_params)
+
     plt.imshow(img3)
     plt.savefig(path + '/' + str(time.time()) + '.png')
-    print(path)
     plt.clf()
 
     match_x = round(-disp[0,0,0])
-    match_y = round(disp[0,0,1] + 2*mid_strips_master - 2*mid_strips_template) # 2* for mid-strips AND SIFT create
+    # match_y = round(disp[0,0,1] + 2*mid_strips_master - 2*mid_strips_template) # 2* for mid-strips AND SIFT create
+    match_y = round(disp[0,0,1] + mid_strips_master - mid_strips_template)
     # print('match_x', -disp[0,0,0], 'match_y', disp[0,0,1])
     # print('match_x2', match_x, 'match_y2', match_y)
+    if match_x > img_master.shape[1] or match_y > img_master.shape[0]:
+        match_x = 0
+        match_y = 0
     return match_x, match_y
 
 def remove_strips(img, dwell_time):
@@ -438,14 +443,6 @@ def remove_strips(img, dwell_time):
     else:
         mid_strips = scores_peaks[-1] + int(0.0512/(dwell_time*w)) # 0.0512 is the time before the movement stabilizes itself. Empirically determined.
 
-    # mid_strips = np.argmax(scores) + int(0.0512/(dwell_time*w)) # 0.0512 is the time before the movement stabilizes itself. Empirically determined.
-    
-    # print('mid_strips', mid_strips)
-    # plt.plot(scores)
-    # plt.axvline(x = mid_strips, color = 'r')
-    # path = 'data/strips/'
-    # plt.savefig(path + str(round(time.time(),3))+'.png')
-    # plt.close()
     img_2 = img[mid_strips:,:]
     img_ret = np.asarray(255*(img_2 - np.min(img_2))/(np.max(img_2)-np.min(img_2)), dtype='uint8')
     return img_ret, mid_strips
@@ -867,7 +864,10 @@ class acquisition(object):
 
         if self.microscope.microscope_type == 'ESEM':
             resize = 410 # width of images for match analysis
+            # resize = -1
+            # resize_factor = 1
             resize_factor = resize/float(self.image_width)
+            print('resize_factor = ', resize_factor)
         else:
             resize = -1
             resize_factor = 1            
@@ -904,9 +904,6 @@ class acquisition(object):
             img      = self.microscope.load(self.path + '/' + img_path)
 
             img_template, mid_strips_template = remove_strips(img, self.dwell_time)
-            # if mid_strips_template != 0:
-            #     plt.imshow(img_template)
-            #     plt.show()
 
             kp1, des1 = match_by_features_SIFT_create(img_template, mid_strips_template, resize_factor)
             

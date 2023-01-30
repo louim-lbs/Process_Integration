@@ -210,8 +210,10 @@ class FEI_QUATTRO_ESEM(microscope):
         
     # Stage Position & Move
     def current_position(self):
-        _, y, z, _, _, _ = self.quattro.specimen.stage.current_position()
-        return  None, y, z, a, None
+        # _, y, z, _, _, _ = self.quattro.specimen.stage.current_position()
+        # return  None, y, z, a, None
+        pos = self.quattro.specimen.stage.current_position
+        return  pos
     
     def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0, hold=True):
         self.quattro.specimen.stage.relative_move(StagePosition(x=dx, y=dy, z=dz, r=da))
@@ -261,36 +263,44 @@ class FEI_QUATTRO_ESEM(microscope):
         limit_y_min = limits.limits_y.min
         limit_y_max = limits.limits_y.max
 
-        limits_extra = 1e-4 # 100 um
+        limits_extra = 100e-6 # 50 um
 
         if mode == 'rel':
-            actual_shift_x, actual_shift_y =   self.quattro.beams.electron_beam.beam_shift.value
+            actual_shift_x, actual_shift_y = self.quattro.beams.electron_beam.beam_shift.value
             x = actual_shift_x + value_x
             y = actual_shift_y + value_y
-            if limit_x_min < x < limit_x_max or limit_y_min < y < limit_y_max:
+            if limit_x_min < x < limit_x_max and limit_y_min < y < limit_y_max:
                 shift = Point(x, y)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
                 print('Only beam shift')
                 return
             elif -limits_extra < y < limits_extra:
-                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0, hold=True)
+                self.quattro.imaging.stop_acquisition()
+                print('current_position', self.current_position())
+                print('value_x', value_x)
+                self.relative_move(-x, -y)
+                print('current_position', self.current_position())
                 shift = Point(0, 0)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
+                time.sleep(1)
+                self.quattro.imaging.start_acquisition()
                 print('Beam shift + stage')
                 return
             else:
                 print('Beam shift out of range. Actual shift y + value = ', y)
                 return
         else:
-            if limit_x_min < value_x < limit_x_max or limit_y_min < value_y < limit_y_max:
+            if limit_x_min < value_x < limit_x_max and limit_y_min < value_y < limit_y_max:
                 shift = Point(value_x, value_y)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
                 return
             elif -limits_extra < value_y < limits_extra:
-                actual_shift_x, actual_shift_y =   self.quattro.beams.electron_beam.beam_shift.value
-                self.relative_move(actual_shift_x+value_x, actual_shift_y+value_y, 0, 0, 0, hold=True)
+                self.quattro.imaging.stop_acquisition()
+                self.relative_move(-x, -y)
                 shift = Point(0, 0)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
+                time.sleep(1)
+                self.quattro.imaging.start_acquisition()
                 print('Beam shift + stage')
                 return
             else:
@@ -308,7 +318,7 @@ class FEI_QUATTRO_ESEM(microscope):
     def get_image(self):
         pass
     
-    def acquire_frame(self, resolution='2048x1768', dwell_time=1e-6, bit_depth=16):
+    def acquire_frame(self, resolution='1024x884', dwell_time=1e-6, bit_depth=16):
         img = self.quattro.imaging.get_image()
         img_prev_stamp = img.data[-1,:]
 

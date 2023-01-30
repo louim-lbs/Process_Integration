@@ -37,11 +37,11 @@ smaract = sm.smaract_class(calibrate=False)
 os.chdir(dir_pi)
 smaract.setpos_abs([0, 0, 0])
 
-quattro.imaging.set_active_view(3)
+# quattro.imaging.set_active_view(3)
 
-# resolution="1536x1024"
-resolution="512x442"
-settings = GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
+# # resolution="1536x1024"
+# resolution="512x442"
+# settings = GrabFrameSettings(resolution=resolution, dwell_time=10e-6, bit_depth=16)
 
-print(quattro.beams.electron_beam.horizontal_field_width.value)
+# print(quattro.beams.electron_beam.horizontal_field_width.value)
 # quattro.specimen.stage.relative_move(StagePosition(y=210105*1e-9))

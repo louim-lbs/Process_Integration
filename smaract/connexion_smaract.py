@@ -54,9 +54,10 @@ class smaract_class(object):
         try:
             os.chdir('smaract\\lib\\')
             self.smart = ctypes.cdll.LoadLibrary(dll_file)
-                
+            print(self.smart)
             os.chdir(os.path.dirname(os.getcwd())) # Change path to the parent directory of the actual path (ie dll path).
         except:
+            print(' Error while importing Smaract dll. Please check the path.')
             logging.info(' Error while importing Smaract dll. Please check the path.')
 
         self.smart.SA_ClearInitSystemsList()
