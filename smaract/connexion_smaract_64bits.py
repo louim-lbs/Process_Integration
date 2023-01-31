@@ -276,7 +276,8 @@ class smaract_class(object):
         '''
         try:
             z_pos_status, z_pos              = self.smaract.SA_GetPosition_S(0)
-            y_pos_status, y_pos              = self.smaract.SA_GetPosition_S(1)
+            # y_pos_status, y_pos              = self.smaract.SA_GetPosition_S(1)
+            y_pos_status, y_pos = 0, 0
             t_angle_status, t_angle, t_revol = self.smaract.SA_GetAngle_S()
             t_angle = self.angle_convert_Smaract2SI(t_angle)
         except:
@@ -304,8 +305,8 @@ class smaract_class(object):
                 -> Move to absolute position
         '''
         try:
-            if None in self.getpos():
-                return 1
+            # if None in self.getpos():
+            #     return 1
             if not self.check_limits(pos):
                 print('Position out of range')
                 return 1
@@ -318,7 +319,8 @@ class smaract_class(object):
         
         try:
             z_setpos_status = self.smaract.SA_GotoPositionAbsolute_S(0, pos[0])
-            y_setpos_status = self.smaract.SA_GotoPositionAbsolute_S(1, pos[1])
+            # y_setpos_status = self.smaract.SA_GotoPositionAbsolute_S(1, pos[1])
+            y_setpos_status = 0
             t_setpos_status = self.smaract.SA_GotoAngleAbsolute_S(      pos[2], revolution)
         except:
             print('Error when setting absolute position.')
@@ -364,7 +366,8 @@ class smaract_class(object):
         try:
             t_setpos_status = self.smaract.SA_GotoAngleRelative_S(step[2], revolution)
             z_setpos_status = self.smaract.SA_GotoPositionRelative_S(0, step[0])
-            y_setpos_status = self.smaract.SA_GotoPositionRelative_S(1, step[1])
+            # y_setpos_status = self.smaract.SA_GotoPositionRelative_S(1, step[1])
+            y_setpos_status = 0
         except:
             print('Error when setting relative position.')
             return 1

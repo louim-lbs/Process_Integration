@@ -19,7 +19,11 @@ positioner.import_package_and_connexion()
 # Lauch GUI
 os.chdir(dir_pi)
 
-
+import numpy as np
 # microscope.relative_move(dx=0, dy=10e-6)
-print(8.0920756e-05-7.9587102e-05)
+print(np.float32([[0,0]]).reshape(-1,1,2))
+print(np.float32([[0,0]]).reshape(-1,1))
+print(np.float32([[0,0]]).reshape(-1))
+print(np.float32([[0,0]]))
+print(np.float32([[0,0]]).reshape(-1,1,2))
 

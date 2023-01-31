@@ -20,15 +20,15 @@ positioner.import_package_and_connexion()
 # Lauch GUI
 os.chdir(dir_pi)
 
-min_focus = -150e-6
-max_focus = 150e-6
+min_focus = -6e-6
+max_focus = 6e-6
 nb_points = 20
 ref_focus = microscope.focus()
 resolution = '1024x884'
 dwell_time = '1e-6'
 bit_depth = 16
 
-name = 'Deg_45_Mag_5000_P_0_DW_1e-6_'
+name = 'Bis_Mag_10000_P_5_DW_1e-6_'
 
 path = 'data/focus/' + name + str(round(time.time())) + '_res_' + str(resolution)
 os.makedirs(path, exist_ok=True)

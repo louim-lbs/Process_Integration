@@ -16,6 +16,7 @@ from tifffile import imread
 from PIL import Image, ImageTk
 import faiss
 from threading import Lock, Condition
+import math
 
 from com_functions import microscope
 
@@ -369,10 +370,11 @@ def cv2_copy(keypoints):
 
     return keypoints_copy
 
-def match_by_features_SIFT_create(img, mid_strips=0, resize_factor=1):
+def match_by_features_SIFT_create(microscope, img, mid_strips=0, resize_factor=1):
     img_ret = cv.resize(img, (0, 0), fx=resize_factor, fy=resize_factor)
     # img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
-    # img_ret = cv.fastNlMeansDenoising(img_ret, None, h=20, templateWindowSize=7, searchWindowSize=21)
+    if microscope.microscope_type == 'ETEM':
+        img_ret = cv.fastNlMeansDenoising(img_ret, None, h=20, templateWindowSize=7, searchWindowSize=21)
     sift = cv.SIFT_create(nfeatures=1000)
     kp, des = sift.detectAndCompute(img_ret, None)
     return kp, des
@@ -398,6 +400,19 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
         M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
         # disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)
         disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)/resize_factor
+        
+        # h,w = img_master.shape
+        # h2,w2 = img_template.shape
+        # print('h, w: ', h, w)
+        # print('h2, w2: ', h2, w2)
+        # pts = np.float32([[h//2,0],[h//2,w-1]]).reshape(-1,1,2)
+        # print('pts: ', pts)
+        # dst = cv.perspectiveTransform(pts,M)
+        # print('dst: ', dst)
+        
+        # zoom_factor = math.hypot(dst[1,0,0] - dst[0,0,0], dst[1,0,1] - dst[0,0,1])/w
+        # print(math.hypot(dst[1,0,0] - dst[0,0,0], dst[1,0,1] - dst[0,0,1]))
+        # print('zoom_factor: ', zoom_factor)
     else:
         print('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
         return 0, 0
@@ -534,7 +549,7 @@ def set_eucentric(microscope, positioner) -> int:
     else:
         img_master = image_euc[0].astype('uint8')
         
-    kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
+    kp2, des2 = match_by_features_SIFT_create(microscope, img_master, 0, resize_factor)     
 
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
     microscope.save(img_tmp, path)
@@ -555,7 +570,7 @@ def set_eucentric(microscope, positioner) -> int:
             img_template = (image_euc[1]/256).astype('uint8')
         else:
             img_template = image_euc[1].astype('uint8')
-        kp1, des1 = match_by_features_SIFT_create(img_template, 0, resize_factor)
+        kp1, des1 = match_by_features_SIFT_create(microscope, img_template, 0, resize_factor)
 
         dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, 0, 0)
 
@@ -598,7 +613,7 @@ def set_eucentric(microscope, positioner) -> int:
                 img_master = (image_euc[0]/256).astype('uint8')
             else:
                 img_master = image_euc[0].astype('uint8')
-            kp2, des2 = match_by_features_SIFT_create(img_master, 0, resize_factor)     
+            kp2, des2 = match_by_features_SIFT_create(microscope, img_master, 0, resize_factor)     
             path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3]))
             microscope.save(img_tmp, path)
             positioner.relative_move(0, 0, 0, angle_step, 0, hold=True)
@@ -893,7 +908,7 @@ class acquisition(object):
                 img_prev_path = list_of_imgs[0]
                 img_prev  = self.microscope.load(self.path + '/' + img_prev_path)
                 img_master, mid_strips_master = remove_strips(img_prev, self.dwell_time)
-                kp2, des2 = match_by_features_SIFT_create(img_master, mid_strips_master, resize_factor)
+                kp2, des2 = match_by_features_SIFT_create(self.microscope, img_master, mid_strips_master, resize_factor)
                 self.c.notify_all()
                 self.c.wait()
                 beam_shift_previous = self.microscope.beam_shift()
@@ -905,7 +920,7 @@ class acquisition(object):
 
             img_template, mid_strips_template = remove_strips(img, self.dwell_time)
 
-            kp1, des1 = match_by_features_SIFT_create(img_template, mid_strips_template, resize_factor)
+            kp1, des1 = match_by_features_SIFT_create(self.microscope, img_template, mid_strips_template, resize_factor)
             
             print('mid_strips_master', 'mid_strips_template', mid_strips_master, mid_strips_template)
             dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master, path = self.path)
