@@ -390,7 +390,8 @@ class App(object):
                                           tilt_increment   = float(self.ent_tilt_step.get()),
                                           tilt_end         = int(self.ent_end_tilt.get()),
                                           drift_correction = self.check1.get(),
-                                          focus_correction = self.check2.get())
+                                          focus_correction = self.check2.get(),
+                                          square_area      = True)
 
             self.thread_tomo = threading.Thread(target=self.acqui.tomo)
             self.thread_tomo.start()
@@ -407,9 +408,6 @@ class App(object):
         except Exception as e:
             logging.info(str(e))
             pass
-
-        self.lbl_acquisition.config(bg='red')
-        self.lbl_acquisition.update()
         return 0
     
     def record(self):
@@ -428,7 +426,8 @@ class App(object):
                                     tilt_increment   = float(self.ent_tilt_step.get()),
                                     tilt_end         = int(self.ent_end_tilt.get()),
                                     drift_correction = self.check1.get(),
-                                    focus_correction = self.check2.get())
+                                    focus_correction = self.check2.get(),
+                                    square_area      = False)
         time.sleep(0.1)
         self.thread_acqui = threading.Thread(target=self.acqui.record)
         self.thread_acqui.start()
@@ -446,9 +445,7 @@ class App(object):
         # except Exception as e:
         #     logging.info(str(e))
         #     pass
-        
-        self.lbl_record.config(bg='red')
-        self.lbl_record.update()
+    
         return 0
 
     def stop(self):

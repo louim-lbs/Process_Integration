@@ -375,6 +375,8 @@ def match_by_features_SIFT_create(microscope, img, mid_strips=0, resize_factor=1
     # img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
     if microscope.microscope_type == 'ETEM':
         img_ret = cv.fastNlMeansDenoising(img_ret, None, h=20, templateWindowSize=7, searchWindowSize=21)
+    else:
+        img_ret = cv.fastNlMeansDenoising(img_ret, None, h=8, templateWindowSize=7, searchWindowSize=14)
     sift = cv.SIFT_create(nfeatures=1000)
     kp, des = sift.detectAndCompute(img_ret, None)
     return kp, des
@@ -772,7 +774,8 @@ class acquisition(object):
                 tilt_increment=2,
                 tilt_end=60,
                 drift_correction=False,
-                focus_correction=False) -> int:
+                focus_correction=False,
+                square_area=False) -> int:
         '''
         '''
         
@@ -795,6 +798,7 @@ class acquisition(object):
             self.tilt_end = tilt_end
             self.drift_correction = drift_correction
             self.focus_correction = focus_correction
+            self.square_area = square_area
         except:
             self.microscope       = 0
             self.positioner       = 0
@@ -811,6 +815,26 @@ class acquisition(object):
         self.path = work_folder + images_name + '_' + str(round(time.time())) + '_res_' + str(resolution) + '_dw_' + str(dwell_time) + 's_stp' + str(tilt_increment) + '_dri_' + str(drift_correction) + '_foc_' + str(focus_correction)
         print('path = ', self.path)
         os.makedirs(self.path, exist_ok=True)
+
+    def set_eucentric_test(self) -> int:
+        resolution      = "1536x1024" # Bigger pixels means less noise and better match
+        dwell_time      = 2e-6
+        bit_depth       = 8
+
+        if self.microscope.microscope_type == 'ESEM':
+            self.microscope.quattro.imaging.set_active_view(3)
+        self.microscope.start_acquisition()
+
+        while self.positioner.current_position()[3] < 20:
+            
+            self.microscope.acquire_frame(resolution, dwell_time, bit_depth)
+            self.positioner.relative_move(0, 0, 0, 1, 0, hold=True)
+        
+
+        ixe, ygrec, zed, _, _ = self.positioner.current_position()
+        self.positioner.absolute_move(ixe, ygrec, zed, 0, 0)
+        return 0
+
 
     def tomo(self):
         self.c.acquire()
@@ -848,14 +872,14 @@ class acquisition(object):
                 self.microscope.tilt_correction(value = -tangle*np.pi/180) # Tilt correction for e- beam
 
             # logging.info(str(i) + str(self.positioner.current_position()[3]))
-            images = self.microscope.acquire_frame(self.resolution, self.dwell_time, self.bit_depth)
+            image = self.microscope.acquire_frame(self.resolution, self.dwell_time, self.bit_depth, square_area=True)
             # images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             # images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             
             a = self.positioner.relative_move(0, 0, 0, self.direction*self.tilt_increment, 0)
 
             path = self.path + '/HAADF_' + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle))
-            self.microscope.save(images, path)
+            self.microscope.save(image, path)
 
             if self.drift_correction == True or self.focus_correction == True:
                 self.c.notify_all()
@@ -905,18 +929,27 @@ class acquisition(object):
                 self.c.wait()
                 continue
             if len(list_of_imgs) == 1:
+                beam_shift_previous = self.microscope.beam_shift()
+                hfw = self.microscope.horizontal_field_view()
                 img_prev_path = list_of_imgs[0]
                 img_prev  = self.microscope.load(self.path + '/' + img_prev_path)
+                if self.square_area == True:
+                    image_width, image_height = int(self.image_width), int(self.image_height)
+                    dim_max = max(image_width, image_height)
+                    dim_min = min(image_width, image_height)
+                    img_prev = img_prev[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
+                    hfw = hfw*dim_min/dim_max
                 img_master, mid_strips_master = remove_strips(img_prev, self.dwell_time)
                 kp2, des2 = match_by_features_SIFT_create(self.microscope, img_master, mid_strips_master, resize_factor)
                 self.c.notify_all()
                 self.c.wait()
-                beam_shift_previous = self.microscope.beam_shift()
-                hfw = self.microscope.horizontal_field_view()
                 print('hfw = ', hfw)
                 continue
+            
+            beam_shift_actual = self.microscope.beam_shift()
             img_path = max(list_of_imgs, key=lambda fn:os.path.getmtime(os.path.join(self.path, fn)))
-            img      = self.microscope.load(self.path + '/' + img_path)
+            img = self.microscope.load(self.path + '/' + img_path)
+            img = img[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
 
             img_template, mid_strips_template = remove_strips(img, self.dwell_time)
 
@@ -928,23 +961,30 @@ class acquisition(object):
             blob_x_pix = 0
             blob_y_pix = 0
 
-            beam_shift_actual = self.microscope.beam_shift()
+            # beam_shift_actual = self.microscope.beam_shift()
             beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
+            # print('beam_shift_actual = ', beam_shift_actual)
+            # print('beam_shift_difference = ', beam_shift_difference)
+
             if self.microscope.microscope_type == 'ETEM':
                 beam_shift_difference[1] *= -1
+            # elif self.microscope.microscope_type == 'ESEM':
+            #     beam_shift_difference[0] *= -1
+            #     beam_shift_difference[1] *= -1
+    
             dx_si                    =   dx_pix * hfw / int(self.image_width) - beam_shift_difference[0]
             dy_si                    =   dy_pix * hfw / int(self.image_height) - beam_shift_difference[1]
-            blob_x_si                =   blob_x_pix * hfw / int(self.image_width)
-            blob_y_si                =   blob_y_pix * hfw / int(self.image_height)
+            # blob_x_si                =   blob_x_pix * hfw / int(self.image_width)
+            # blob_y_si                =   blob_y_pix * hfw / int(self.image_height)
 
             correction_x             = - dx_si + correction_x
             correction_y             = - dy_si + correction_y
-            anticipation_x          +=   correction_x - blob_x_si
-            anticipation_y          +=   correction_y - blob_y_si
+            anticipation_x          +=   correction_x #- blob_x_si
+            anticipation_y          +=   correction_y #- blob_y_si
             
             #print('blob_x', 'blob_y', blob_x_pix, blob_y_pix)
             
-            if (dx_pix != 0 and dy_pix != 0) or (blob_x_pix != 0 and blob_y_pix != 0):
+            if (dx_pix != 0 and dy_pix != 0): #or (blob_x_pix != 0 and blob_y_pix != 0):
                 value_x = correction_x + anticipation_x
                 value_y = correction_y + anticipation_y
                 print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
@@ -956,8 +996,12 @@ class acquisition(object):
                 else:
                     self.microscope.beam_shift(value_x, -value_y, mode = 'rel')
                 print('Correction Done')
+            else:
+                value_x, value_y = 0, 0
             
-            beam_shift_previous = self.microscope.beam_shift()
+            beam_shift_previous[0] = beam_shift_actual[0] + value_x
+            beam_shift_previous[1] = beam_shift_actual[1] + value_y
+
             mid_strips_master = deepcopy(mid_strips_template)
             kp2 = cv2_copy(kp1)
             des2 = deepcopy(des1)

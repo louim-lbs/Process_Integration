@@ -263,7 +263,7 @@ class FEI_QUATTRO_ESEM(microscope):
         limit_y_min = limits.limits_y.min
         limit_y_max = limits.limits_y.max
 
-        limits_extra = 100e-6 # 50 um
+        limits_extra = self.quattro.beams.electron_beam.horizontal_field_width.value
 
         if mode == 'rel':
             actual_shift_x, actual_shift_y = self.quattro.beams.electron_beam.beam_shift.value
@@ -318,10 +318,9 @@ class FEI_QUATTRO_ESEM(microscope):
     def get_image(self):
         pass
     
-    def acquire_frame(self, resolution='1024x884', dwell_time=1e-6, bit_depth=16):
+    def acquire_frame(self, resolution='1024x884', dwell_time=1e-6, bit_depth=16, square_area=False):
         img = self.quattro.imaging.get_image()
         img_prev_stamp = img.data[-1,:]
-
         micro_resolution = self.quattro.beams.electron_beam.scanning.resolution.value
         micro_dwell_time = self.quattro.beams.electron_beam.scanning.dwell_time.value
         micro_bit_depth = self.quattro.beams.electron_beam.scanning.bit_depth
@@ -329,7 +328,17 @@ class FEI_QUATTRO_ESEM(microscope):
             self.quattro.beams.electron_beam.scanning.resolution.value = resolution
             self.quattro.beams.electron_beam.scanning.dwell_time.value = dwell_time
             self.quattro.beams.electron_beam.scanning.bit_depth = bit_depth
-
+        if square_area == True:
+            image_width, image_height = resolution.split('x')
+            image_width, image_height = int(image_width), int(image_height)
+            dim_max = max(image_width, image_height)
+            dim_min = min(image_width, image_height)
+            left = (dim_max - dim_min)/(2*dim_max)
+            top = 0
+            width = 2*(dim_max - dim_min)/dim_max
+            height = 1
+            self.quattro.beams.electron_beam.scanning.mode.set_reduced_area(left, top, width, height)
+        
         while (True):
             img = self.quattro.imaging.get_image()
             try:

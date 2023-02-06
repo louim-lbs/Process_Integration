@@ -25,11 +25,13 @@ h_0 = 10
 axis_color = 'lightgoldenrodyellow'
 
 # Load image
-# image_path = askopenfilename()
+image_path = askopenfilename()
+image = imread(image_path)
+resize_factor = 0.6
+image = cv.resize(image, (0, 0), fx=resize_factor, fy=resize_factor)
 
-
-image = load(r"C:\Users\Public\Documents\Lebas\Process_Integration\data\tomo\Acquisition_rep_1673533223_res_1024x1024_dw_2e-06s_stp0.2_dri_True_foc_False\HAADF_Acquisition_rep_4_-57.dm4")
-image = np.asarray(255*(image - np.min(image))/(np.max(image)-np.min(image)), dtype='uint8')
+# image = load(r"C:\Users\Public\Documents\Lebas\Process_Integration\data\tomo\Acquisition_rep_1673533223_res_1024x1024_dw_2e-06s_stp0.2_dri_True_foc_False\HAADF_Acquisition_rep_4_-57.dm4")
+# image = np.asarray(255*(image - np.min(image))/(np.max(image)-np.min(image)), dtype='uint8')
 
 # Analyse image dimensions
 try:
