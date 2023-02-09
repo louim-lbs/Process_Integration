@@ -335,7 +335,7 @@ class FEI_QUATTRO_ESEM(microscope):
             dim_min = min(image_width, image_height)
             left = (dim_max - dim_min)/(2*dim_max)
             top = 0
-            width = 2*(dim_max - dim_min)/dim_max
+            width = dim_min/dim_max
             height = 1
             self.quattro.beams.electron_beam.scanning.mode.set_reduced_area(left, top, width, height)
         

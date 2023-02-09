@@ -935,9 +935,14 @@ class acquisition(object):
                 img_prev  = self.microscope.load(self.path + '/' + img_prev_path)
                 if self.square_area == True:
                     image_width, image_height = int(self.image_width), int(self.image_height)
+                    print('image_width = ', image_width)
+                    print('image_height = ', image_height)
                     dim_max = max(image_width, image_height)
                     dim_min = min(image_width, image_height)
+                    print('dim_max = ', dim_max)
+                    print('dim_min = ', dim_min)
                     img_prev = img_prev[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
+                    print(0,dim_min, (dim_max - dim_min)//2,(dim_max + dim_min)//2)
                     hfw = hfw*dim_min/dim_max
                 img_master, mid_strips_master = remove_strips(img_prev, self.dwell_time)
                 kp2, des2 = match_by_features_SIFT_create(self.microscope, img_master, mid_strips_master, resize_factor)
