@@ -372,7 +372,6 @@ def cv2_copy(keypoints):
 
 def match_by_features_SIFT_create(microscope, img, mid_strips=0, resize_factor=1):
     img_ret = cv.resize(img, (0, 0), fx=resize_factor, fy=resize_factor)
-    # img_ret = cv.cvtColor(img_ret, cv.IMREAD_GRAYSCALE)
     if microscope.microscope_type == 'ETEM':
         img_ret = cv.fastNlMeansDenoising(img_ret, None, h=20, templateWindowSize=7, searchWindowSize=21)
     else:
@@ -400,21 +399,7 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
         src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1,1,2)
         dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,1,2)
         M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
-        # disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)
         disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)/resize_factor
-        
-        # h,w = img_master.shape
-        # h2,w2 = img_template.shape
-        # print('h, w: ', h, w)
-        # print('h2, w2: ', h2, w2)
-        # pts = np.float32([[h//2,0],[h//2,w-1]]).reshape(-1,1,2)
-        # print('pts: ', pts)
-        # dst = cv.perspectiveTransform(pts,M)
-        # print('dst: ', dst)
-        
-        # zoom_factor = math.hypot(dst[1,0,0] - dst[0,0,0], dst[1,0,1] - dst[0,0,1])/w
-        # print(math.hypot(dst[1,0,0] - dst[0,0,0], dst[1,0,1] - dst[0,0,1]))
-        # print('zoom_factor: ', zoom_factor)
     else:
         print('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
         return 0, 0
@@ -436,16 +421,14 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
     plt.clf()
 
     match_x = round(-disp[0,0,0])
-    # match_y = round(disp[0,0,1] + 2*mid_strips_master - 2*mid_strips_template) # 2* for mid-strips AND SIFT create
     match_y = round(disp[0,0,1] + mid_strips_master - mid_strips_template)
-    # print('match_x', -disp[0,0,0], 'match_y', disp[0,0,1])
-    # print('match_x2', match_x, 'match_y2', match_y)
+
     if match_x > img_master.shape[1] or match_y > img_master.shape[0]:
         match_x = 0
         match_y = 0
     return match_x, match_y
 
-def remove_strips(img, dwell_time):
+def remove_strips(microscope, img, dwell_time):
     img = np.asarray(img, dtype='int32')
     w, _ = img.shape
     scores = np.zeros(w//2, dtype='int32')
@@ -460,6 +443,8 @@ def remove_strips(img, dwell_time):
     else:
         mid_strips = scores_peaks[-1] + int(0.0512/(dwell_time*w)) # 0.0512 is the time before the movement stabilizes itself. Empirically determined.
 
+    if microscope.microscope_type == 'ETEM':
+        mid_strips = 0
     img_2 = img[mid_strips:,:]
     img_ret = np.asarray(255*(img_2 - np.min(img_2))/(np.max(img_2)-np.min(img_2)), dtype='uint8')
     return img_ret, mid_strips
@@ -909,7 +894,7 @@ class acquisition(object):
             print('resize_factor = ', resize_factor)
         else:
             resize = -1
-            resize_factor = 1            
+            resize_factor = 1                      
 
         # hfw = self.microscope.horizontal_field_view()
         # print('hfw = ', hfw)
@@ -944,7 +929,7 @@ class acquisition(object):
                     img_prev = img_prev[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
                     print(0,dim_min, (dim_max - dim_min)//2,(dim_max + dim_min)//2)
                     hfw = hfw*dim_min/dim_max
-                img_master, mid_strips_master = remove_strips(img_prev, self.dwell_time)
+                img_master, mid_strips_master = remove_strips(self.microscope, img_prev, self.dwell_time)
                 kp2, des2 = match_by_features_SIFT_create(self.microscope, img_master, mid_strips_master, resize_factor)
                 self.c.notify_all()
                 self.c.wait()
@@ -956,7 +941,7 @@ class acquisition(object):
             img = self.microscope.load(self.path + '/' + img_path)
             img = img[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
 
-            img_template, mid_strips_template = remove_strips(img, self.dwell_time)
+            img_template, mid_strips_template = remove_strips(self.microscope, img, self.dwell_time)
 
             kp1, des1 = match_by_features_SIFT_create(self.microscope, img_template, mid_strips_template, resize_factor)
             
@@ -966,16 +951,20 @@ class acquisition(object):
             blob_x_pix = 0
             blob_y_pix = 0
 
-            # beam_shift_actual = self.microscope.beam_shift()
-            beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
-            # print('beam_shift_actual = ', beam_shift_actual)
-            # print('beam_shift_difference = ', beam_shift_difference)
+            if self.microscope.microscope_type == 'ESEM':
+                beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
+            else:
+                beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
+
 
             if self.microscope.microscope_type == 'ETEM':
                 beam_shift_difference[1] *= -1
             # elif self.microscope.microscope_type == 'ESEM':
             #     beam_shift_difference[0] *= -1
             #     beam_shift_difference[1] *= -1
+            print('beam shift prev', beam_shift_previous)
+            print('beam shift act', beam_shift_actual)
+            print('beam shift diff', beam_shift_difference)
     
             dx_si                    =   dx_pix * hfw / int(self.image_width) - beam_shift_difference[0]
             dy_si                    =   dy_pix * hfw / int(self.image_height) - beam_shift_difference[1]
@@ -990,22 +979,27 @@ class acquisition(object):
             #print('blob_x', 'blob_y', blob_x_pix, blob_y_pix)
             
             if (dx_pix != 0 and dy_pix != 0): #or (blob_x_pix != 0 and blob_y_pix != 0):
-                value_x = correction_x + anticipation_x
-                value_y = correction_y + anticipation_y
-                print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
-                print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
-                print('value_x, value_y', number_format(value_x), number_format(value_y))
-                
-                if self.microscope.microscope_type == 'ESEM':
-                    self.microscope.beam_shift(value_x, value_y, mode = 'rel')
+                if (dx_pix < image_width and dy_pix < image_height):
+                    value_x = correction_x + anticipation_x
+                    value_y = correction_y + anticipation_y
+                    print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
+                    print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
+                    print('value_x, value_y', number_format(value_x), number_format(value_y))
+                    
+                    if self.microscope.microscope_type == 'ESEM':
+                        self.microscope.beam_shift(value_x, value_y, mode = 'rel')
+                    else:
+                        self.microscope.beam_shift(value_x, -value_y, mode = 'rel')
+                    print('Correction Done')
                 else:
-                    self.microscope.beam_shift(value_x, -value_y, mode = 'rel')
-                print('Correction Done')
+                    print('/!\ Drift is not correctly handled!')
             else:
                 value_x, value_y = 0, 0
             
-            beam_shift_previous[0] = beam_shift_actual[0] + value_x
-            beam_shift_previous[1] = beam_shift_actual[1] + value_y
+            if self.microscope.microscope_type == 'ESEM':
+                beam_shift_previous = beam_shift_actual[0] + value_x, beam_shift_actual[1] + value_y
+            else:
+                beam_shift_previous = beam_shift_actual[0] + value_x, beam_shift_actual[1] - value_y
 
             mid_strips_master = deepcopy(mid_strips_template)
             kp2 = cv2_copy(kp1)

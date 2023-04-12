@@ -27,6 +27,7 @@ class FEI_TITAN_ETEM(microscope):
         self.microscope_type = 'ETEM'
         self.InitState_status = 0
         self.imgID = 0
+        
          
     # Packages & Connexion
     def import_package_and_connexion(self):
@@ -34,6 +35,15 @@ class FEI_TITAN_ETEM(microscope):
         # import DigitalMicroscope as DM
         # Connexion handled by GMS3
         self.camera = DM.GetActiveCamera()
+        
+        img = DM.GetFrontImage()
+        img_unit, _ = img.GetDimensionUnitInfo(0)
+        if img_unit == 'nanometer':
+            self.img_unit = 1e-9
+        elif img_unit == 'micrometer':
+            self.img_unit = 1e-6
+        else:
+            print('Unit not known')
         pass
     
     # Stage Position & Move
@@ -57,9 +67,10 @@ class FEI_TITAN_ETEM(microscope):
         '''
         img = DM.GetFrontImage()
         # if DM.Py_Microscope().GetMagnification() <= 1e5:
-        #     hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*1e-6
+        #     hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*self.img_unit
         # else:
-        hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*1e-9
+        hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*self.img_unit
+        print(hfw)
         return hfw
             
 
@@ -75,8 +86,8 @@ class FEI_TITAN_ETEM(microscope):
         if value==None:
             return DM.Py_Microscope().GetFocus()*1e-9
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeFocus(value*1e9)
-        return DM.Py_Microscope().SetFocus(value*1e9)
+            return DM.Py_Microscope().ChangeFocus(value/1e-9)
+        return DM.Py_Microscope().SetFocus(value/1e-9)
     
     def tilt_correction(self, ONOFF:bool=None, value:float=None, mode:str=None):     
         if ONOFF == False:
@@ -97,27 +108,30 @@ class FEI_TITAN_ETEM(microscope):
             x, y = DM.Py_Microscope().GetImageShift()
             return x*1e-9, y*1e-9
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeImageShift(value_x*1e9, value_y*1e9)
-        return DM.Py_Microscope().SetImageShift(value_x*1e9, value_y*1e9)
+            return DM.Py_Microscope().ChangeImageShift(value_x/1e-9, value_y/1e-9)
+        return DM.Py_Microscope().SetImageShift(value_x/1e-9, value_y/1e-9)
     
     def beam_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
+        '''
+        In nanometers
+        '''
         if value_x==None or value_y==None:
             x, y = DM.Py_Microscope().GetBeamShift()
             return y*1e-9, x*1e-9
         if mode == 'rel':
             try:
-                return DM.Py_Microscope().ChangeBeamShift(value_y*1e9, value_x*1e9)
+                return DM.Py_Microscope().ChangeBeamShift(value_y/1e-9, value_x/1e-9)
             except:
                 pass
-        return DM.Py_Microscope().SetBeamShift(value_y*1e9, value_x*1e9)
+        return DM.Py_Microscope().SetBeamShift(value_y/1e-9, value_x/1e-9)
     
     def projector_shift(self, value_x:float=None, value_y:float=None, mode:str=None):
         if value_x==None or value_y==None:
             x, y = DM.Py_Microscope().GetProjectorShift()
             return x*1e-9, y*1e-9
         if mode == 'rel':
-            return DM.Py_Microscope().ChangeProjectorShift(value_x*1e9, value_y*1e9)
-        return DM.Py_Microscope().SetProjectorShift(value_x*1e9, value_y*1e9)
+            return DM.Py_Microscope().ChangeProjectorShift(value_x/1e-9, value_y/1e-9)
+        return DM.Py_Microscope().SetProjectorShift(value_x/1e-9, value_y/1e-9)
     
     # Imaging
     def image_settings(self):
@@ -140,7 +154,7 @@ class FEI_TITAN_ETEM(microscope):
     def get_image(self):
         return DM.GetFrontImage()
     
-    def acquire_frame(self, resolution=None, dwell_time=None, bit_depth=None):
+    def acquire_frame(self, resolution=None, dwell_time=None, bit_depth=None, square_area=False):
         
         if resolution==None and dwell_time==None:
             resolution, dwell_time = self.image_settings()
