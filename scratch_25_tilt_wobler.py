@@ -4,8 +4,12 @@ import sys
 from autoscript_sdb_microscope_client.structures import GrabFrameSettings
 from autoscript_sdb_microscope_client.enumerations import ScanningResolution
 
-sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
-os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')
+try:
+    sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
+    os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')
+except:
+    sys.path.insert(1, r'C:\Users\User\Documents\LM Lebas\Process_Integration')
+    os.chdir(r'C:\Users\User\Documents\LM Lebas\Process_Integration')
 
 import com_functions
 
@@ -34,4 +38,10 @@ while True:
     time.sleep(0.5)
     positioner.relative_move(da = 2*alpha)
     time.sleep(0.5)
+
+# while True:
+#     positioner.absolute_move(y=pos[1] , z=pos[2], a = -alpha)
+#     time.sleep(0.5)
+#     positioner.absolute_move(y=pos[1] , z=pos[2], a = alpha)
+#     time.sleep(0.5)
 

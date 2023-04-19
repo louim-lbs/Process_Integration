@@ -497,6 +497,7 @@ class App(object):
         self.lbl_img.update()
 
         self.microscope.tilt_correction(False)
+        self.microscope.start_acquisition()
         return 0
     
     def pause(self):

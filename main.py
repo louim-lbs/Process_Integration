@@ -20,8 +20,8 @@ except:
         sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
         os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')
     except:
-        sys.path.insert(1, r'C:\Users\lmleb\Mon Drive\3_Professionnel\3_Doctorat\Projets\Process_Integration')
-        os.chdir(r'C:\Users\lmleb\Mon Drive\3_Professionnel\3_Doctorat\Projets\Process_Integration')
+        sys.path.insert(1, r'C:\Users\User\Documents\LM Lebas\Process_Integration')
+        os.chdir(r'C:\Users\User\Documents\LM Lebas\Process_Integration')
 
 import com_functions
 from gui import GUI

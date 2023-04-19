@@ -918,17 +918,14 @@ class acquisition(object):
                 hfw = self.microscope.horizontal_field_view()
                 img_prev_path = list_of_imgs[0]
                 img_prev  = self.microscope.load(self.path + '/' + img_prev_path)
+                
+                image_width, image_height = int(self.image_width), int(self.image_height)
+                dim_max = max(image_width, image_height)
+                dim_min = min(image_width, image_height)
+                img_prev = img_prev[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
                 if self.square_area == True:
-                    image_width, image_height = int(self.image_width), int(self.image_height)
-                    print('image_width = ', image_width)
-                    print('image_height = ', image_height)
-                    dim_max = max(image_width, image_height)
-                    dim_min = min(image_width, image_height)
-                    print('dim_max = ', dim_max)
-                    print('dim_min = ', dim_min)
-                    img_prev = img_prev[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
-                    print(0,dim_min, (dim_max - dim_min)//2,(dim_max + dim_min)//2)
                     hfw = hfw*dim_min/dim_max
+
                 img_master, mid_strips_master = remove_strips(self.microscope, img_prev, self.dwell_time)
                 kp2, des2 = match_by_features_SIFT_create(self.microscope, img_master, mid_strips_master, resize_factor)
                 self.c.notify_all()
@@ -951,11 +948,7 @@ class acquisition(object):
             blob_x_pix = 0
             blob_y_pix = 0
 
-            if self.microscope.microscope_type == 'ESEM':
-                beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
-            else:
-                beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
-
+            beam_shift_difference = [beam_shift_actual[0] - beam_shift_previous[0], beam_shift_actual[1] - beam_shift_previous[1]]
 
             if self.microscope.microscope_type == 'ETEM':
                 beam_shift_difference[1] *= -1
@@ -986,10 +979,7 @@ class acquisition(object):
                     print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
                     print('value_x, value_y', number_format(value_x), number_format(value_y))
                     
-                    if self.microscope.microscope_type == 'ESEM':
-                        self.microscope.beam_shift(value_x, value_y, mode = 'rel')
-                    else:
-                        self.microscope.beam_shift(value_x, -value_y, mode = 'rel')
+                    self.microscope.beam_shift(value_x, -value_y, mode = 'rel')
                     print('Correction Done')
                 else:
                     print('/!\ Drift is not correctly handled!')
@@ -1125,7 +1115,7 @@ class acquisition(object):
 
             # logging.info(str(i) + str(self.positioner.getpos()[2]))
             
-            images = self.microscope.acquire_frame(self.resolution, self.dwell_time, self.bit_depth)
+            images = self.microscope.acquire_frame(self.resolution, self.dwell_time, self.bit_depth, square_area=True)
             
             # images[0].save(self.path + '/SE_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
             # images[1].save(self.path + '/BF_'    + str(self.images_name) + '_' + str(i) + '_' + str(round(tangle)) + '.tif')
