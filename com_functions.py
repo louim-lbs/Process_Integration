@@ -78,7 +78,7 @@ class FEI_TITAN_ETEM(microscope):
     def magnification(self, value:int=None):
         if value==None:
             return DM.Py_Microscope().GetMagnification()
-        print('Magnififcation changes are not supported with ETEM')
+        print('Magnification changes are not supported with ETEM')
         return
         return DM.Py_Microscope().SetMagIndex(value)
     
@@ -320,7 +320,7 @@ class FEI_QUATTRO_ESEM(microscope):
             else:
                 print('Beam shift out of range')
                 return
-    
+            
     # Imaging
     def image_settings(self):
         resolution = self.quattro.beams.electron_beam.scanning.resolution.value
@@ -330,8 +330,7 @@ class FEI_QUATTRO_ESEM(microscope):
     def get_image(self):
         pass
     
-    def acquire_frame(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16, square_area=False):
-        self.quattro.imaging.start_acquisition()
+    def acquire_frame(self, resolution='1024x884', dwell_time=1e-6, bit_depth=16, square_area=False):
         img = self.quattro.imaging.get_image()
         img_prev_stamp = img.data[-1,:]
         micro_resolution = self.quattro.beams.electron_beam.scanning.resolution.value
@@ -356,7 +355,6 @@ class FEI_QUATTRO_ESEM(microscope):
             img = self.quattro.imaging.get_image()
             try:
                 if not np.array_equal(img_prev_stamp, img.data[-1,:]):
-                    self.quattro.imaging.stop_acquisition()
                     return img
             except:
                 print('Error acquiring frame')
