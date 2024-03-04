@@ -422,8 +422,8 @@ class SMARACT_MCS_3D(microscope):
            
     # Packages & Connexion
     def import_package_and_connexion(self):
-        from smaract_folder import connexion_smaract_64bits as sm
-        self.positioner = sm.smaract_class(calibrate=False)
+        from smaract_folder import smaract_tomo5 as sm
+        self.positioner = sm.smaract_class()
         self.InitState_status = 0
     
     # Stage Position & Move
@@ -437,12 +437,15 @@ class SMARACT_MCS_3D(microscope):
         self.positioner.setpos_rel([dz*1e9, dy*1e9, da*1e6], hold)
         return 0
     
-    def absolute_move(self, x=None, y=None, z=None, a=None, b=None):
+    def absolute_move(self, x=None, y=None, z=None, a=None, b=None, hold=True):
         return self.positioner.setpos_abs([z*1e9, y*1e9, a*1e6])
 
-
 if __name__ == "__main__":
-    
-    active_microscope = microscope().f
-    a = active_microscope.import_package_and_connexion()
-    print(a)
+    device = SMARACT_MCS_3D()
+    device.import_package_and_connexion()
+    print(device.current_position())
+    device.relative_move(da=-1)
+    print(device.current_position())
+    time.sleep(2)
+    # device.absolute_move(y=0, z=0, a=0)
+    # print(device.current_position())

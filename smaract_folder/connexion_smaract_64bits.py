@@ -1,21 +1,21 @@
 import ctypes
 import logging
 from typing import List
-from smaract.smaract_lib import smaract_lib_client64
+from smaract_folder.smaract_lib import smaract_lib_client64
 import time
 
 vector = List[int]
 
 class smaract_class(object):
     def __init__(self, calibrate:bool) -> None:
-        ''' Buid smaract_class.
+        ''' Build smaract_class.
 
-        Class atributes:
-            - status codes : dictionnary with status codes and meaning from MCSControl.h (dict{int:str}).
-            - error codes  : dictionnary with errors codes and meaning from MCSControl.h, build from status codes (dict{int:str}).
-            - state codes  : dictionnary with state codes and meaning from MCSControl.h, build from status codes (dict{int:str}).
+        Class attributes:
+            - status codes : dictionary with status codes and meaning from MCSControl.h (dict{int:str}).
+            - error codes  : dictionary with errors codes and meaning from MCSControl.h, build from status codes (dict{int:str}).
+            - state codes  : dictionary with state codes and meaning from MCSControl.h, build from status codes (dict{int:str}).
             - smart        : library giving access to C++ methods from MCSControl.dll (class).
-            - range limits : dictionnary with set deplacement range limits in nanometers or microdegrees.
+            - range limits : dictionary with set displacement range limits in nanometers or microdegrees.
 
         Return:
             - None (bool).
@@ -103,7 +103,7 @@ class smaract_class(object):
         ''' Retrieve status message from error code.
 
         Input:
-            - dictionnary with status code and status messages (dict).
+            - dictionary with status code and status messages (dict).
             - status code (int).
 
         Return:
@@ -119,7 +119,7 @@ class smaract_class(object):
         return ''
     
     def check_status(self, list_error:vector, error_text:str = 'Error. ') -> int:
-        ''' Check if an error occured during smart C++ function execution. If so, the corresponding status message is written in log.
+        ''' Check if an error occurred during smart C++ function execution. If so, the corresponding status message is written in log.
 
         Input:
             - self (class).
@@ -127,7 +127,7 @@ class smaract_class(object):
             - text to add to log (str).
         
         Return:
-            - 0 if evrything OK, 1 else.
+            - 0 if everything OK, 1 else.
         
         Exemple:
             check_status([z_pos_status, y_pos_status, t_angle_status])
@@ -281,7 +281,7 @@ class smaract_class(object):
             t_angle_status, t_angle, t_revol = self.smaract.SA_GetAngle_S()
             t_angle = self.angle_convert_Smaract2SI(t_angle)
         except:
-            print('Error when acquiring postitions')
+            print('Error when acquiring positions')
             return [None, None, None]
 
         if self.check_status([z_pos_status, y_pos_status, t_angle_status]) == 1:
@@ -298,7 +298,7 @@ class smaract_class(object):
             - pos: list of desired position [z, y, t] in nanometers or microdegrees (list[int, int, int]).
 
         Return:
-            - succes code 0 (SA_OK) or error codes (int).
+            - success code 0 (SA_OK) or error codes (int).
 
         Exemple:
             move_status = smaract.setpos([1242.14, 3456.32, 23.44])
@@ -345,7 +345,7 @@ class smaract_class(object):
             - step: list of steps [z_step, y_step, t_step] in nanometers or microdegrees (list[int, int, int]).
 
         Return:
-            - succes code 0 (//SA_OK) or error codes (int).
+            - success code 0 (//SA_OK) or error codes (int).
 
         Exemple:
             move_status = smaract.setpos([-100, O, 0.1])
@@ -388,7 +388,6 @@ class smaract_class(object):
     
 if __name__ == "__main__":
 
-    logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=print)
-
+    # logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=print)
     smaract = smaract_class(calibrate=False)
     print(smaract.getpos())

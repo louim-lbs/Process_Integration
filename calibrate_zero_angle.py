@@ -12,7 +12,7 @@ import numpy as np
 quattro = SdbMicroscopeClient()
 quattro.connect('localhost') # local connection (Support PC) or offline scripting
 
-from smaract import connexion_smaract_64bits as sm
+from smaract_folder import connexion_smaract_64bits as sm
 smaract = sm.smaract_class(calibrate=False)
 
 
