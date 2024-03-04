@@ -446,6 +446,6 @@ if __name__ == "__main__":
     print(device.current_position())
     device.relative_move(da=-1)
     print(device.current_position())
-    time.sleep(2)
+    # time.sleep(2)
     # device.absolute_move(y=0, z=0, a=0)
     # print(device.current_position())
