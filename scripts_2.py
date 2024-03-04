@@ -7,7 +7,7 @@ from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import os
 import matplotlib.pyplot as plt
-# plt.switch_backend('agg')
+# plt.switch_backend('agg')  # Switching backend if necessary
 import logging
 import time
 from shutil import copyfile
@@ -23,12 +23,18 @@ from com_functions import microscope
 s_print_lock = Lock()
 
 def number_format(number:float, decimals:int=2):
+    '''
+    Convert a float number to a string with a specified number of decimals.
+    If the input number is None, return the string 'None'.
+    '''
     if number == None:
         return 'None'
     return str('{:.{}e}'.format(float(number), decimals))
 
 def PrintException():
-    ''' https://stackoverflow.com/questions/14519177/python-exception-handling-line-number
+    '''
+    Function to print the exception message with the corresponding line number and file name.
+    From: https://stackoverflow.com/questions/14519177/python-exception-handling-line-number
     '''
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
@@ -39,30 +45,35 @@ def PrintException():
     print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
 def s_print(*a, **b):
-    """Thread safe print function from: https://stackoverflow.com/questions/40356200/python-printing-in-multiple-threads"""
+    '''
+    Thread-safe print function to prevent intermingled prints from multiple threads.
+    From: https://stackoverflow.com/questions/40356200/python-printing-in-multiple-threads
+    '''
     s_print_lock.acquire()
     print(*a, **b)
     s_print_lock.release()
 
-# Automatic brightness and contrast optimization with optional histogram clipping
 def automatic_brightness_and_contrast(image, clip_hist_percent=1):
     '''
-    from:
-    https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape
+    Perform automatic brightness and contrast optimization on the input image.
+    The function calculates the grayscale histogram, cumulative distribution, and
+    determines optimal alpha and beta values for contrast adjustment.
+    It returns the adjusted image.
+    From: https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape
     '''
     # Calculate grayscale histogram
-    hist = cv.calcHist([image],[0],None,[256],[0,256])
+    hist = cv.calcHist([image], [0], None, [256], [0, 256])
     hist_size = len(hist)
     
     # Calculate cumulative distribution from the histogram
     accumulator = []
     accumulator.append(float(hist[0]))
     for index in range(1, hist_size):
-        accumulator.append(accumulator[index -1] + float(hist[index]))
+        accumulator.append(accumulator[index - 1] + float(hist[index]))
     
     # Locate points to clip
     maximum = accumulator[-1]
-    clip_hist_percent *= (maximum/100.0)
+    clip_hist_percent *= (maximum / 100.0)
     clip_hist_percent /= 2.0
     
     # Locate left cut
@@ -71,7 +82,7 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
         minimum_gray += 1
     
     # Locate right cut
-    maximum_gray = hist_size -1
+    maximum_gray = hist_size - 1
     while accumulator[maximum_gray] >= (maximum - clip_hist_percent):
         maximum_gray -= 1
     
@@ -83,26 +94,38 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
     return auto_result
 
 def fft(img):
+    '''
+    Compute the 2D Fast Fourier Transform (FFT) magnitude of an input image.
+    The function pads the image to optimal size for FFT, computes FFT and
+    returns the magnitude of the FFT.
+    '''
     rows, cols = img.shape
     nrows = cv.getOptimalDFTSize(rows)
     ncols = cv.getOptimalDFTSize(cols)
     right = ncols - cols
     bottom = nrows - rows
     img = cv.copyMakeBorder(img, 0, bottom, 0, right, borderType=cv.BORDER_CONSTANT, value=0)
-    
+
     # Compute FFT
-    image_fft     = np.fft.fftshift(cv.dft(np.float32(img), flags=cv.DFT_COMPLEX_OUTPUT))
-    image_fft_mag = 20*np.log(cv.magnitude(image_fft[:,:,0], image_fft[:,:,1]))
+    image_fft = np.fft.fftshift(cv.dft(np.float32(img), flags=cv.DFT_COMPLEX_OUTPUT))
+    image_fft_mag = 20 * np.log(cv.magnitude(image_fft[:, :, 0], image_fft[:, :, 1]))
     return image_fft_mag
 
+
 def find_ellipse(img, save=False):
+    '''
+    Find an ellipse that best fits the input image using contour detection and ellipse fitting.
+    The function applies image processing techniques to enhance contours, find the main contour,
+    and fit an ellipse to it. It returns the parameters of the best-fit ellipse.
+    If 'save' is True, it saves a plot of the ellipse and contour.
+    '''
     if save:
         plt.imshow(img, 'gray')
-    
-    img = cv.morphologyEx(img, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_RECT, (5, 5))) # 5
-    img = cv.morphologyEx(img, cv.MORPH_DILATE, cv.getStructuringElement(cv.MORPH_RECT, (3, 3))) # 3
-    img = cv.medianBlur(img, 75)
-    
+
+    img = cv.morphologyEx(img, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_RECT, (5, 5)))  # Closing operation
+    img = cv.morphologyEx(img, cv.MORPH_DILATE, cv.getStructuringElement(cv.MORPH_RECT, (3, 3)))  # Dilating operation
+    img = cv.medianBlur(img, 75)  # Median blur to remove noise and smooth edges
+
     contours, _ = cv.findContours(img, mode=cv.RETR_LIST, method=cv.CHAIN_APPROX_NONE)
     if len(contours) != 0:
         ind = np.argmax([len(cont) for cont in contours])
@@ -117,47 +140,45 @@ def find_ellipse(img, save=False):
             s_print('len contour < 5', len(contours))
             if save:
                 plt.imshow(img)
-                # plt.show()
             pass
 
-        elps = cv.fitEllipse(cont)
-        # plt.imshow(img, 'gray', alpha=0.1)
-        if save:
-            plt.plot([i[0][0] for i in cont], [i[0][1] for i in cont], alpha = 0.7)
+        elps = cv.fitEllipse(cont)  # Fit an ellipse to the contour
 
-        u =     elps[0][0]        # x-position of the center
-        v =     elps[0][1]        # y-position of the center
-        a =     elps[1][0]/2        # radius on the x-axis
-        b =     elps[1][1]/2        # radius on the y-axis
-        t_rot = elps[2]*np.pi/180 # rotation angle
+        # Extract ellipse parameters
+        u = elps[0][0]          # x-position of the center
+        v = elps[0][1]          # y-position of the center
+        a = elps[1][0] / 2      # radius on the x-axis
+        b = elps[1][1] / 2      # radius on the y-axis
+        t_rot = elps[2] * np.pi / 180  # rotation angle (converted to radians)
 
-        t = np.linspace(0, 2*np.pi, 100)
-        Ell = np.array([a*np.cos(t) , b*np.sin(t)])  
-            #u,v removed to keep the same center location
-        R_rot = np.array([[np.cos(t_rot) , -np.sin(t_rot)],[np.sin(t_rot) , np.cos(t_rot)]])  
-            #2-D rotation matrix
+        t = np.linspace(0, 2 * np.pi, 100)
+        Ell = np.array([a * np.cos(t), b * np.sin(t)])  # Parametric equation of the ellipse
+        R_rot = np.array([[np.cos(t_rot), -np.sin(t_rot)], [np.sin(t_rot), np.cos(t_rot)]])  # 2-D rotation matrix
 
-        Ell_rot = np.zeros((2,Ell.shape[1]))
+        Ell_rot = np.zeros((2, Ell.shape[1]))
         for i in range(Ell.shape[1]):
-            Ell_rot[:,i] = np.dot(R_rot,Ell[:,i])
+            Ell_rot[:, i] = np.dot(R_rot, Ell[:, i])
 
         if save:
-            plt.plot( u+Ell_rot[0,:] , v+Ell_rot[1,:],'r', alpha = 0.7)
-            plt.savefig('images/ellipse/' + str(time.time()) + '.tif')
-            
-            # plt.show()
-            plt.clf()
+            plt.plot(u + Ell_rot[0, :], v + Ell_rot[1, :], 'r', alpha=0.7)  # Plotting the fitted ellipse
+            plt.savefig('images/ellipse/' + str(time.time()) + '.tif')  # Save the plot as an image
+
+            plt.clf()  # Clear the plot
         return elps
     else:
         s_print('no contour found')
         if save:
             plt.imshow(img, 'gray')
-            # plt.show()
-    return ((0, 0), (0, 0), 0)
+    return ((0, 0), (0, 0), 0)  # Return a default ellipse if no contour is found
 
-def function_displacement(x, z, y, R):#, x2, x3):
-    x = [i*np.pi/180 for i in x]
-    return y*(1-np.cos(x)) + z*np.sin(x) + R*(1-np.sin(x))#np.multiply(x, x2))) + x3
+def function_displacement(x, z, y, R):
+    '''
+    Function to model the displacement as a function of angle using parameters z, y, and R.
+    The function returns the displacement calculated based on the input angle and parameters.
+    '''
+    x = [i * np.pi / 180 for i in x]
+    return y * (1 - np.cos(x)) + z * np.sin(x) + R * (1 - np.sin(x))  # np.multiply(x, x2))) + x3
+
 
 def correct_eucentric(microscope, positioner, displacement, angle):
     ''' Calculate z and y parameters for postioner eucentric correction, correct it, correct microscope view and focus.

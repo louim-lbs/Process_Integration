@@ -85,7 +85,7 @@ def match_pool(image_master, image_template, grid_size = 5, ratio_template_maste
 
 if __name__ == '__main__':
 
-    from smaract import connexion_smaract as sm
+    from smaract_folder import connexion_smaract as sm
     smaract = sm.smaract_class(calibrate=False)
     os.chdir(dir_pi)
 

@@ -32,7 +32,7 @@ except:
 
 # Connect to positioner
 
-from smaract import connexion_smaract as sm
+from smaract_folder import connexion_smaract as sm
 smaract = sm.smaract_class(calibrate=False)
 os.chdir(dir_pi)
 smaract.setpos_abs([0, 0, 0])

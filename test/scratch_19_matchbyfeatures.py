@@ -168,7 +168,7 @@ if __name__ == '__main__':
     angle_max       = 10  # °
     precision       = 5   # pixels
     eucentric_error = 0
-    resolution      = "2048x1768" # Bigger pixels means less noise and better match
+    resolution      = "512x442" # Bigger pixels means less noise and better match
     image_width     = int(resolution[:resolution.find('x')])
     image_height    = int(resolution[-resolution.find('x'):])
     dwell_time      = 1e-07
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     angle           = [0]
 
 
-    path = 'data/tmp/'
+    path = r"C:\Users\lmleb\Desktop\Nouveaudossier\\"
     #list all files in the directory if they are images
     files = [f for f in os.listdir(path) if f.lower().endswith(('.tif'))]
     img_tmp = cv.imread(path + files[0], cv.IMREAD_GRAYSCALE)
@@ -230,10 +230,17 @@ if __name__ == '__main__':
 
     print('Done calculation')
     
-    plt.plot(angle, [i[0] for i in displacement])
-    plt.plot(angle, [i[1] for i in displacement])
+    plt.plot(angle, [i[0] for i in displacement], color='red')
+    plt.plot(angle, [i[1] for i in displacement], color='blue')
     plt.show()
     #correct_eucentric(displacement[:], angle[:])
+    
+    # save as csv with angle, [i[0] for i in displacement] as x, [i[1] for i in     with open('data/tmp/displacement.csv', 'w') as f:
+    with open(path+'displacement'+str(time.time())+'.csv', 'w') as f:
+        f.write('angle,x,y\n')
+        for i in range(len(angle)):
+            f.write(str(angle[i]) + ',' + str(displacement[i][0]) + ',' + str(displacement[i][1]) + '\n')
+    print('Done saving')
     
     exit()
 

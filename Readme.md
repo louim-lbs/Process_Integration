@@ -7,11 +7,11 @@ M-SIS facilitates the acquisition of tomogram/tilt series with a two-buttons phi
 - One button to set up;
 - One button to start automated acquisition.
 
-Works for know with Termo Fisher microscopes running Autoscript and Smaract MCS-3D controllers. 
+Works for now with ThermoFisher microscopes running Autoscript and Smaract MCS-3D controllers. 
 
 ## Features
 
-- Auto eucentric setting, user-independant
+- Auto eucentric setting, user-independent
 - Auto tomogram acquisition:
     - No manual beam correction
     - No manual focus correction
@@ -27,6 +27,7 @@ Works for know with Termo Fisher microscopes running Autoscript and Smaract MCS-
  - [INSA de Lyon](https://www.insa-lyon.fr/)
  - [Laboratoire Mateis](https://mateis.insa-lyon.fr/)
  - [Agence Nationale de la Recherche](https://anr.fr/)
+ 
 ## Appendix
 
 Any additional information goes here
@@ -39,7 +40,7 @@ Any additional information goes here
 
 ## Roadmap
 
-- Asynchronous comunication for microscope functions
+- Asynchronous communication for microscope functions
 
 
 ## License
@@ -69,8 +70,6 @@ Install my-project with pip
 For support, email louis-marie.lebas@insa-lyon.fr
 
 
-
-
 # Microsoft-Stage Integration Software M-SIS
 
 M-SIS is an integration software to facilitate the acquisition of images, initially thought for tomograms.
@@ -94,7 +93,7 @@ The soft works with a two-buttons philosophy: one to set up, and one to acquire 
     - **Pondérer** le match par la confiance.
     - Deal with smaract errors
     - IF NOT MATCHED INCREASE DWELL TIME.
-    - Calculer le décallage une fois qu'il a été fait la première fois.
+    - Calculer le décalage une fois qu'il a été fait la première fois.
     - Le HAADF donne le meilleur contraste.
     - Augmenter le dwell time pour augmenter la précision.
     - Corriger le décalage de l'axe de tilt grâce à une analyse avec un déplacement horizontal de y
