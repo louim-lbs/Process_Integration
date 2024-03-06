@@ -18,7 +18,7 @@ import faiss
 from threading import Lock, Condition
 import math
 
-from com_functions import microscope
+from com_functions2 import microscope
 
 s_print_lock = Lock()
 

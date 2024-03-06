@@ -9,7 +9,7 @@ import numpy as np
 sys.path.insert(1, r'C:\Users\User\Documents\LM Lebas\Process_Integration')
 os.chdir(r'C:\Users\User\Documents\LM Lebas\Process_Integration')
 
-import com_functions
+import com_functions2
 
 dir_pi = os.getcwd()
 

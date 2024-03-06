@@ -12,20 +12,12 @@ Updated on Jul 27 2023
 import os
 import logging
 import sys
-# insert at 1, 0 is the script path (or '' in REPL)
 
-try:
-    sys.path.insert(1, r'C:\Users\Public\Documents\Lebas\Process_Integration')
-    os.chdir(r'C:\Users\Public\Documents\Lebas\Process_Integration')
-except:
-    try:
-        sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
-        os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')
-    except:
-        sys.path.insert(1, r'C:\Users\lmleb\Mon Drive\3_Professionnel\3_Doctorat\Projets\Process_Integration')
-        os.chdir(r'C:\Users\lmleb\Mon Drive\3_Professionnel\3_Doctorat\Projets\Process_Integration')
+actual_path = os.getcwd()
+sys.path.insert(1, actual_path)
+os.chdir(actual_path)
 
-import com_functions  # Importing custom functions related to microscope control
+import com_functions2  as com_functions # Importing custom functions related to microscope control
 from gui import GUI   # Importing the GUI module
 
 # Get the current working directory
@@ -43,7 +35,6 @@ positioner.import_package_and_connexion()
 
 # Launch the GUI
 os.chdir(dir_pi)  # Set the current working directory back to the original directory
-
 
 def on_closing():
     '''
@@ -63,4 +54,3 @@ root = GUI.tk.Tk()  # Create the main GUI window
 GUI.App(root, microscope, positioner)  # Initialize the application with the microscope and positioner objects
 root.protocol("WM_DELETE_WINDOW", on_closing)  # Call on_closing() when the GUI window is closed
 root.mainloop()  # Start the main event loop for the GUI
-

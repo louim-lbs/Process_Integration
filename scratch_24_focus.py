@@ -7,7 +7,7 @@ from autoscript_sdb_microscope_client.enumerations import ScanningResolution
 sys.path.insert(1, r'D:\SharedData\LM LEBAS\Process_Integration')
 os.chdir(r'D:\SharedData\LM LEBAS\Process_Integration')
 
-import com_functions
+import com_functions2
 
 dir_pi = os.getcwd()
 

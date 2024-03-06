@@ -1,4 +1,4 @@
-import com_functions
+import com_functions2
 import time
 
 positioner = com_functions.SMARACT_MCS_3D()

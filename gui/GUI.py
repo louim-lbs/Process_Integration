@@ -1,3 +1,11 @@
+if __name__ == "__main__":
+    import os
+    
+    actual_path = os.getcwd()
+    parent_path = os.path.abspath(os.path.join(actual_path, '..'))
+    print(actual_path, parent_path)
+    os.chdir(parent_path)
+
 import logging
 import time
 import tkinter as tk
@@ -5,11 +13,12 @@ import tkinter.scrolledtext as ScrolledText
 from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
-#from com_functions import microscope
-import scripts_2 as scripts
-# import scripts_2_cython as scripts
 import threading
-
+try:
+    import scripts_2 as scripts
+except:
+    print('Autotest?')
+    pass
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -382,21 +391,21 @@ class App(object):
             imgID = 0
             self.acqui = scripts.acquisition(self.microscope,
                                           self.positioner,
-                                          work_folder      = 'data/tomo/',
-                                          images_name      = self.ent_name.get(),
-                                          resolution       = self.microscope.image_settings()[0],
-                                          bit_depth        = 8,
-                                          dwell_time       = self.microscope.image_settings()[1],
-                                          tilt_increment   = float(self.ent_tilt_step.get()),
-                                          tilt_end         = int(self.ent_end_tilt.get()),
+                                          work_folder = 'data/tomo/',
+                                          images_name = self.ent_name.get(),
+                                          resolution = self.microscope.image_settings()[0],
+                                          bit_depth = 8,
+                                          dwell_time = self.microscope.image_settings()[1],
+                                          tilt_increment = float(self.ent_tilt_step.get()),
+                                          tilt_end = int(self.ent_end_tilt.get()),
                                           drift_correction = self.check1.get(),
                                           focus_correction = self.check2.get(),
-                                          square_area      = True)
+                                          square_area = True)
 
-            self.thread_tomo = threading.Thread(target=self.acqui.tomo)
+            self.thread_tomo = threading.Thread(target = self.acqui.tomo)
             self.thread_tomo.start()
             if self.check1.get() == True:
-                self.thread_drift_correction = threading.Thread(target=self.acqui.f_drift_correction)
+                self.thread_drift_correction = threading.Thread(target = self.acqui.f_drift_correction)
                 self.thread_drift_correction.start()
             # if self.check2.get() == True:
             #     self.thread_focus_correction = threading.Thread(target=self.acqui.f_focus_correction, args=(self,))
@@ -418,21 +427,21 @@ class App(object):
         # try:
         self.acqui = scripts.acquisition(self.microscope,
                                     self.positioner,
-                                    work_folder      = 'data/record/',
-                                    images_name      = self.ent_name.get(),
-                                    resolution       = self.microscope.image_settings()[0],
-                                    bit_depth        = 8,
-                                    dwell_time       = self.microscope.image_settings()[1],
-                                    tilt_increment   = float(self.ent_tilt_step.get()),
-                                    tilt_end         = int(self.ent_end_tilt.get()),
+                                    work_folder = 'data/record/',
+                                    images_name = self.ent_name.get(),
+                                    resolution = self.microscope.image_settings()[0],
+                                    bit_depth = 8,
+                                    dwell_time = self.microscope.image_settings()[1],
+                                    tilt_increment = float(self.ent_tilt_step.get()),
+                                    tilt_end = int(self.ent_end_tilt.get()),
                                     drift_correction = self.check1.get(),
                                     focus_correction = self.check2.get(),
-                                    square_area      = False)
+                                    square_area = False)
         time.sleep(0.1)
-        self.thread_acqui = threading.Thread(target=self.acqui.record)
+        self.thread_acqui = threading.Thread(target = self.acqui.record)
         self.thread_acqui.start()
         if self.check1.get() == True:
-            self.thread_drift_correction = threading.Thread(target=self.acqui.f_drift_correction)
+            self.thread_drift_correction = threading.Thread(target = self.acqui.f_drift_correction)
             self.thread_drift_correction.start()
         # if self.check2.get() == True:
         #     self.thread_focus_correction = threading.Thread(target=self.acqui.f_focus_correction, args=(self,))
@@ -518,6 +527,7 @@ class App(object):
         return
 
 if __name__ == "__main__":
+
     root = tk.Tk()
     app = App(root, 0, 0)
     root.mainloop()
