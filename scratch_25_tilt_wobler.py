@@ -11,16 +11,15 @@ import com_functions2
 
 dir_pi = os.getcwd()
 
-microscope = com_functions.microscope().f
+microscope = com_functions2.microscope().f
 microscope.import_package_and_connexion()
 
-positioner = com_functions.microscope().p
+positioner = com_functions2.microscope().p
 positioner.import_package_and_connexion()
 
 os.chdir(dir_pi)
 
 alpha = 40
-
 
 pos = positioner.current_position()
 print(pos)
