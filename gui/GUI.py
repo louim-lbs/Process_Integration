@@ -3,7 +3,7 @@ if __name__ == "__main__":
     
     actual_path = os.getcwd()
     parent_path = os.path.abspath(os.path.join(actual_path, '..'))
-    print(actual_path, parent_path)
+    logging.info(actual_path, parent_path)
     os.chdir(parent_path)
 
 import logging
@@ -14,10 +14,12 @@ from tkinter.constants import RAISED
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 import threading
+import ctypes as ct
+
 try:
     import scripts_2 as scripts
 except:
-    print('Autotest?')
+    logging.info('Autotest?')
     pass
 
 class TextHandler(logging.Handler):
@@ -152,21 +154,25 @@ class App(object):
         # Microscope
         
         # Smaract Detectors X, Y
+
+        self.lbl_detec = tk.Label(master=self.frm_mov, width=58, height=1, bg='#2B2B2B', fg='white', text="Detector", justify='left')
+        self.lbl_detec.place(x=22, y=10)
+
         self.btn_dx_up = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dx_up)
         self.btn_dx_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.dx_down)
         self.btn_dy_up = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dy_up)
         self.btn_dy_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.dy_down)
 
-        self.btn_dx_up.place(x=22, y=10)
-        self.btn_dx_down.place(x=22, y=120)
-        self.btn_dy_up.place(x=132, y=10)
-        self.btn_dy_down.place(x=132, y=120)
+        self.btn_dx_up.place(x=22, y=50)
+        self.btn_dx_down.place(x=22, y=160)
+        self.btn_dy_up.place(x=132, y=50)
+        self.btn_dy_down.place(x=132, y=160)
 
         positioner_pos_detector = self.positioner.current_detector_position()
-        self.lbl_dx_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos_detector[0]) + " m", justify='left')
-        self.lbl_dy_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos_detector[1]) + " m", justify='left')
-        self.lbl_dx_pos.place(x=20, y=50)
-        self.lbl_dy_pos.place(x=130, y=50)
+        self.lbl_dx_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="x = " + scripts.number_format(positioner_pos_detector[0]) + " m", justify='left')
+        self.lbl_dy_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="y = " + scripts.number_format(positioner_pos_detector[1]) + " m", justify='left')
+        self.lbl_dx_pos.place(x=20, y=90)
+        self.lbl_dy_pos.place(x=130, y=90)
 
         ent_step_values1 = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
         ent_step_values2 = (1, 2, 5, 10, 20, 50)
@@ -177,9 +183,11 @@ class App(object):
         self.ent_dx_step.config(textvariable=var1)
         self.ent_dy_step.config(textvariable=var2)
 
-        self.ent_dx_step.place(x=20, y=80)
-        self.ent_dy_step.place(x=130, y=80)
-        
+        self.ent_dx_step.place(x=20, y=120)
+        self.ent_dy_step.place(x=130, y=120)
+
+        self.lbl_detec = tk.Label(master=self.frm_mov, width=58, height=1, bg='#2B2B2B', fg='white', text="Sample", justify='left')
+        self.lbl_detec.place(x=22, y=210)
 
         # Smaract Z, Y, T
         self.btn_z_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.z_up)
@@ -190,25 +198,25 @@ class App(object):
         self.btn_t_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.t_down)
         self.btn_t_zero = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="0", justify='left', command=self.t_zero)
         self.btn_t_angle = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="Go", justify='left', command=self.t_angle)
-        self.btn_z_up.place(x=22, y=210)
-        self.btn_z_down.place(x=22, y=320)
-        self.btn_y_up.place(x=132, y=210)
-        self.btn_y_down.place(x=132, y=320)
-        self.btn_t_up.place(x=242, y=210)
-        self.btn_t_down.place(x=242, y=320)
-        self.btn_t_zero.place(x=242, y=360)
-        self.btn_t_angle.place(x=352, y=320)
+        self.btn_z_up.place(x=22, y=250)
+        self.btn_z_down.place(x=22, y=360)
+        self.btn_y_up.place(x=132, y=250)
+        self.btn_y_down.place(x=132, y=360)
+        self.btn_t_up.place(x=242, y=250)
+        self.btn_t_down.place(x=242, y=360)
+        self.btn_t_zero.place(x=242, y=400)
+        self.btn_t_angle.place(x=352, y=360)
 
         positioner_pos   = self.positioner.current_position()
-        self.lbl_z_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[2]) + " m", justify='left')
-        self.lbl_y_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[1]) + " m", justify='left')
-        self.lbl_t_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[3]) + " °", justify='left')
+        self.lbl_z_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="z = " + scripts.number_format(positioner_pos[2]) + " m", justify='left')
+        self.lbl_y_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="y = " + scripts.number_format(positioner_pos[1]) + " m", justify='left')
+        self.lbl_t_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text="θ = " + scripts.number_format(positioner_pos[3]) + " °", justify='left')
         text1  = tk.StringVar(master=self.frm_mov, value='0')
         self.ent_t_angle = tk.Entry(master=self.frm_mov, width=13, bg='#2B2B2B', fg='white', textvariable=text1, justify='center')
-        self.lbl_z_pos.place(x=20, y=250)
-        self.lbl_y_pos.place(x=130, y=250)
-        self.lbl_t_pos.place(x=240, y=250)
-        self.ent_t_angle.place(x=350, y=280)
+        self.lbl_z_pos.place(x=20, y=290)
+        self.lbl_y_pos.place(x=130, y=290)
+        self.lbl_t_pos.place(x=240, y=290)
+        self.ent_t_angle.place(x=350, y=320)
 
         ent_step_values1 = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
         ent_step_values2 = (1, 2, 5, 10, 20, 50)
@@ -222,9 +230,9 @@ class App(object):
         self.ent_y_step.config(textvariable=var2)
         self.ent_t_step.config(textvariable=var3)
 
-        self.ent_z_step.place(x=20, y=280)
-        self.ent_y_step.place(x=130, y=280)
-        self.ent_t_step.place(x=240, y=280)
+        self.ent_z_step.place(x=20, y=320)
+        self.ent_y_step.place(x=130, y=320)
+        self.ent_t_step.place(x=240, y=320)
 
         ### Acquisition
         self.frm_sav = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//2, height=height//2, bg='#202020')
@@ -298,12 +306,12 @@ class App(object):
         else:
             set_eucentric_status = scripts.set_eucentric(self.microscope, self.positioner)
         
-        if set_eucentric_status == 0:
-            self.lbl_eucent.config(bg='green')
-            self.lbl_eucent.update()
-        else:
-            self.lbl_eucent.config(bg='red')
-            self.lbl_eucent.update()
+        # if set_eucentric_status == 0:
+        #     self.lbl_eucent.config(bg='green')
+        #     self.lbl_eucent.update()
+        # else:
+        #     self.lbl_eucent.config(bg='red')
+        #     self.lbl_eucent.update()
         return 0
 
     def zero_eucentric(self):
@@ -531,31 +539,31 @@ class App(object):
        
             try:
                 self.thread_acqui.join()
-                print('Acquisition thread joined')
+                logging.info('Acquisition thread joined')
             except:
                 try:
                     self.thread_tomo.join()
-                    print('Tomography thread joined')
+                    logging.info('Tomography thread joined')
                 except:
-                    print('No thread to join. No acquisition running')
+                    logging.info('No thread to join. No acquisition running')
         
             if self.check1.get() == True:
                 try:
                     self.thread_drift_correction.join()
-                    print('Drift correction thread joined')
+                    logging.info('Drift correction thread joined')
                 except:
                     pass
             else:
-                print('No drift correction to join.')
+                logging.info('No drift correction to join.')
             # if self.check2.get() == True:
             #     try:
             #         self.thread_focus_correction.join()
-            #         print('Focus correction thread joined')
+            #         logging.info('Focus correction thread joined')
             #     except:
             #         pass
             # try:
             #     self.thread_image_fft.join()
-            #     print('FFT thread joined')
+            #     logging.info('FFT thread joined')
             # except:
             #     pass
 
@@ -580,7 +588,7 @@ class App(object):
             self.lbl_y_pos.update()
             if hasattr(self, 'acqui') and self.acqui.flag == 0:
                 self.acqui.flag = 2
-                print('Pause')
+                logging.info('Pause')
         else:
             self.btn_pause.config(text='Pause')
             self.lbl_y_pos.update()

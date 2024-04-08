@@ -1,4 +1,5 @@
 import copy
+import logging
 import numpy as np
 from autoscript_sdb_microscope_client.structures import Point, StagePosition, AdornedImage
 import time
@@ -42,7 +43,7 @@ class FEI_TITAN_ETEM(microscope):
         elif img_unit == 'micrometer':
             self.img_unit = 1e-6
         else:
-            print('Unit not known')
+            logging.info('Unit not known')
         pass
     
     # Stage Position & Move
@@ -69,7 +70,7 @@ class FEI_TITAN_ETEM(microscope):
         #     hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*self.img_unit
         # else:
         hfw = img.GetDimensionScale(0)*img.GetDimensionSize(0)*self.img_unit
-        print(hfw)
+        logging.info(hfw)
         return hfw
             
 
@@ -77,7 +78,7 @@ class FEI_TITAN_ETEM(microscope):
     def magnification(self, value:int=None):
         if value==None:
             return DM.Py_Microscope().GetMagnification()
-        print('Magnification changes are not supported with ETEM')
+        logging.info('Magnification changes are not supported with ETEM')
         return
         return DM.Py_Microscope().SetMagIndex(value)
     
@@ -174,11 +175,11 @@ class FEI_TITAN_ETEM(microscope):
                 if not np.array_equal(img_prev_stamp, img.data[-1,:]):
                     return img
             except:
-                print('error acquire frame')
+                logging.info('error acquire frame')
                 pass
     
     def acquire_multiple_frames(self, resolution=None, dwell_time=None, bit_depth=None):
-        #print('Multiple frames acquisition is not yet implemented')
+        #logging.info('Multiple frames acquisition is not yet implemented')
         return
     
     def image_array(self, image):
@@ -285,22 +286,22 @@ class FEI_QUATTRO_ESEM(microscope):
             if limit_x_min < x < limit_x_max and limit_y_min < y < limit_y_max:
                 shift = Point(x, y)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
-                print('Only beam shift')
+                logging.info('Only beam shift')
                 return
             elif -limits_extra < y < limits_extra:
                 self.quattro.imaging.stop_acquisition()
-                print('current_position', self.current_position())
-                print('value_x', value_x)
+                logging.info('current_position', self.current_position())
+                logging.info('value_x', value_x)
                 self.relative_move(-x, -y)
-                print('current_position', self.current_position())
+                logging.info('current_position', self.current_position())
                 shift = Point(0, 0)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
                 time.sleep(1)
                 self.quattro.imaging.start_acquisition()
-                print('Beam shift + stage')
+                logging.info('Beam shift + stage')
                 return
             else:
-                print('Beam shift out of range. Actual shift y + value = ', y)
+                logging.info('Beam shift out of range. Actual shift y + value = ', y)
                 return
         else:
             if limit_x_min < value_x < limit_x_max and limit_y_min < value_y < limit_y_max:
@@ -314,10 +315,10 @@ class FEI_QUATTRO_ESEM(microscope):
                 self.quattro.beams.electron_beam.beam_shift.value = shift
                 time.sleep(1)
                 self.quattro.imaging.start_acquisition()
-                print('Beam shift + stage')
+                logging.info('Beam shift + stage')
                 return
             else:
-                print('Beam shift out of range')
+                logging.info('Beam shift out of range')
                 return
             
     # Imaging
@@ -356,7 +357,7 @@ class FEI_QUATTRO_ESEM(microscope):
                 if not np.array_equal(img_prev_stamp, img.data[-1,:]):
                     return img
             except:
-                print('Error acquiring frame')
+                logging.info('Error acquiring frame')
                 pass
     
     def acquire_multiple_frames(self, resolution='1536x1024', dwell_time=1e-6, bit_depth=16, windows='123'):        
@@ -456,9 +457,9 @@ class SMARACT_MCS_3D(microscope):
 if __name__ == "__main__":
     device = SMARACT_MCS_3D()
     device.import_package_and_connexion()
-    print(device.current_position())
+    logging.info(device.current_position())
     # device.relative_move(da=10)
-    # print(device.current_position())
+    # logging.info(device.current_position())
     # time.sleep(2)
     device.absolute_move(y=0, z=0, a=0)
-    print(device.current_position())
+    logging.info(device.current_position())

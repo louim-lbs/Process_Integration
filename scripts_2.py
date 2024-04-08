@@ -131,13 +131,13 @@ def find_ellipse(img, save=False):
         ind = np.argmax([len(cont) for cont in contours])
         contours = contours[:ind] + contours[ind+1:]
         if len(contours) == 0:
-            s_print('no contour found')
+            logging.info('no contour found')
             return ((0, 0), (0, 0), 0)
         ind = np.argmax([len(cont) for cont in contours])
 
         cont = contours[ind]
         if len(cont) < 5:
-            s_print('len contour < 5', len(contours))
+            logging.info('len contour < 5', len(contours))
             if save:
                 plt.imshow(img)
             pass
@@ -166,7 +166,7 @@ def find_ellipse(img, save=False):
             plt.clf()  # Clear the plot
         return elps
     else:
-        s_print('no contour found')
+        logging.info('no contour found')
         if save:
             plt.imshow(img, 'gray')
     return ((0, 0), (0, 0), 0)  # Return a default ellipse if no contour is found
@@ -227,8 +227,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
     z0_calc, y0_calc, R_calc = res
     stdevs           = np.sqrt(np.diag(cov))
 
-    logging.info('z0 =' + str(z0_calc) + '+-' + str(stdevs[0]) + 'y0 = ' + str(-direction*y0_calc) + '+-' + str(stdevs[1]))# + 'R = ' + str(R_calc) + '+-' + str(stdevs[2]) + 'x2 = ' + str(x2_calc) + '+-' + str(stdevs[3]) + 'x3 = ' + str(x3_calc) + '+-' + str(stdevs[4]))
-    s_print('z0 =', z0_calc, 'y0 = ', -direction*y0_calc)
+    logging.info('z0 =' + number_format(z0_calc) + '+-' + number_format(stdevs[0]) + 'y0 = ' + number_format(-direction*y0_calc) + '+-' + number_format(stdevs[1]))# + 'R = ' + number_format(R_calc) + '+-' + number_format(stdevs[2]) + 'x2 = ' + number_format(x2_calc) + '+-' + number_format(stdevs[3]) + 'x3 = ' + number_format(x3_calc) + '+-' + number_format(stdevs[4]))
     
     plt.plot([i/pas for i in angle_sort], [i[1]-offset for i in displacement], 'green')
     plt.plot(alpha, displacement_y_interpa, 'blue')
@@ -251,11 +250,7 @@ def correct_eucentric(microscope, positioner, displacement, angle):
         microscope.focus(z0_calc, 'rel')
         plt.plot(alpha, displacement_y_interpa, 'blue')
         plt.show()
-        #####################
-        #####################
-        #####################
     plt.clf()
-    
 
 def match(image_master, image_template, grid_size = 3, ratio_template_master = 0.9, ratio_master_template_patch = 0, speed_factor = 0, resize_factor = 1):
     ''' Match two images
@@ -329,7 +324,7 @@ def match(image_master, image_template, grid_size = 3, ratio_template_master = 0
     # t_match = t_match/(grid_size**2)
     # t_calc = t_calc/(grid_size**2)
     # t_append = t_append/(grid_size**2)
-    #print('t_temp', t_temp, 't_match', t_match, 't_calc', t_calc, 't_append', t_append)
+    #logging.info('t_temp' +  t_temp +  't_match' +  t_match +  't_calc' +  t_calc +  't_append' +  t_append)
 
     corr_trust_x          = np.delete(corr_trust, 0)
     corr_trust_y          = deepcopy(corr_trust_x)
@@ -422,7 +417,7 @@ def match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_fac
         M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
         disp = cv.perspectiveTransform(np.float32([[0,0]]).reshape(-1,1,2),M)/resize_factor
     else:
-        print('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
+        logging.info('Not enough match to perform homography: only ' + str(len(good)) + ' matches.')
         return 0, 0
     
     matchesMask = mask.ravel().tolist()
@@ -524,11 +519,11 @@ def set_eucentric(microscope, positioner) -> int:
     '''
     x0, y0, z0, a0, _ = positioner.current_position()
     if z0 == None or y0 == None or a0 == None:
-        s_print('Error. Positioner is not initialized.')
+        logging.info('Error. Positioner is not initialized.')
         return 1
     
     angle_step      =  1  # °
-    angle_max       = 20  # °
+    angle_max       = 10  # °
     precision       = 5   # pixels
     eucentric_error = 0
     resolution      = "512x442" # Bigger pixels means less noise and better match
@@ -566,8 +561,9 @@ def set_eucentric(microscope, positioner) -> int:
     hfw = microscope.horizontal_field_view() # meters
 
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
-        s_print(       'eucentric_error =', number_format(eucentric_error), 'precision =', number_format(precision), 'current angle =', number_format(positioner.current_position()[3]), 'angle_max =', number_format(angle_max))
-        
+        msg = str('eucentric_error =' + number_format(eucentric_error) + 'precision =' + number_format(precision) + 'current angle =' + number_format(positioner.current_position()[3]) + 'angle_max =' + number_format(angle_max))
+        logging.info(msg)
+
         img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
         image_euc[1] = microscope.image_array(img_tmp)
     
@@ -585,7 +581,8 @@ def set_eucentric(microscope, positioner) -> int:
         dx_si = dx_pix*hfw/image_width
         dy_si = dy_pix*hfw/image_width
 
-        s_print(       'dx_pix, dy_pix', number_format(dx_pix), number_format(dy_pix), 'dx_si, dy_si', number_format(dx_si), number_format(dy_si))
+        msg = str('dx_pix, dy_pix' + number_format(dx_pix) + number_format(dy_pix) + 'dx_si, dy_si' + number_format(dx_si) + number_format(dy_si))
+        logging.info(msg)
 
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.current_position()[3])
@@ -601,7 +598,7 @@ def set_eucentric(microscope, positioner) -> int:
             positioner.absolute_move(ixe, ygrec, zed, 0, 0)
             
             displacement  = [[0,0]]
-            angle           = [positioner.current_position()[3]]
+            angle = [positioner.current_position()[3]]
             eucentric_error = 0
             
             if microscope.microscope_type == 'ESEM':
@@ -635,7 +632,7 @@ def set_eucentric(microscope, positioner) -> int:
     ixe, ygrec, zed, _, _ = positioner.current_position()
     positioner.absolute_move(ixe, ygrec, zed, 0, 0)
     # logging.info('Done eucentrixx')
-    s_print(       'Done eucentrixx')
+    logging.info(       'Done eucentrixx')
     copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
     return 0
 
@@ -655,7 +652,7 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
     '''
     x0, y0, z0, a0, _ = positioner.current_position()
     if z0 == None or y0 == None or a0 == None:
-        s_print('Error. Positioner is not initialized.')
+        logging.info('Error. Positioner is not initialized.')
         return 1
     
     angle_step0     =  1
@@ -675,9 +672,7 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
     positioner.absolute_move(x0, y0, z0, -angle_step, 0)
     positioner.absolute_move(x0, y0, z0, 0, 0)
     microscope.start_acquisition()
-    print('1')
     img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
-    print('2')
     image_euc[0] = microscope.image_array(img_tmp)
     path = 'data/tmp/' + str(round(time.time(),1)) + 'img_' + str(round(positioner.current_position()[3])/1000000)
     microscope.save(img_tmp, path)
@@ -687,7 +682,7 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
     
     while abs(eucentric_error) > precision or positioner.current_position()[3] < angle_max:
                 
-        s_print(       'eucentric_error =', number_format(eucentric_error), 'precision =', number_format(precision), 'current angle =', number_format(positioner.current_position()[3]), 'angle_max =', number_format(angle_max))
+        logging.info('eucentric_error =' + number_format(eucentric_error) + 'precision =' + number_format(precision) + 'current angle =' + number_format(positioner.current_position()[3]) + 'angle_max =' + number_format(angle_max))
         
         img_tmp      = microscope.acquire_frame(resolution, dwell_time, bit_depth)
         image_euc[1] = microscope.image_array(img_tmp)
@@ -702,7 +697,7 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
         dx_si = dx_pix*hfw/image_height
         dy_si = dy_pix*hfw/image_width
 
-        s_print(       'dx_pix, dy_pix', number_format(dx_pix), number_format(dy_pix), 'dx_si, dy_si', number_format(dx_si), number_format(dy_si))
+        logging.info('dx_pix, dy_pix' + number_format(dx_pix) + number_format(dy_pix) + 'dx_si, dy_si' + number_format(dx_si) + number_format(dy_si))
 
         displacement.append([displacement[-1][0] + dx_si, displacement[-1][1] + dy_si])
         angle.append(positioner.current_position()[3])
@@ -715,7 +710,7 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
         if abs(positioner.current_position()[3]) >= angle_max - 0.01: # 0.010000 degree of freedom
             '''If out of the angle range'''
             correct_eucentric(microscope, positioner, displacement, angle)
-            s_print(       'Start again with negative angles')
+            logging.info('Start again with negative angles')
             
             displacement  = [[0,0]]
             ixe, ygrec, zed, _, _ = positioner.current_position()
@@ -743,8 +738,7 @@ def set_eucentric_ETEM(microscope, positioner) -> int:
 
     ixe, ygrec, zed, _, _ = positioner.current_position()
     positioner.absolute_move(ixe, ygrec, zed, 0, 0)
-    # logging.info('Done eucentrixx')
-    s_print(       'Done eucentrixx')
+    logging.info('Done eucentrixx')
     copyfile('last_execution.log', 'data/tmp/log' + str(time.time()) + '.txt')
     return 0
 
@@ -758,7 +752,7 @@ def absolute_move_with_autocorrect(positioner, y, z, a):
     increment = 100e-6
     i = 0
     while (alpha2 < a-0.1 or alpha2 > a+0.1) and abs(i*increment) < 0.003:
-        print("Autocorrecting")
+        logging.info("Autocorrecting")
         positioner.absolute_move(y=y, z=z - i*increment, a=alpha2)
         positioner.absolute_move(y=y, z=z - i*increment, a=a)
         _, _, zed, alpha2, _ = positioner.current_position()
@@ -819,7 +813,7 @@ class acquisition(object):
             self.dtype_number = 255
 
         self.path = work_folder + images_name + '_' + str(round(time.time())) + '_res_' + str(resolution) + '_dw_' + str(dwell_time) + 's_stp' + str(tilt_increment) + '_dri_' + str(drift_correction) + '_foc_' + str(focus_correction)
-        print('path = ', self.path)
+        logging.info('path = ' + self.path)
         os.makedirs(self.path, exist_ok=True)
 
     def set_eucentric_test(self) -> int:
@@ -856,7 +850,7 @@ class acquisition(object):
                 self.tilt_end *= -1
 
         nb_images = int((abs(self.pos[3])+abs(self.tilt_end))/self.tilt_increment + 1)
-        s_print('Number of images', nb_images)
+        logging.info('Number of images' + number_format(nb_images))
 
         if self.microscope.microscope_type == 'ESEM':
             self.microscope.tilt_correction(ONOFF=True)
@@ -872,7 +866,7 @@ class acquisition(object):
             
             tangle = self.positioner.current_position()[3]
             
-            s_print('Image {} / {}. Current tilt angle = {}'.format(i, nb_images, number_format(tangle)))
+            logging.info('Image {} / {}. Current tilt angle = {}'.format(i, nb_images, number_format(tangle)))
             
             if self.microscope.microscope_type == 'ESEM':
                 self.microscope.tilt_correction(value = -tangle*np.pi/180) # Tilt correction for e- beam
@@ -894,7 +888,7 @@ class acquisition(object):
         self.c.notify_all()
         self.c.release()    
         self.flag = 1
-        s_print('Tomography is a Success')
+        logging.info('Tomography is a Success')
         return 0
 
     def f_drift_correction(self):
@@ -912,13 +906,13 @@ class acquisition(object):
             # resize = -1
             # resize_factor = 1
             resize_factor = resize/float(self.image_width)
-            print('resize_factor = ', resize_factor)
+            logging.info('resize_factor = ' + number_format(resize_factor))
         else:
             resize = -1
             resize_factor = 1                      
 
         # hfw = self.microscope.horizontal_field_view()
-        # print('hfw = ', hfw)
+        # logging.info('hfw = ', number_format(hfw))
 
         while True:
             if self.flag == 1:
@@ -941,20 +935,20 @@ class acquisition(object):
                 img_prev  = self.microscope.load(self.path + '/' + img_prev_path)
                 if self.square_area == True:
                     image_width, image_height = int(self.image_width), int(self.image_height)
-                    print('image_width = ', image_width)
-                    print('image_height = ', image_height)
+                    logging.info('image_width = ' + number_format(image_width))
+                    logging.info('image_height = ' + number_format(image_height))
                     dim_max = max(image_width, image_height)
                     dim_min = min(image_width, image_height)
-                    print('dim_max = ', dim_max)
-                    print('dim_min = ', dim_min)
+                    logging.info('dim_max = ' + number_format(dim_max))
+                    logging.info('dim_min = ' + number_format(dim_min))
                     img_prev = img_prev[0:dim_min, (dim_max - dim_min)//2:(dim_max + dim_min)//2]
-                    print(0,dim_min, (dim_max - dim_min)//2,(dim_max + dim_min)//2)
+                    logging.info(0,dim_min, (dim_max - dim_min)//2,(dim_max + dim_min)//2)
                     hfw = hfw*dim_min/dim_max
                 img_master, mid_strips_master = remove_strips(self.microscope, img_prev, self.dwell_time)
                 kp2, des2 = match_by_features_SIFT_create(self.microscope, img_master, mid_strips_master, resize_factor)
                 self.c.notify_all()
                 self.c.wait()
-                print('hfw = ', hfw)
+                logging.info('hfw = ' + number_format(hfw))
                 continue
             
             beam_shift_actual = self.microscope.beam_shift()
@@ -966,7 +960,7 @@ class acquisition(object):
 
             kp1, des1 = match_by_features_SIFT_create(self.microscope, img_template, mid_strips_template, resize_factor)
             
-            print('mid_strips_master', 'mid_strips_template', mid_strips_master, mid_strips_template)
+            logging.info('mid_strips_master' + 'mid_strips_template' + number_format(mid_strips_master) + number_format(mid_strips_template))
             dx_pix, dy_pix = match_by_features(img_template, img_master, kp1, des1, kp2, des2, resize_factor, mid_strips_template, mid_strips_master, path = self.path)
             # blob_x_pix, blob_y_pix = blob_detection(img_template, mid_strips_template, resize_factor)
             blob_x_pix = 0
@@ -983,9 +977,9 @@ class acquisition(object):
             # elif self.microscope.microscope_type == 'ESEM':
             #     beam_shift_difference[0] *= -1
             #     beam_shift_difference[1] *= -1
-            print('beam shift prev', beam_shift_previous)
-            print('beam shift act', beam_shift_actual)
-            print('beam shift diff', beam_shift_difference)
+            logging.info('beam shift prev' + number_format(beam_shift_previous))
+            logging.info('beam shift act' + number_format(beam_shift_actual))
+            logging.info('beam shift diff' + number_format(beam_shift_difference))
     
             dx_si                    =   dx_pix * hfw / int(self.image_width) - beam_shift_difference[0]
             dy_si                    =   dy_pix * hfw / int(self.image_height) - beam_shift_difference[1]
@@ -997,23 +991,23 @@ class acquisition(object):
             anticipation_x          +=   correction_x #- blob_x_si
             anticipation_y          +=   correction_y #- blob_y_si
             
-            #print('blob_x', 'blob_y', blob_x_pix, blob_y_pix)
+            #logging.info('blob_x', 'blob_y', blob_x_pix, blob_y_pix)
             
             if (dx_pix != 0 and dy_pix != 0): #or (blob_x_pix != 0 and blob_y_pix != 0):
                 if (dx_pix < image_width and dy_pix < image_height):
                     value_x = correction_x + anticipation_x
                     value_y = correction_y + anticipation_y
-                    print('dx_pix', number_format(dx_pix), 'dy_pix', number_format(dy_pix))
-                    print('dx_si', number_format(dx_si), 'dy_si', number_format(dy_si))
-                    print('value_x, value_y', number_format(value_x), number_format(value_y))
+                    logging.info('dx_pix' + number_format(dx_pix) + 'dy_pix' + number_format(dy_pix))
+                    logging.info('dx_si' + number_format(dx_si) + 'dy_si' + number_format(dy_si))
+                    logging.info('value_x, value_y' + number_format(value_x) + number_format(value_y))
                     
                     if self.microscope.microscope_type == 'ESEM':
                         self.microscope.beam_shift(value_x, value_y, mode = 'rel')
                     else:
                         self.microscope.beam_shift(value_x, -value_y, mode = 'rel')
-                    print('Correction Done')
+                    logging.info('Correction Done')
                 else:
-                    print('/!\ Drift is not correctly handled!')
+                    logging.info('/!\ Drift is not correctly handled!')
             else:
                 value_x, value_y = 0, 0
             
@@ -1129,7 +1123,7 @@ class acquisition(object):
         i = 0
         
         while True:
-            print('Image ' + str(i))
+            logging.info('Image ' + str(i))
             if self.flag == 1:
                 self.c.notify_all()
                 self.c.release()

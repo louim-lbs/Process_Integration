@@ -1,3 +1,4 @@
+import logging
 import sys
 import smaract.ctl as ctl
 import ctypes
@@ -7,11 +8,11 @@ vector = List[int]
 class smaract_class(object):
     def __init__(self) -> None:
         try:
-            print('Initialization...')
+            logging.info('Initialization...')
             locator = "usb:ix:0"
             self.d_handle = None
             self.d_handle = ctl.Open(locator)
-            print("MCS2 opened {}.".format(locator))
+            logging.info("MCS2 opened {}.".format(locator))
             
             self.range_limits = {'z_min': -19000000,
                                 'z_max': 19000000,
@@ -26,7 +27,7 @@ class smaract_class(object):
             self.InitState_status = 0
         except Exception as ex:
             self.InitState_status = 1
-            print("Unexpected error: {}, {} in line: {}".format(ex, type(ex), (sys.exc_info()[-1].tb_lineno)))
+            logging.info("Unexpected error: {}, {} in line: {}".format(ex, type(ex), (sys.exc_info()[-1].tb_lineno)))
             raise
         return None
 
@@ -93,7 +94,7 @@ class smaract_class(object):
             y_pos = ctl.GetProperty_i64(self.d_handle, 2, ctl.Property.POSITION)*1e-3
             t_angle = ctl.GetProperty_i64(self.d_handle, 0, ctl.Property.POSITION)*1e-3
         except:
-            print('Error when acquiring positions')
+            logging.info('Error when acquiring positions')
             return [None, None, None]
         return [z_pos, y_pos, t_angle]
     
@@ -102,7 +103,7 @@ class smaract_class(object):
             dx_pos = ctl.GetProperty_i64(self.d_handle, 3, ctl.Property.POSITION)*1e-3
             dy_pos = ctl.GetProperty_i64(self.d_handle, 4, ctl.Property.POSITION)*1e-3
         except:
-            print('Error when acquiring positions')
+            logging.info('Error when acquiring positions')
             return [None, None]
         return [dx_pos, dy_pos]
     
@@ -123,10 +124,10 @@ class smaract_class(object):
             # if None in self.getpos():
             #     return 1
             if not self.check_limits(pos):
-                print('Position out of range')
+                logging.info('Position out of range')
                 return 1
         except:
-            print('Error when checking limits')
+            logging.info('Error when checking limits')
             return 1        
         
         try:
@@ -137,7 +138,7 @@ class smaract_class(object):
             ctl.Move(self.d_handle, 2, int(pos[1]*1e3), 0)
             ctl.Move(self.d_handle, 0, int(pos[2]*1e3), 0)
         except:
-            print('Error when setting absolute position.')
+            logging.info('Error when setting absolute position.')
             return 1
         
         # z_status_status, y_status_status, t_status_status = self.hold_during_move()
@@ -147,25 +148,25 @@ class smaract_class(object):
 
         if hold == True:
             self.hold_during_move()
-            print('Position set at: ' + str([pos[0], pos[1], pos[2]]))
+            logging.info('Position set at: ' + str([pos[0], pos[1], pos[2]]))
         else:
-            print('Position set at: ' + str([pos[0], pos[1], pos[2]]))
+            logging.info('Position set at: ' + str([pos[0], pos[1], pos[2]]))
         return 0
     
     def detector_setpos_abs(self, pos:vector, hold=True) -> int:
         try:
             if not self.check_limits_detector(pos):
-                print('Position out of range')
+                logging.info('Position out of range')
                 return 1
         except:
-            print('Error when checking limits')
+            logging.info('Error when checking limits')
             return 1        
         
         try:
             ctl.Move(self.d_handle, 3, int(pos[0]*1e3), 0)
             ctl.Move(self.d_handle, 4, int(pos[1]*1e3), 0)
         except:
-            print('Error when setting absolute position.')
+            logging.info('Error when setting absolute position.')
             return 1
         
         # z_status_status, y_status_status, t_status_status = self.hold_during_move()
@@ -175,9 +176,9 @@ class smaract_class(object):
 
         if hold == True:
             self.hold_during_move()
-            print('Position set at: ' + str([pos[0], pos[1]]))
+            logging.info('Position set at: ' + str([pos[0], pos[1]]))
         else:
-            print('Position set at: ' + str([pos[0], pos[1]]))
+            logging.info('Position set at: ' + str([pos[0], pos[1]]))
         return 0
     
     def setpos_rel(self, step:vector, hold=True) -> int:
@@ -198,11 +199,11 @@ class smaract_class(object):
         
         try:
             if not self.check_limits(pos2):
-                print(pos2)
-                print('Position out of range')
+                logging.info(pos2)
+                logging.info('Position out of range')
                 return 1
         except:
-            print('Error when checking limits')
+            logging.info('Error when checking limits')
             return 1
     
         try:
@@ -210,14 +211,14 @@ class smaract_class(object):
             ctl.Move(self.d_handle, 2, int(pos2[1]*1e3), 0)
             ctl.Move(self.d_handle, 0, int(pos2[2]*1e3), 0)
         except:
-            print('Error when setting relative position.')
+            logging.info('Error when setting relative position.')
             return 1
 
         if hold == True:
             self.hold_during_move()
-            print('Position increased of: ' + str([step[0], step[1], step[2]]))
+            logging.info('Position increased of: ' + str([step[0], step[1], step[2]]))
         else:
-            print('Position increasing of: ' + str([step[0], step[1], step[2]]))
+            logging.info('Position increasing of: ' + str([step[0], step[1], step[2]]))
         return 0
     
     def detector_setpos_rel(self, step:vector, hold=True) -> int:
@@ -226,33 +227,33 @@ class smaract_class(object):
         
         try:
             if not self.check_limits_detector(pos2):
-                print(pos2)
-                print('Position out of range')
+                logging.info(pos2)
+                logging.info('Position out of range')
                 return 1
         except:
-            print('Error when checking limits')
+            logging.info('Error when checking limits')
             return 1
     
         try:
             ctl.Move(self.d_handle, 3, int(pos2[0]*1e3), 0)
             ctl.Move(self.d_handle, 4, int(pos2[1]*1e3), 0)
         except:
-            print('Error when setting relative position.')
+            logging.info('Error when setting relative position.')
             return 1
 
         if hold == True:
             self.hold_during_move()
-            print('Position increased of: ' + str([step[0], step[1]]))
+            logging.info('Position increased of: ' + str([step[0], step[1]]))
         else:
-            print('Position increasing of: ' + str([step[0], step[1]]))
+            logging.info('Position increasing of: ' + str([step[0], step[1]]))
         return 0
     
     def set_zero_position(self, channel):
         ctl.SetProperty_i64(self.d_handle, channel, ctl.Property.POSITION, 0)
     
 if __name__ == "__main__":
-    # logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=print)
+    logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=print)
     device = smaract_class()
-    print(device.detector_getpos())
+    logging.info(device.detector_getpos())
     # device.setpos_rel([0, 0, -10000000])
     

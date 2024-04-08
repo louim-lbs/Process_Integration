@@ -46,11 +46,10 @@ def on_closing():
         microscope.beam_shift(0, 0)
     except:
         pass
-    print('Python closed')
+    logging.info('Python closed')
     root.destroy()  # Destroy the GUI window
     exit(0)  # Exit the Python script
 
 root = GUI.tk.Tk()  # Create the main GUI window
 GUI.App(root, microscope, positioner)  # Initialize the application with the microscope and positioner objects
-root.protocol("WM_DELETE_WINDOW", on_closing)  # Call on_closing() when the GUI window is closed
 root.mainloop()  # Start the main event loop for the GUI

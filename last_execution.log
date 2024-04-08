@@ -1,0 +1,45 @@
+INFO:Initialization...
+INFO:MCS2 opened usb:ix:0.
+INFO:Position increased of: [100000.0, 0.0]
+INFO:Position increased of: [-100000.0, 0.0]
+INFO:Position increased of: [100000.0, 0.0]
+INFO:Position increased of: [-100000.0, 0.0]
+INFO:Position increased of: [100000.0, 0.0]
+INFO:Position increased of: [0.0, -100000.0]
+INFO:Position increased of: [0.0, -100000.0]
+INFO:Position increased of: [0.0, -100000.0]
+INFO:Position set at: [2.279, 4.26, 0.0]
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =0.00e+00precision =5.00e+00current angle =1.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix3.00e+00-3.30e+01dx_si, dy_si4.96e-07-5.46e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =3.30e+01precision =5.00e+00current angle =2.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix0.00e+00-4.90e+01dx_si, dy_si0.00e+00-8.10e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =8.20e+01precision =5.00e+00current angle =3.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix0.00e+00-5.50e+01dx_si, dy_si0.00e+00-9.10e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =1.37e+02precision =5.00e+00current angle =4.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix2.00e+00-3.60e+01dx_si, dy_si3.31e-07-5.95e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =1.73e+02precision =5.00e+00current angle =5.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix1.00e+00-5.20e+01dx_si, dy_si1.65e-07-8.60e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =2.25e+02precision =5.00e+00current angle =6.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix0.00e+00-4.20e+01dx_si, dy_si0.00e+00-6.95e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =2.67e+02precision =5.00e+00current angle =7.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix0.00e+00-4.50e+01dx_si, dy_si0.00e+00-7.44e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =3.12e+02precision =5.00e+00current angle =8.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix1.00e+00-4.40e+01dx_si, dy_si1.65e-07-7.28e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =3.56e+02precision =5.00e+00current angle =9.00e+00angle_max =1.00e+01
+INFO:dx_pix, dy_pix0.00e+00-4.00e+01dx_si, dy_si0.00e+00-6.61e-06
+INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:eucentric_error =3.96e+02precision =5.00e+00current angle =1.00e+01angle_max =1.00e+01
+INFO:dx_pix, dy_pix0.00e+00-4.60e+01dx_si, dy_si0.00e+00-7.61e-06
+INFO:displacement[[0, 0], [4.9609375e-07, -5.45703125e-06], [4.9609375e-07, -1.3559895833333333e-05], [4.9609375e-07, -2.2654947916666666e-05], [8.268229166666667e-07, -2.8608072916666667e-05], [9.921875e-07, -3.720703125e-05], [9.921875e-07, -4.415234375e-05], [9.921875e-07, -5.1593750000000004e-05], [1.1575520833333334e-06, -5.886979166666667e-05], [1.1575520833333334e-06, -6.5484375e-05], [1.1575520833333334e-06, -7.309114583333333e-05]]
+INFO:angle[0, 1.000044812, 2.0000341109999997, 3.000040131, 4.000033857, 5.0000218169999995, 6.000018980999999, 7.000027888, 8.000014108, 9.000015826999999, 10.000011981]
+INFO:direction1
+INFO:z0 =-4.37e-04+-1.48e-05y0 = -1.37e-04+-1.68e-04
