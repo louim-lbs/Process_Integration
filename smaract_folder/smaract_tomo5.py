@@ -14,11 +14,15 @@ class smaract_class(object):
             print("MCS2 opened {}.".format(locator))
             
             self.range_limits = {'z_min': -19000000,
-                                'z_max':   19000000,
-                                'y_min':  -19000000,
-                                'y_max':   19000000,
+                                'z_max': 19000000,
+                                'y_min': -19000000,
+                                'y_max': 19000000,
                                 't_min': -900000000,
-                                't_max':  900000000}
+                                't_max': 900000000,
+                                'dx_min': -19000000,
+                                'dx_max': 19000000,
+                                'dy_min': -19000000,
+                                'dy_max': 19000000,}
             self.InitState_status = 0
         except Exception as ex:
             self.InitState_status = 1
@@ -45,6 +49,12 @@ class smaract_class(object):
         else:
             return False
     
+    def check_limits_detector(self, pos:vector) -> bool:
+        if (self.range_limits['dx_min'] <= pos[0] <= self.range_limits['dx_max']) and (self.range_limits['dy_min'] <= pos[1] <= self.range_limits['dy_max']):
+            return True
+        else:
+            return False
+        
     def hold_during_move(self) -> ctypes.c_uint32:
         ''' Hold instruction flow during movement of positioners.
 
@@ -80,12 +90,21 @@ class smaract_class(object):
         '''
         try:
             z_pos = ctl.GetProperty_i64(self.d_handle, 1, ctl.Property.POSITION)*1e-3
-            y_pos =ctl.GetProperty_i64(self.d_handle, 2, ctl.Property.POSITION)*1e-3
+            y_pos = ctl.GetProperty_i64(self.d_handle, 2, ctl.Property.POSITION)*1e-3
             t_angle = ctl.GetProperty_i64(self.d_handle, 0, ctl.Property.POSITION)*1e-3
         except:
             print('Error when acquiring positions')
             return [None, None, None]
         return [z_pos, y_pos, t_angle]
+    
+    def detector_getpos(self) -> vector:
+        try:
+            dx_pos = ctl.GetProperty_i64(self.d_handle, 3, ctl.Property.POSITION)*1e-3
+            dy_pos = ctl.GetProperty_i64(self.d_handle, 4, ctl.Property.POSITION)*1e-3
+        except:
+            print('Error when acquiring positions')
+            return [None, None]
+        return [dx_pos, dy_pos]
     
     def setpos_abs(self, pos:vector, hold=True) -> int:
         ''' Move the nanocontrollers from Smaract device (Z, Y and T channels) to desired absolute [z, y, t] position.
@@ -133,6 +152,34 @@ class smaract_class(object):
             print('Position set at: ' + str([pos[0], pos[1], pos[2]]))
         return 0
     
+    def detector_setpos_abs(self, pos:vector, hold=True) -> int:
+        try:
+            if not self.check_limits_detector(pos):
+                print('Position out of range')
+                return 1
+        except:
+            print('Error when checking limits')
+            return 1        
+        
+        try:
+            ctl.Move(self.d_handle, 3, int(pos[0]*1e3), 0)
+            ctl.Move(self.d_handle, 4, int(pos[1]*1e3), 0)
+        except:
+            print('Error when setting absolute position.')
+            return 1
+        
+        # z_status_status, y_status_status, t_status_status = self.hold_during_move()
+
+        # if self.check_status([z_status_status, y_status_status, t_status_status]) == 1:
+        #     return 1
+
+        if hold == True:
+            self.hold_during_move()
+            print('Position set at: ' + str([pos[0], pos[1]]))
+        else:
+            print('Position set at: ' + str([pos[0], pos[1]]))
+        return 0
+    
     def setpos_rel(self, step:vector, hold=True) -> int:
         ''' Move the nanocontrollers from Smaract device (Z, Y and T channels) to desired relative [z, y, t] position.
 
@@ -173,12 +220,39 @@ class smaract_class(object):
             print('Position increasing of: ' + str([step[0], step[1], step[2]]))
         return 0
     
+    def detector_setpos_rel(self, step:vector, hold=True) -> int:
+        pos1 = self.detector_getpos()
+        pos2 = [pos1[0] + step[0], pos1[1] + step[1]]
+        
+        try:
+            if not self.check_limits_detector(pos2):
+                print(pos2)
+                print('Position out of range')
+                return 1
+        except:
+            print('Error when checking limits')
+            return 1
+    
+        try:
+            ctl.Move(self.d_handle, 3, int(pos2[0]*1e3), 0)
+            ctl.Move(self.d_handle, 4, int(pos2[1]*1e3), 0)
+        except:
+            print('Error when setting relative position.')
+            return 1
+
+        if hold == True:
+            self.hold_during_move()
+            print('Position increased of: ' + str([step[0], step[1]]))
+        else:
+            print('Position increasing of: ' + str([step[0], step[1]]))
+        return 0
+    
     def set_zero_position(self, channel):
         ctl.SetProperty_i64(self.d_handle, channel, ctl.Property.POSITION, 0)
     
 if __name__ == "__main__":
     # logging.basicConfig(filename='last_execution.log', filemode='w', format='%(levelname)s:%(message)s', level=print)
     device = smaract_class()
-    print(device.getpos())
-    device.setpos_rel([0, 0, -10000000])
+    print(device.detector_getpos())
+    # device.setpos_rel([0, 0, -10000000])
     

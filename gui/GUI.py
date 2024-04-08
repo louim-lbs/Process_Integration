@@ -152,21 +152,21 @@ class App(object):
         # Microscope
         
         # Smaract Detectors X, Y
-        self.btn_dx_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dx_up)
+        self.btn_dx_up = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dx_up)
         self.btn_dx_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.dx_down)
-        self.btn_y_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dy_up)
-        self.btn_y_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.dy_down)
+        self.btn_dy_up = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dy_up)
+        self.btn_dy_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.dy_down)
 
-        self.btn_dx_up.place(x=22, y=50)
-        self.btn_dx_down.place(x=22, y=160)
-        self.btn_dy_up.place(x=132, y=50)
-        self.btn_dy_down.place(x=132, y=160)
+        self.btn_dx_up.place(x=22, y=10)
+        self.btn_dx_down.place(x=22, y=120)
+        self.btn_dy_up.place(x=132, y=10)
+        self.btn_dy_down.place(x=132, y=120)
 
-        positioner_pos   = self.positioner.current_position()
-        self.lbl_dx_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[2]) + " m", justify='left')
-        self.lbl_dy_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[1]) + " m", justify='left')
-        self.lbl_dx_pos.place(x=20, y=90)
-        self.lbl_dx_pos.place(x=130, y=90)
+        positioner_pos_detector = self.positioner.current_detector_position()
+        self.lbl_dx_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos_detector[0]) + " m", justify='left')
+        self.lbl_dy_pos = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos_detector[1]) + " m", justify='left')
+        self.lbl_dx_pos.place(x=20, y=50)
+        self.lbl_dy_pos.place(x=130, y=50)
 
         ent_step_values1 = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
         ent_step_values2 = (1, 2, 5, 10, 20, 50)
@@ -175,10 +175,10 @@ class App(object):
         self.ent_dx_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
         self.ent_dy_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
         self.ent_dx_step.config(textvariable=var1)
-        self.ent_d_step.config(textvariable=var2)
+        self.ent_dy_step.config(textvariable=var2)
 
-        self.ent_dx_step.place(x=20, y=120)
-        self.ent_dy_step.place(x=130, y=120)
+        self.ent_dx_step.place(x=20, y=80)
+        self.ent_dy_step.place(x=130, y=80)
         
 
         # Smaract Z, Y, T
@@ -338,9 +338,21 @@ class App(object):
         return 0
 
     def dx_up(self):
+        step = float(self.ent_dx_step.get())
+        status = self.positioner.relative_detector_move(step, 0)
+        if status != 0:
+            return 1
+        self.lbl_dx_pos.config(text=scripts.number_format(self.positioner.current_detector_position()[0]) + ' m')
+        self.lbl_dx_pos.update()
         return 0
     
     def dy_up(self):
+        step = float(self.ent_dy_step.get())
+        status = self.positioner.relative_detector_move(0, step)
+        if status != 0:
+            return 1
+        self.lbl_dy_pos.config(text=scripts.number_format(self.positioner.current_detector_position()[1]) + ' m')
+        self.lbl_dy_pos.update()
         return 0
 
     def t_up(self):
@@ -372,9 +384,21 @@ class App(object):
         return 0
 
     def dx_down(self):
+        step = float(self.ent_dx_step.get())
+        status = self.positioner.relative_detector_move(-step, 0)
+        if status != 0:
+            return 1
+        self.lbl_dx_pos.config(text=scripts.number_format(self.positioner.current_detector_position()[0]) + ' m')
+        self.lbl_dx_pos.update()
         return 0
     
     def dy_down(self):
+        step = float(self.ent_dy_step.get())
+        status = self.positioner.relative_detector_move(0, -step)
+        if status != 0:
+            return 1
+        self.lbl_dy_pos.config(text=scripts.number_format(self.positioner.current_detector_position()[1]) + ' m')
+        self.lbl_dy_pos.update()
         return 0
     
     def t_down(self):
