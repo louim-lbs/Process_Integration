@@ -149,10 +149,39 @@ class App(object):
         self.frm_mov = tk.Frame(master=root, relief=RAISED, borderwidth=4, width=width//2, height=height//2, bg='#202020')
         self.frm_mov.place(x=3*width//4, y=0)
 
-        # Microsope
-        #
+        # Microscope
+        
+        # Smaract Detectors X, Y
+        self.btn_dx_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dx_up)
+        self.btn_dx_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.dx_down)
+        self.btn_y_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.dy_up)
+        self.btn_y_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.dy_down)
 
-        # Smaract
+        self.btn_dx_up.place(x=22, y=50)
+        self.btn_dx_down.place(x=22, y=160)
+        self.btn_dy_up.place(x=132, y=50)
+        self.btn_dy_down.place(x=132, y=160)
+
+        positioner_pos   = self.positioner.current_position()
+        self.lbl_dx_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[2]) + " m", justify='left')
+        self.lbl_dy_pos   = tk.Label(master=self.frm_mov, width=13, height=1, bg='#2B2B2B', fg='white', text=scripts.number_format(positioner_pos[1]) + " m", justify='left')
+        self.lbl_dx_pos.place(x=20, y=90)
+        self.lbl_dx_pos.place(x=130, y=90)
+
+        ent_step_values1 = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
+        ent_step_values2 = (1, 2, 5, 10, 20, 50)
+        var1 = tk.StringVar(value='1e-6')
+        var2 = tk.StringVar(value='1e-6')
+        self.ent_dx_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
+        self.ent_dy_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
+        self.ent_dx_step.config(textvariable=var1)
+        self.ent_d_step.config(textvariable=var2)
+
+        self.ent_dx_step.place(x=20, y=120)
+        self.ent_dy_step.place(x=130, y=120)
+        
+
+        # Smaract Z, Y, T
         self.btn_z_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.z_up)
         self.btn_z_down = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↓", justify='left', command=self.z_down)
         self.btn_y_up   = tk.Button(master=self.frm_mov, width=12, height=1, bg='#373737', fg='white', text="↑", justify='left', command=self.y_up)
@@ -308,6 +337,12 @@ class App(object):
         self.lbl_y_pos.update()
         return 0
 
+    def dx_up(self):
+        return 0
+    
+    def dy_up(self):
+        return 0
+
     def t_up(self):
         step = float(self.ent_t_step.get())
         status = self.positioner.relative_move(0, 0, 0, step, 0)
@@ -334,6 +369,12 @@ class App(object):
             return 1
         self.lbl_y_pos.config(text=scripts.number_format(self.positioner.current_position()[1]) + ' m')
         self.lbl_y_pos.update()
+        return 0
+
+    def dx_down(self):
+        return 0
+    
+    def dy_down(self):
         return 0
     
     def t_down(self):

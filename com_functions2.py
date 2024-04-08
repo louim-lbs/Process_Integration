@@ -433,12 +433,25 @@ class SMARACT_MCS_3D(microscope):
             return None, None, None, None, None
         return  None, y*1e-9, z*1e-9, a*1e-6, None
     
+    def current_detector_position(self):
+        z, y, a = self.positioner.detector_getpos()
+        if None in [z, y, a]:
+            return None, None, None, None, None
+        return  None, y*1e-9, z*1e-9, a*1e-6, None
+    
     def relative_move(self, dx=0, dy=0, dz=0, da=0, db=0, hold=True):
         self.positioner.setpos_rel([dz*1e9, dy*1e9, da*1e6], hold)
         return 0
     
+    def relative_detector_move(self, dx=0, dy=0, dz=0, da=0, db=0, hold=True):
+        self.positioner.detector_setpos_rel([dz*1e9, dy*1e9, da*1e6], hold)
+        return 0
+    
     def absolute_move(self, x=None, y=None, z=None, a=None, b=None, hold=True):
         return self.positioner.setpos_abs([z*1e9, y*1e9, a*1e6])
+
+    def absolute_detector_move(self, x=None, y=None, z=None, a=None, b=None, hold=True):
+        return self.positioner.detector_setpos_abs([z*1e9, y*1e9, a*1e6])
 
 if __name__ == "__main__":
     device = SMARACT_MCS_3D()
