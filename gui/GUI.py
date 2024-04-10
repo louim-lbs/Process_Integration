@@ -146,7 +146,6 @@ class App(object):
         # Microscope
         
         # Smaract Detectors X, Y
-
         self.lbl_detec = tk.Label(master=self.frm_mov, width=58, height=1, bg='#2B2B2B', fg='white', text="Detector", justify='left')
         self.lbl_detec.place(x=22, y=10)
 
@@ -168,8 +167,8 @@ class App(object):
 
         ent_step_values1 = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
         ent_step_values2 = (1, 2, 5, 10, 20, 50)
-        var1 = tk.StringVar(value='1e-6')
-        var2 = tk.StringVar(value='1e-6')
+        var1 = tk.StringVar(value='1e-4')
+        var2 = tk.StringVar(value='1e-4')
         self.ent_dx_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
         self.ent_dy_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
         self.ent_dx_step.config(textvariable=var1)
@@ -212,8 +211,8 @@ class App(object):
 
         ent_step_values1 = tuple(scripts.number_format(1e-9*10**i, 0) for i in range(10))
         ent_step_values2 = (1, 2, 5, 10, 20, 50)
-        var1 = tk.StringVar(value='1e-6')
-        var2 = tk.StringVar(value='1e-6')
+        var1 = tk.StringVar(value='1e-5')
+        var2 = tk.StringVar(value='1e-5')
         var3 = tk.StringVar(value='1')
         self.ent_z_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
         self.ent_y_step = tk.Spinbox(master=self.frm_mov, width=14, bg='#2B2B2B', readonlybackground='#2B2B2B', fg='white', values=ent_step_values1, justify='center', state='readonly', wrap=True)
@@ -238,8 +237,8 @@ class App(object):
         text1  = tk.StringVar(master=self.frm_sav, value='1')
         text2  = tk.StringVar(master=self.frm_sav, value='70')
         text3  = tk.StringVar(master=self.frm_sav, value='Acquisition')
-        self.check1 = tk.BooleanVar(value=True)
-        self.check2 = tk.BooleanVar(value=True)
+        self.check1 = tk.BooleanVar(value=False)
+        self.check2 = tk.BooleanVar(value=False)
         self.ent_tilt_step = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text1, justify='left')
         self.ent_end_tilt  = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text2, justify='left')
         self.ent_name      = tk.Entry(      master=self.frm_sav, width=20, bg='#2B2B2B', fg='white', textvariable=text3, justify='left')
