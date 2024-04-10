@@ -1,11 +1,3 @@
-if __name__ == "__main__":
-    import os
-    
-    actual_path = os.getcwd()
-    parent_path = os.path.abspath(os.path.join(actual_path, '..'))
-    logging.info(actual_path, parent_path)
-    os.chdir(parent_path)
-
 import logging
 import time
 import tkinter as tk
@@ -600,7 +592,6 @@ class App(object):
         return
 
 if __name__ == "__main__":
-
     root = tk.Tk()
     app = App(root, 0, 0)
     root.mainloop()
