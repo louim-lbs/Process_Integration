@@ -1,380 +1,641 @@
 INFO:Initialization...
 INFO:MCS2 opened usb:ix:0.
+INFO:Position set at: [0.0, 0.0, 10500085.159]
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:Position set at: [-3.3810000000000007, -2.7460000000000004, -2000000.0]
+INFO:Position set at: [-3.3810000000000007, -2.7460000000000004, 0.0]
+INFO:Position set at: [-6.783000000000001, -4.458, -2000000.0]
+INFO:Position set at: [-6.783000000000001, -4.458, 0.0]
+INFO:Position set at: [-9.129, -4.779, -2000000.0]
+INFO:Position set at: [-9.129, -4.779, 0.0]
+INFO:Position set at: [-9.637, -5.851000000000001, -2000000.0]
+INFO:Position set at: [-9.637, -5.851000000000001, 0.0]
 INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:Position set at: [-16.633, -10.315, 20000000.0]
+INFO:Position set at: [-15.017000000000001, -11.059000000000001, 30000000.0]
+INFO:Position set at: [-16.418000000000003, -8.923, 35000000.0]
+INFO:Position set at: [-15.833, -7.935000000000001, 30000000.0]
+INFO:Position set at: [-13.769, -9.21, 0.0]
+INFO:Position set at: [-14.052000000000001, -10.317, 10000000.0]
+INFO:Position set at: [-12.464000000000002, -13.859, 20000000.0]
+INFO:Position set at: [-13.504, -12.919000000000002, 0.0]
+INFO:Position set at: [-13.954000000000002, -15.207000000000003, 30000000.0]
+INFO:Position set at: [-11.915000000000001, -15.298000000000002, 0.0]
+INFO:Position set at: [-13.032, -17.335000000000004, 30000000.0]
+INFO:Position set at: [-11.772, -16.455000000000005, 0.0]
+INFO:Position set at: [-15.000000000000002, -18.775000000000006, 40000000.0]
+INFO:Position set at: [-14.320000000000002, -17.629, 30000000.0]
+INFO:Position set at: [-18.914, -18.078000000000003, 0.0]
+INFO:Position set at: [-19.395, -20.741, 30000000.0]
 INFO:Position increased of: [0.0, 0.0, 1000000.0]
 INFO:Position increased of: [0.0, 0.0, 1000000.0]
-INFO:path = data/tomo/Acquisition_1712752441_res_1536x1024_dw_1e-06s_stp1.0_dri_True_foc_False
-INFO:Number of images2.10e+01
-INFO:Image 1 / 21. Current tilt angle = -1.00e+01
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:path = data/tomo/Acquisition_1712753632_res_1536x1024_dw_2e-06s_stp1.0_dri_True_foc_False
+INFO:Number of images6.10e+01
+INFO:Image 1 / 61. Current tilt angle = 3.00e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:resize_factor = 2.67e-01
 INFO:image_width = 1.54e+03
 INFO:image_height = 1.02e+03
 INFO:dim_max = 1.54e+03
 INFO:dim_min = 1.02e+03
 INFO:square = True
-INFO:Image 2 / 21. Current tilt angle = -9.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
-INFO:hfw = 1.69e-05
-INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[-4.103254 38.172672]]]
-INFO:match_x 4.00e+00 match_y 3.80e+01
+INFO:Image 2 / 61. Current tilt angle = 2.90e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:hfw = 7.06e-05
+INFO:mid_strips_mastermid_strips_template 0.00e+00 2.60e+02
+INFO:disp [[[  7.494436 250.43791 ]]]
+INFO:match_x -7.00e+00 match_y -1.00e+01
 INFO:beam shift prevPoint(x=0, y=0)
 INFO:beam shift actPoint(x=0, y=0)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 4.00e+00 dy_pix 3.80e+01
+INFO:dx_pix -7.00e+00 dy_pix -1.00e+01
 INFO:correction_x 0.00e+00
 INFO:correction_y 0.00e+00
-INFO:dx_pix 4.00e+00 dy_pix 3.80e+01
-INFO:dx_si 4.41e-08 dy_si 4.19e-07
-INFO:correction_x -4.41e-08 correction_y -4.19e-07
-INFO:anticipation_x -4.41e-08 anticipation_y -4.19e-07
-INFO:value_x, value_y -8.82e-08-8.38e-07
+INFO:dx_pix -7.00e+00 dy_pix -1.00e+01
+INFO:dx_si -3.22e-07 dy_si -4.59e-07
+INFO:correction_x 3.22e-07 correction_y 4.59e-07
+INFO:anticipation_x 3.22e-07 anticipation_y 4.59e-07
+INFO:value_x, value_y 6.43e-079.19e-07
 INFO:Only beam shift
 INFO:Correction Done
-INFO:Image 3 / 21. Current tilt angle = -8.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
-INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ 10.227075 -36.1596  ]]]
-INFO:match_x -1.00e+01 match_y -3.60e+01
-INFO:beam shift prev(-8.819444444444437e-08, -8.378472222222215e-07)
-INFO:beam shift actPoint(x=-8.8194444e-08, y=-8.3784722e-07)
+INFO:Image 3 / 61. Current tilt angle = 2.80e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 2.60e+02 0.00e+00
+INFO:disp [[[ -15.719213 -265.39307 ]]]
+INFO:match_x 1.60e+01 match_y -5.00e+00
+INFO:beam shift prev(6.430844907407407e-07, 9.186921296296297e-07)
+INFO:beam shift actPoint(x=6.4308449e-07, y=9.1869213e-07)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -1.00e+01 dy_pix -3.60e+01
-INFO:correction_x -4.41e-08
-INFO:correction_y -4.19e-07
-INFO:dx_pix -1.00e+01 dy_pix -3.60e+01
-INFO:dx_si -1.10e-07 dy_si -3.97e-07
-INFO:correction_x 6.61e-08 correction_y -2.20e-08
-INFO:anticipation_x 2.20e-08 anticipation_y -4.41e-07
-INFO:value_x, value_y 8.82e-08-4.63e-07
+INFO:dx_pix 1.60e+01 dy_pix -5.00e+00
+INFO:correction_x 3.22e-07
+INFO:correction_y 4.59e-07
+INFO:dx_pix 1.60e+01 dy_pix -5.00e+00
+INFO:dx_si 7.35e-07 dy_si -2.30e-07
+INFO:correction_x -4.13e-07 correction_y 6.89e-07
+INFO:anticipation_x -9.19e-08 anticipation_y 1.15e-06
+INFO:value_x, value_y -5.05e-071.84e-06
 INFO:Only beam shift
 INFO:Correction Done
-INFO:Image 4 / 21. Current tilt angle = -7.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
-INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[  1.7235539 -91.85889  ]]]
-INFO:match_x -2.00e+00 match_y -9.20e+01
-INFO:beam shift prev(-1.3234889800848443e-23, -1.3008680555555543e-06)
-INFO:beam shift actPoint(x=-1.323489e-23, y=-1.3008681e-06)
+INFO:Image 4 / 61. Current tilt angle = 2.70e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 2.78e+02
+INFO:disp [[[  8.061469 236.29652 ]]]
+INFO:match_x -8.00e+00 match_y -4.20e+01
+INFO:beam shift prev(1.378038194444444e-07, 2.756076388888889e-06)
+INFO:beam shift actPoint(x=1.3780382e-07, y=2.7560764e-06)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -2.00e+00 dy_pix -9.20e+01
-INFO:correction_x 6.61e-08
-INFO:correction_y -2.20e-08
-INFO:dx_pix -2.00e+00 dy_pix -9.20e+01
-INFO:dx_si -2.20e-08 dy_si -1.01e-06
-INFO:correction_x 8.82e-08 correction_y 9.92e-07
-INFO:anticipation_x 1.10e-07 anticipation_y 5.51e-07
-INFO:value_x, value_y 1.98e-071.54e-06
+INFO:dx_pix -8.00e+00 dy_pix -4.20e+01
+INFO:correction_x -4.13e-07
+INFO:correction_y 6.89e-07
+INFO:dx_pix -8.00e+00 dy_pix -4.20e+01
+INFO:dx_si -3.67e-07 dy_si -1.93e-06
+INFO:correction_x -4.59e-08 correction_y 2.62e-06
+INFO:anticipation_x -1.38e-07 anticipation_y 3.77e-06
+INFO:value_x, value_y -1.84e-076.38e-06
 INFO:Only beam shift
 INFO:Correction Done
-INFO:Image 5 / 21. Current tilt angle = -6.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
-INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[-8.723839 49.807137]]]
-INFO:match_x 9.00e+00 match_y 5.00e+01
-INFO:beam shift prev(1.984374999999998e-07, 2.4253472222222266e-07)
-INFO:beam shift actPoint(x=1.984375e-07, y=2.4253472e-07)
+INFO:Image 5 / 61. Current tilt angle = 2.60e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 2.78e+02 2.06e+02
+INFO:disp [[[-0.83905613  0.9406188 ]]]
+INFO:match_x 1.00e+00 match_y 7.30e+01
+INFO:beam shift prev(-4.5934606481481606e-08, 9.140986689814816e-06)
+INFO:beam shift actPoint(x=-4.5934606e-08, y=9.1409867e-06)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 9.00e+00 dy_pix 5.00e+01
-INFO:correction_x 8.82e-08
-INFO:correction_y 9.92e-07
-INFO:dx_pix 9.00e+00 dy_pix 5.00e+01
-INFO:dx_si 9.92e-08 dy_si 5.51e-07
-INFO:correction_x -1.10e-08 correction_y 4.41e-07
-INFO:anticipation_x 9.92e-08 anticipation_y 9.92e-07
-INFO:value_x, value_y 8.82e-081.43e-06
+INFO:dx_pix 1.00e+00 dy_pix 7.30e+01
+INFO:correction_x -4.59e-08
+INFO:correction_y 2.62e-06
+INFO:dx_pix 1.00e+00 dy_pix 7.30e+01
+INFO:dx_si 4.59e-08 dy_si 3.35e-06
+INFO:correction_x -9.19e-08 correction_y -7.35e-07
+INFO:anticipation_x -2.30e-07 anticipation_y 3.03e-06
+INFO:value_x, value_y -3.22e-072.30e-06
 INFO:Only beam shift
 INFO:Correction Done
-INFO:Image 6 / 21. Current tilt angle = -5.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
-INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ -2.2321389 111.79923  ]]]
-INFO:match_x 2.00e+00 match_y 1.12e+02
-INFO:beam shift prev(2.866319444444441e-07, 1.6756944444444442e-06)
-INFO:beam shift actPoint(x=2.8663194e-07, y=1.6756944e-06)
+INFO:Image 6 / 61. Current tilt angle = 2.50e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 2.06e+02 0.00e+00
+INFO:disp [[[-1.8996637e-01 -2.0894189e+02]]]
+INFO:match_x 0.00e+00 match_y -3.00e+00
+INFO:beam shift prev(-3.6747685185185205e-07, 1.143771701388889e-05)
+INFO:beam shift actPoint(x=-3.6747685e-07, y=1.1437717e-05)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 2.00e+00 dy_pix 1.12e+02
-INFO:correction_x -1.10e-08
-INFO:correction_y 4.41e-07
-INFO:dx_pix 2.00e+00 dy_pix 1.12e+02
-INFO:dx_si 2.20e-08 dy_si 1.23e-06
-INFO:correction_x -3.31e-08 correction_y -7.94e-07
-INFO:anticipation_x 6.61e-08 anticipation_y 1.98e-07
-INFO:value_x, value_y 3.31e-08-5.95e-07
-INFO:Only beam shift
-INFO:Correction Done
-INFO:Image 7 / 21. Current tilt angle = -4.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:dx_pix 0.00e+00 dy_pix -3.00e+00
+INFO:correction_x -9.19e-08
+INFO:correction_y -7.35e-07
+INFO:Image 7 / 61. Current tilt angle = 2.40e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[  3.184664 -46.006714]]]
-INFO:match_x -3.00e+00 match_y -4.60e+01
-INFO:beam shift prev(3.1970486111111065e-07, 1.0803819444444456e-06)
-INFO:beam shift actPoint(x=3.1970486e-07, y=1.0803819e-06)
+INFO:disp [[[ -2.241648 -15.063216]]]
+INFO:match_x 2.00e+00 match_y -1.50e+01
+INFO:beam shift prev(-3.6747685185185205e-07, 1.143771701388889e-05)
+INFO:beam shift actPoint(x=-3.6747685e-07, y=1.1437717e-05)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -3.00e+00 dy_pix -4.60e+01
-INFO:correction_x -3.31e-08
-INFO:correction_y -7.94e-07
-INFO:dx_pix -3.00e+00 dy_pix -4.60e+01
-INFO:dx_si -3.31e-08 dy_si -5.07e-07
-INFO:correction_x -1.99e-23 correction_y -2.87e-07
-INFO:anticipation_x 6.61e-08 anticipation_y -8.82e-08
-INFO:value_x, value_y 6.61e-08-3.75e-07
+INFO:dx_pix 2.00e+00 dy_pix -1.50e+01
+INFO:correction_x -9.19e-08
+INFO:correction_y -5.97e-07
+INFO:dx_pix 2.00e+00 dy_pix -1.50e+01
+INFO:dx_si 9.19e-08 dy_si -6.89e-07
+INFO:correction_x -1.84e-07 correction_y 9.19e-08
+INFO:anticipation_x -5.05e-07 anticipation_y 2.53e-06
+INFO:value_x, value_y -6.89e-072.62e-06
 INFO:Only beam shift
 INFO:Correction Done
-INFO:Image 8 / 21. Current tilt angle = -3.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 8 / 61. Current tilt angle = 2.30e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[-2.113311 20.022196]]]
-INFO:match_x 2.00e+00 match_y 2.00e+01
-INFO:beam shift prev(3.858506944444438e-07, 7.055555555555583e-07)
-INFO:beam shift actPoint(x=3.8585069e-07, y=7.0555556e-07)
+INFO:disp [[[ 11.755198 -31.11044 ]]]
+INFO:match_x -1.20e+01 match_y -3.10e+01
+INFO:beam shift prev(-1.0564959490740743e-06, 1.4055989583333333e-05)
+INFO:beam shift actPoint(x=-1.0564959e-06, y=1.405599e-05)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 2.00e+00 dy_pix 2.00e+01
-INFO:correction_x -1.99e-23
-INFO:correction_y -2.87e-07
-INFO:dx_pix 2.00e+00 dy_pix 2.00e+01
-INFO:dx_si 2.20e-08 dy_si 2.20e-07
-INFO:correction_x -2.20e-08 correction_y -5.07e-07
-INFO:anticipation_x 4.41e-08 anticipation_y -5.95e-07
-INFO:value_x, value_y 2.20e-08-1.10e-06
+INFO:dx_pix -1.20e+01 dy_pix -3.10e+01
+INFO:correction_x -1.84e-07
+INFO:correction_y 9.19e-08
+INFO:dx_pix -1.20e+01 dy_pix -3.10e+01
+INFO:dx_si -5.51e-07 dy_si -1.42e-06
+INFO:correction_x 3.67e-07 correction_y 1.52e-06
+INFO:anticipation_x -1.38e-07 anticipation_y 4.04e-06
+INFO:value_x, value_y 2.30e-075.56e-06
 INFO:Only beam shift
 INFO:Correction Done
-INFO:Image 9 / 21. Current tilt angle = -2.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 9 / 61. Current tilt angle = 2.20e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[   4.588255 -126.64936 ]]]
-INFO:match_x -5.00e+00 match_y -1.27e+02
-INFO:beam shift prev(4.078993055555548e-07, -3.968749999999947e-07)
-INFO:beam shift actPoint(x=4.0789931e-07, y=-3.96875e-07)
+INFO:disp [[[-11.226435  57.628906]]]
+INFO:match_x 1.10e+01 match_y 5.80e+01
+INFO:beam shift prev(-8.26822916666667e-07, 1.961407696759259e-05)
+INFO:beam shift actPoint(x=-8.2682292e-07, y=1.9614077e-05)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -5.00e+00 dy_pix -1.27e+02
-INFO:correction_x -2.20e-08
-INFO:correction_y -5.07e-07
-INFO:dx_pix -5.00e+00 dy_pix -1.27e+02
-INFO:dx_si -5.51e-08 dy_si -1.40e-06
-INFO:correction_x 3.31e-08 correction_y 8.93e-07
-INFO:anticipation_x 7.72e-08 anticipation_y 2.98e-07
-INFO:value_x, value_y 1.10e-071.19e-06
-INFO:Only beam shift
+INFO:dx_pix 1.10e+01 dy_pix 5.80e+01
+INFO:correction_x 3.67e-07
+INFO:correction_y 1.52e-06
+INFO:dx_pix 1.10e+01 dy_pix 5.80e+01
+INFO:dx_si 5.05e-07 dy_si 2.66e-06
+INFO:correction_x -1.38e-07 correction_y -1.15e-06
+INFO:anticipation_x -2.76e-07 anticipation_y 2.89e-06
+INFO:value_x, value_y -4.13e-071.75e-06
+INFO:current_positionStagePosition(x=1.0587275e-05, y=7.2495081e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-4.1341145833333345e-07
+INFO:current_positionStagePosition(x=1.1920929e-05, y=5.1078387e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
 INFO:Correction Done
-INFO:Image 10 / 21. Current tilt angle = -1.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 10 / 61. Current tilt angle = 2.10e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ -2.6092007 103.4696   ]]]
-INFO:match_x 3.00e+00 match_y 1.03e+02
-INFO:beam shift prev(5.181423611111101e-07, 7.937500000000063e-07)
-INFO:beam shift actPoint(x=5.1814236e-07, y=7.9375e-07)
-INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 3.00e+00 dy_pix 1.03e+02
-INFO:correction_x 3.31e-08
-INFO:correction_y 8.93e-07
-INFO:dx_pix 3.00e+00 dy_pix 1.03e+02
-INFO:dx_si 3.31e-08 dy_si 1.14e-06
-INFO:correction_x -1.99e-23 correction_y -2.43e-07
-INFO:anticipation_x 7.72e-08 anticipation_y 5.51e-08
-INFO:value_x, value_y 7.72e-08-1.87e-07
-INFO:Only beam shift
+INFO:disp [[[17.550802  -1.8230505]]]
+INFO:match_x -1.80e+01 match_y -2.00e+00
+INFO:beam shift prev(-1.2402343750000005e-06, 2.1359592013888887e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[1.2402343750000005e-06, -2.1359592013888887e-05]
+INFO:dx_pix -1.80e+01 dy_pix -2.00e+00
+INFO:correction_x -1.38e-07
+INFO:correction_y -1.15e-06
+INFO:dx_pix -1.80e+01 dy_pix -2.00e+00
+INFO:dx_si -2.07e-06 dy_si 2.13e-05
+INFO:correction_x 1.93e-06 correction_y -2.24e-05
+INFO:anticipation_x 1.65e-06 anticipation_y -1.95e-05
+INFO:value_x, value_y 3.58e-06-4.19e-05
+INFO:current_positionStagePosition(x=1.1920929e-05, y=5.1078387e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x3.582899305555557e-06
+INFO:current_positionStagePosition(x=8.251518e-06, y=9.3078241e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
 INFO:Correction Done
-INFO:Image 11 / 21. Current tilt angle = -6.35e-05
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 11 / 61. Current tilt angle = 2.00e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[-2.8869536 35.0621   ]]]
-INFO:match_x 3.00e+00 match_y 3.50e+01
-INFO:beam shift prev(5.953124999999987e-07, 6.063368055555643e-07)
-INFO:beam shift actPoint(x=5.953125e-07, y=6.0633681e-07)
-INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 3.00e+00 dy_pix 3.50e+01
-INFO:correction_x -1.99e-23
-INFO:correction_y -2.43e-07
-INFO:dx_pix 3.00e+00 dy_pix 3.50e+01
-INFO:dx_si 3.31e-08 dy_si 3.86e-07
-INFO:correction_x -3.31e-08 correction_y -6.28e-07
-INFO:anticipation_x 4.41e-08 anticipation_y -5.73e-07
-INFO:value_x, value_y 1.10e-08-1.20e-06
-INFO:Only beam shift
+INFO:disp [[[ -74.638145 -642.9537  ]]]
+INFO:match_x 7.50e+01 match_y -6.43e+02
+INFO:beam shift prev(3.582899305555557e-06, -4.193829571759259e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-3.582899305555557e-06, 4.193829571759259e-05]
+INFO:dx_pix 7.50e+01 dy_pix -6.43e+02
+INFO:correction_x 1.93e-06
+INFO:correction_y -2.24e-05
+INFO:dx_pix 7.50e+01 dy_pix -6.43e+02
+INFO:dx_si 7.03e-06 dy_si -7.15e-05
+INFO:correction_x -5.10e-06 correction_y 4.91e-05
+INFO:anticipation_x -3.45e-06 anticipation_y 2.95e-05
+INFO:value_x, value_y -8.54e-067.86e-05
+INFO:current_positionStagePosition(x=8.251518e-06, y=9.3078241e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-8.543836805555556e-06
+INFO:current_positionStagePosition(x=1.6834587e-05, y=1.4411751e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
 INFO:Correction Done
-INFO:Image 12 / 21. Current tilt angle = 1.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 12 / 61. Current tilt angle = 1.90e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[   2.6288838 -168.71144  ]]]
-INFO:match_x -3.00e+00 match_y -1.69e+02
-INFO:beam shift prev(6.063368055555541e-07, -5.953124999999876e-07)
-INFO:beam shift actPoint(x=6.0633681e-07, y=-5.953125e-07)
-INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -3.00e+00 dy_pix -1.69e+02
-INFO:correction_x -3.31e-08
-INFO:correction_y -6.28e-07
-INFO:dx_pix -3.00e+00 dy_pix -1.69e+02
-INFO:dx_si -3.31e-08 dy_si -1.86e-06
-INFO:correction_x -1.99e-23 correction_y 1.23e-06
-INFO:anticipation_x 4.41e-08 anticipation_y 6.61e-07
-INFO:value_x, value_y 4.41e-081.90e-06
-INFO:Only beam shift
-INFO:Correction Done
-INFO:Image 13 / 21. Current tilt angle = 2.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:disp [[[676.7923  971.90784]]]
+INFO:match_x -6.77e+02 match_y 9.72e+02
+INFO:beam shift prev(-8.543836805555556e-06, 7.859411168981483e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[8.543836805555556e-06, -7.859411168981483e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x -5.10e-06
+INFO:correction_y 4.91e-05
+INFO:Image 13 / 61. Current tilt angle = 1.80e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[  1.235037 194.35446 ]]]
-INFO:match_x -1.00e+00 match_y 1.94e+02
-INFO:beam shift prev(6.504340277777761e-07, 1.3008680555555695e-06)
-INFO:beam shift actPoint(x=6.5043403e-07, y=1.3008681e-06)
+INFO:disp [[[ -7.769474 -34.93659 ]]]
+INFO:match_x 8.00e+00 match_y -3.50e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -1.00e+00 dy_pix 1.94e+02
-INFO:correction_x -1.99e-23
-INFO:correction_y 1.23e-06
-INFO:dx_pix -1.00e+00 dy_pix 1.94e+02
-INFO:dx_si -1.10e-08 dy_si 2.14e-06
-INFO:correction_x 1.10e-08 correction_y -9.04e-07
-INFO:anticipation_x 5.51e-08 anticipation_y -2.43e-07
-INFO:value_x, value_y 6.61e-08-1.15e-06
-INFO:Only beam shift
+INFO:dx_pix 8.00e+00 dy_pix -3.50e+01
+INFO:correction_x 3.45e-06
+INFO:correction_y -2.95e-05
+INFO:dx_pix 8.00e+00 dy_pix -3.50e+01
+INFO:dx_si 3.67e-07 dy_si -1.61e-06
+INFO:correction_x 3.08e-06 correction_y -2.79e-05
+INFO:anticipation_x 3.08e-06 anticipation_y -2.79e-05
+INFO:value_x, value_y 6.16e-06-5.59e-05
+INFO:current_positionStagePosition(x=1.6834587e-05, y=1.4411751e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x6.155237268518516e-06
+INFO:current_positionStagePosition(x=1.0587275e-05, y=7.0328359e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
 INFO:Correction Done
-INFO:Image 14 / 21. Current tilt angle = 3.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 14 / 61. Current tilt angle = 1.70e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ 4.682559 36.060234]]]
-INFO:match_x -5.00e+00 match_y 3.60e+01
-INFO:beam shift prev(7.165798611111091e-07, 1.543402777777963e-07)
-INFO:beam shift actPoint(x=7.1657986e-07, y=1.5434028e-07)
-INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -5.00e+00 dy_pix 3.60e+01
-INFO:correction_x 1.10e-08
-INFO:correction_y -9.04e-07
-INFO:dx_pix -5.00e+00 dy_pix 3.60e+01
-INFO:dx_si -5.51e-08 dy_si 3.97e-07
-INFO:correction_x 6.61e-08 correction_y -1.30e-06
-INFO:anticipation_x 1.21e-07 anticipation_y -1.54e-06
-INFO:value_x, value_y 1.87e-07-2.84e-06
-INFO:Only beam shift
-INFO:Correction Done
-INFO:Image 15 / 21. Current tilt angle = 4.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:disp [[[-2721.6106    369.50934]]]
+INFO:match_x 2.72e+03 match_y 3.70e+02
+INFO:beam shift prev(6.155237268518516e-06, -5.58564814814815e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-6.155237268518516e-06, 5.58564814814815e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x 3.08e-06
+INFO:correction_y -2.79e-05
+INFO:Image 15 / 61. Current tilt angle = 1.60e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[  -3.8686643 -178.76717  ]]]
-INFO:match_x 4.00e+00 match_y -1.79e+02
-INFO:beam shift prev(9.039930555555531e-07, -2.6899305555555306e-06)
-INFO:beam shift actPoint(x=9.0399306e-07, y=-2.6899306e-06)
+INFO:disp [[[  1.6077311 -61.25729  ]]]
+INFO:match_x -2.00e+00 match_y -6.10e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 4.00e+00 dy_pix -1.79e+02
-INFO:correction_x 6.61e-08
-INFO:correction_y -1.30e-06
-INFO:dx_pix 4.00e+00 dy_pix -1.79e+02
-INFO:dx_si 4.41e-08 dy_si -1.97e-06
-INFO:correction_x 2.20e-08 correction_y 6.72e-07
-INFO:anticipation_x 1.43e-07 anticipation_y -8.71e-07
-INFO:value_x, value_y 1.65e-07-1.98e-07
-INFO:Only beam shift
+INFO:dx_pix -2.00e+00 dy_pix -6.10e+01
+INFO:correction_x -3.08e-06
+INFO:correction_y 2.79e-05
+INFO:dx_pix -2.00e+00 dy_pix -6.10e+01
+INFO:dx_si -9.19e-08 dy_si -2.80e-06
+INFO:correction_x -2.99e-06 correction_y 3.07e-05
+INFO:anticipation_x -2.99e-06 anticipation_y 3.07e-05
+INFO:value_x, value_y -5.97e-066.15e-05
+INFO:current_positionStagePosition(x=1.0587275e-05, y=7.0328359e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-5.9714988425925895e-06
+INFO:current_positionStagePosition(x=1.6584992e-05, y=8.8284723e-06, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
 INFO:Correction Done
-INFO:Image 16 / 21. Current tilt angle = 5.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 16 / 61. Current tilt angle = 1.50e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[-2.7524424 76.90645  ]]]
-INFO:match_x 3.00e+00 match_y 7.70e+01
-INFO:beam shift prev(1.069357638888886e-06, -2.8883680555555266e-06)
-INFO:beam shift actPoint(x=1.0693576e-06, y=-2.8883681e-06)
-INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 3.00e+00 dy_pix 7.70e+01
-INFO:correction_x 2.20e-08
-INFO:correction_y 6.72e-07
-INFO:dx_pix 3.00e+00 dy_pix 7.70e+01
-INFO:dx_si 3.31e-08 dy_si 8.49e-07
-INFO:correction_x -1.10e-08 correction_y -1.76e-07
-INFO:anticipation_x 1.32e-07 anticipation_y -1.05e-06
-INFO:value_x, value_y 1.21e-07-1.22e-06
-INFO:Only beam shift
-INFO:Correction Done
-INFO:Image 17 / 21. Current tilt angle = 6.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:disp [[[760.1442 728.8189]]]
+INFO:match_x -7.60e+02 match_y 7.29e+02
+INFO:beam shift prev(-5.9714988425925895e-06, 6.146050347222224e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[5.9714988425925895e-06, -6.146050347222224e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x -2.99e-06
+INFO:correction_y 3.07e-05
+INFO:Image 17 / 61. Current tilt angle = 1.40e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ -1.5131656 -28.032804 ]]]
-INFO:match_x 2.00e+00 match_y -2.80e+01
-INFO:beam shift prev(1.1906249999999968e-06, -4.112065972222188e-06)
-INFO:beam shift actPoint(x=1.190625e-06, y=-4.112066e-06)
+INFO:disp [[[ -9.87426  -29.189995]]]
+INFO:match_x 1.00e+01 match_y -2.90e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 2.00e+00 dy_pix -2.80e+01
-INFO:correction_x -1.10e-08
-INFO:correction_y -1.76e-07
-INFO:dx_pix 2.00e+00 dy_pix -2.80e+01
-INFO:dx_si 2.20e-08 dy_si -3.09e-07
-INFO:correction_x -3.31e-08 correction_y 1.32e-07
-INFO:anticipation_x 9.92e-08 anticipation_y -9.15e-07
-INFO:value_x, value_y 6.61e-08-7.83e-07
-INFO:Only beam shift
+INFO:dx_pix 1.00e+01 dy_pix -2.90e+01
+INFO:correction_x 2.99e-06
+INFO:correction_y -3.07e-05
+INFO:dx_pix 1.00e+01 dy_pix -2.90e+01
+INFO:dx_si 4.59e-07 dy_si -1.33e-06
+INFO:correction_x 2.53e-06 correction_y -2.94e-05
+INFO:anticipation_x 2.53e-06 anticipation_y -2.94e-05
+INFO:value_x, value_y 5.05e-06-5.88e-05
+INFO:current_positionStagePosition(x=1.6584992e-05, y=8.8284723e-06, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x5.0528067129629595e-06
+INFO:current_positionStagePosition(x=1.1503696e-05, y=6.7661516e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
 INFO:Correction Done
-INFO:Image 18 / 21. Current tilt angle = 7.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 18 / 61. Current tilt angle = 1.30e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ 5.4010415 30.102058 ]]]
-INFO:match_x -5.00e+00 match_y 3.00e+01
-INFO:beam shift prev(1.2567708333333296e-06, -4.894791666666629e-06)
-INFO:beam shift actPoint(x=1.2567708e-06, y=-4.8947917e-06)
-INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -5.00e+00 dy_pix 3.00e+01
-INFO:correction_x -3.31e-08
-INFO:correction_y 1.32e-07
-INFO:dx_pix -5.00e+00 dy_pix 3.00e+01
-INFO:dx_si -5.51e-08 dy_si 3.31e-07
-INFO:correction_x 2.20e-08 correction_y -1.98e-07
-INFO:anticipation_x 1.21e-07 anticipation_y -1.11e-06
-INFO:value_x, value_y 1.43e-07-1.31e-06
-INFO:Only beam shift
-INFO:Correction Done
-INFO:Image 19 / 21. Current tilt angle = 8.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:disp [[[347.8355  277.80197]]]
+INFO:match_x -3.48e+02 match_y 2.78e+02
+INFO:beam shift prev(5.0528067129629595e-06, -5.879629629629632e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-5.0528067129629595e-06, 5.879629629629632e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x 2.53e-06
+INFO:correction_y -2.94e-05
+INFO:Image 19 / 61. Current tilt angle = 1.20e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ 1.8061298 14.941667 ]]]
-INFO:match_x -2.00e+00 match_y 1.50e+01
-INFO:beam shift prev(1.4000868055555514e-06, -6.206684027777735e-06)
-INFO:beam shift actPoint(x=1.4000868e-06, y=-6.206684e-06)
+INFO:disp [[[ -4.2241054 -56.562317 ]]]
+INFO:match_x 4.00e+00 match_y -5.70e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix -2.00e+00 dy_pix 1.50e+01
-INFO:correction_x 2.20e-08
-INFO:correction_y -1.98e-07
-INFO:dx_pix -2.00e+00 dy_pix 1.50e+01
-INFO:dx_si -2.20e-08 dy_si 1.65e-07
-INFO:correction_x 4.41e-08 correction_y -3.64e-07
-INFO:anticipation_x 1.65e-07 anticipation_y -1.48e-06
-INFO:value_x, value_y 2.09e-07-1.84e-06
-INFO:Only beam shift
+INFO:dx_pix 4.00e+00 dy_pix -5.70e+01
+INFO:correction_x -2.53e-06
+INFO:correction_y 2.94e-05
+INFO:dx_pix 4.00e+00 dy_pix -5.70e+01
+INFO:dx_si 1.84e-07 dy_si -2.62e-06
+INFO:correction_x -2.71e-06 correction_y 3.20e-05
+INFO:anticipation_x -2.71e-06 anticipation_y 3.20e-05
+INFO:value_x, value_y -5.42e-066.40e-05
+INFO:current_positionStagePosition(x=1.1503696e-05, y=6.7661516e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-5.4202835648148115e-06
+INFO:current_positionStagePosition(x=1.7002225e-05, y=3.5781413e-06, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
 INFO:Correction Done
-INFO:Image 20 / 21. Current tilt angle = 9.00e+00
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:Image 20 / 61. Current tilt angle = 1.10e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ -3.7264004 -48.02187  ]]]
-INFO:match_x 4.00e+00 match_y -4.80e+01
-INFO:beam shift prev(1.6095486111111064e-06, -8.047743055555507e-06)
-INFO:beam shift actPoint(x=1.6095486e-06, y=-8.0477431e-06)
-INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 4.00e+00 dy_pix -4.80e+01
-INFO:correction_x 4.41e-08
-INFO:correction_y -3.64e-07
-INFO:dx_pix 4.00e+00 dy_pix -4.80e+01
-INFO:dx_si 4.41e-08 dy_si -5.29e-07
-INFO:correction_x -1.99e-23 correction_y 1.65e-07
-INFO:anticipation_x 1.65e-07 anticipation_y -1.31e-06
-INFO:value_x, value_y 1.65e-07-1.15e-06
-INFO:Only beam shift
-INFO:Correction Done
-INFO:Image 21 / 21. Current tilt angle = 1.00e+01
-INFO:Position increased of: [0.0, 0.0, 1000000.0]
+INFO:disp [[[527.2629  750.22784]]]
+INFO:match_x -5.27e+02 match_y 7.50e+02
+INFO:beam shift prev(-5.4202835648148115e-06, 6.403284143518521e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[5.4202835648148115e-06, -6.403284143518521e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x -2.71e-06
+INFO:correction_y 3.20e-05
+INFO:Image 21 / 61. Current tilt angle = 1.00e+01
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
 INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
-INFO:disp [[[ -2.5426803 -22.895489 ]]]
-INFO:match_x 3.00e+00 match_y -2.30e+01
-INFO:beam shift prev(1.7749131944444392e-06, -9.19427083333328e-06)
-INFO:beam shift actPoint(x=1.7749132e-06, y=-9.1942708e-06)
+INFO:disp [[[ -5.2050223 -22.614172 ]]]
+INFO:match_x 5.00e+00 match_y -2.30e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
 INFO:beam shift diff[0.0, 0.0]
-INFO:dx_pix 3.00e+00 dy_pix -2.30e+01
-INFO:correction_x -1.99e-23
-INFO:correction_y 1.65e-07
-INFO:dx_pix 3.00e+00 dy_pix -2.30e+01
-INFO:dx_si 3.31e-08 dy_si -2.54e-07
-INFO:correction_x -3.31e-08 correction_y 4.19e-07
-INFO:anticipation_x 1.32e-07 anticipation_y -8.93e-07
-INFO:value_x, value_y 9.92e-08-4.74e-07
+INFO:dx_pix 5.00e+00 dy_pix -2.30e+01
+INFO:correction_x 2.71e-06
+INFO:correction_y -3.20e-05
+INFO:dx_pix 5.00e+00 dy_pix -2.30e+01
+INFO:dx_si 2.30e-07 dy_si -1.06e-06
+INFO:correction_x 2.48e-06 correction_y -3.10e-05
+INFO:anticipation_x 2.48e-06 anticipation_y -3.10e-05
+INFO:value_x, value_y 4.96e-06-6.19e-05
+INFO:current_positionStagePosition(x=1.7002225e-05, y=3.5781413e-06, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x4.960937499999997e-06
+INFO:current_positionStagePosition(x=1.2002885e-05, y=6.5578148e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 22 / 61. Current tilt angle = 9.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[911.18427 176.4204 ]]]
+INFO:match_x -9.11e+02 match_y 1.76e+02
+INFO:beam shift prev(4.960937499999997e-06, -6.191984953703706e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-4.960937499999997e-06, 6.191984953703706e-05]
+INFO:dx_pix -9.11e+02 dy_pix 1.76e+02
+INFO:correction_x 2.48e-06
+INFO:correction_y -3.10e-05
+INFO:dx_pix -9.11e+02 dy_pix 1.76e+02
+INFO:dx_si -3.69e-05 dy_si -5.38e-05
+INFO:correction_x 3.94e-05 correction_y 2.29e-05
+INFO:anticipation_x 4.18e-05 anticipation_y -8.08e-06
+INFO:value_x, value_y 8.12e-051.48e-05
+INFO:current_positionStagePosition(x=1.2002885e-05, y=6.5578148e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x8.121238425925928e-05
+INFO:current_positionStagePosition(x=-6.9245696e-05, y=5.0744973e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 23 / 61. Current tilt angle = 8.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[254.95111 576.63513]]]
+INFO:match_x -2.55e+02 match_y 5.77e+02
+INFO:beam shift prev(8.121238425925928e-05, 1.4790943287037049e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-8.121238425925928e-05, -1.4790943287037049e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x 3.94e-05
+INFO:correction_y 2.29e-05
+INFO:Image 24 / 61. Current tilt angle = 7.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[-11.252452 -27.041067]]]
+INFO:match_x 1.10e+01 match_y -2.70e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[0.0, 0.0]
+INFO:dx_pix 1.10e+01 dy_pix -2.70e+01
+INFO:correction_x -4.18e-05
+INFO:correction_y 8.08e-06
+INFO:dx_pix 1.10e+01 dy_pix -2.70e+01
+INFO:dx_si 5.05e-07 dy_si -1.24e-06
+INFO:correction_x -4.24e-05 correction_y 9.32e-06
+INFO:anticipation_x -4.24e-05 anticipation_y 9.32e-06
+INFO:value_x, value_y -8.47e-051.86e-05
+INFO:current_positionStagePosition(x=-6.9245696e-05, y=5.0744973e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-8.470341435185187e-05
+INFO:current_positionStagePosition(x=1.5504658e-05, y=3.2078475e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 25 / 61. Current tilt angle = 6.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[429.41928 488.19366]]]
+INFO:match_x -4.29e+02 match_y 4.88e+02
+INFO:beam shift prev(-8.470341435185187e-05, 1.8649450231481482e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[8.470341435185187e-05, -1.8649450231481482e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x -4.24e-05
+INFO:correction_y 9.32e-06
+INFO:Image 26 / 61. Current tilt angle = 5.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[-3.8364618 -6.9264092]]]
+INFO:match_x 4.00e+00 match_y -7.00e+00
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[0.0, 0.0]
+INFO:dx_pix 4.00e+00 dy_pix -7.00e+00
+INFO:correction_x 4.24e-05
+INFO:correction_y -9.32e-06
+INFO:dx_pix 4.00e+00 dy_pix -7.00e+00
+INFO:dx_si 1.84e-07 dy_si -3.22e-07
+INFO:correction_x 4.22e-05 correction_y -9.00e-06
+INFO:anticipation_x 4.22e-05 anticipation_y -9.00e-06
+INFO:value_x, value_y 8.43e-05-1.80e-05
+INFO:current_positionStagePosition(x=1.5504658e-05, y=3.2078475e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x8.433593750000002e-05
+INFO:current_positionStagePosition(x=-6.8914145e-05, y=5.01615e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 27 / 61. Current tilt angle = 4.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[329.83783 705.8546 ]]]
+INFO:match_x -3.30e+02 match_y 7.06e+02
+INFO:beam shift prev(8.433593750000002e-05, -1.800636574074074e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-8.433593750000002e-05, 1.800636574074074e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x 4.22e-05
+INFO:correction_y -9.00e-06
+INFO:Image 28 / 61. Current tilt angle = 3.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[-12.109332 -24.851461]]]
+INFO:match_x 1.20e+01 match_y -2.50e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[0.0, 0.0]
+INFO:dx_pix 1.20e+01 dy_pix -2.50e+01
+INFO:correction_x -4.22e-05
+INFO:correction_y 9.00e-06
+INFO:dx_pix 1.20e+01 dy_pix -2.50e+01
+INFO:dx_si 5.51e-07 dy_si -1.15e-06
+INFO:correction_x -4.27e-05 correction_y 1.02e-05
+INFO:anticipation_x -4.27e-05 anticipation_y 1.02e-05
+INFO:value_x, value_y -8.54e-052.03e-05
+INFO:current_positionStagePosition(x=-6.8914145e-05, y=5.01615e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-8.543836805555557e-05
+INFO:current_positionStagePosition(x=1.6584992e-05, y=2.9828399e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 29 / 61. Current tilt angle = 2.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[676.61365 212.50172]]]
+INFO:match_x -6.77e+02 match_y 2.13e+02
+INFO:beam shift prev(-8.543836805555557e-05, 2.0303096064814813e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[8.543836805555557e-05, -2.0303096064814813e-05]
+INFO:dx_pix -6.77e+02 dy_pix 2.13e+02
+INFO:correction_x -4.27e-05
+INFO:correction_y 1.02e-05
+INFO:dx_pix -6.77e+02 dy_pix 2.13e+02
+INFO:dx_si -1.17e-04 dy_si 3.01e-05
+INFO:correction_x 7.38e-05 correction_y -1.99e-05
+INFO:anticipation_x 3.11e-05 anticipation_y -9.78e-06
+INFO:value_x, value_y 1.05e-04-2.97e-05
+INFO:current_positionStagePosition(x=1.6584992e-05, y=2.9828399e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x0.00010491464120370372
+INFO:current_positionStagePosition(x=-8.8412315e-05, y=5.9578102e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 30 / 61. Current tilt angle = 1.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[282.02838 223.183  ]]]
+INFO:match_x -2.82e+02 match_y 2.23e+02
+INFO:beam shift prev(0.00010491464120370372, -2.971969039351852e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-0.00010491464120370372, 2.971969039351852e-05]
+INFO:dx_pix -2.82e+02 dy_pix 2.23e+02
+INFO:correction_x 7.38e-05
+INFO:correction_y -1.99e-05
+INFO:dx_pix -2.82e+02 dy_pix 2.23e+02
+INFO:dx_si 9.20e-05 dy_si -1.95e-05
+INFO:correction_x -1.81e-05 correction_y -4.59e-07
+INFO:anticipation_x 1.30e-05 anticipation_y -1.02e-05
+INFO:value_x, value_y -5.19e-06-1.07e-05
 INFO:Only beam shift
 INFO:Correction Done
-INFO:Tomography is a Success
+INFO:Image 31 / 61. Current tilt angle = -1.08e-04
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[ 44.88283 -81.73046]]]
+INFO:match_x -4.50e+01 match_y -8.20e+01
+INFO:beam shift prev(-5.190610532407429e-06, -1.070276331018518e-05)
+INFO:beam shift actPoint(x=-5.1906105e-06, y=-1.0702763e-05)
+INFO:beam shift diff[0.0, 0.0]
+INFO:dx_pix -4.50e+01 dy_pix -8.20e+01
+INFO:correction_x -1.81e-05
+INFO:correction_y -4.59e-07
+INFO:dx_pix -4.50e+01 dy_pix -8.20e+01
+INFO:dx_si -2.07e-06 dy_si -3.77e-06
+INFO:correction_x -1.61e-05 correction_y 3.31e-06
+INFO:anticipation_x -3.12e-06 anticipation_y -6.94e-06
+INFO:value_x, value_y -1.92e-05-3.63e-06
+INFO:current_positionStagePosition(x=-8.8412315e-05, y=5.9578102e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-1.9200665509259293e-05
+INFO:current_positionStagePosition(x=-6.3996762e-05, y=7.3994976e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 32 / 61. Current tilt angle = -1.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[265.9904   -61.101303]]]
+INFO:match_x -2.66e+02 match_y -6.10e+01
+INFO:beam shift prev(-2.4391276041666722e-05, -1.433159722222221e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[2.4391276041666722e-05, 1.433159722222221e-05]
+INFO:dx_pix -2.66e+02 dy_pix -6.10e+01
+INFO:correction_x -1.61e-05
+INFO:correction_y 3.31e-06
+INFO:dx_pix -2.66e+02 dy_pix -6.10e+01
+INFO:dx_si -3.66e-05 dy_si -1.71e-05
+INFO:correction_x 2.05e-05 correction_y 2.04e-05
+INFO:anticipation_x 1.74e-05 anticipation_y 1.35e-05
+INFO:value_x, value_y 3.79e-053.39e-05
+INFO:current_positionStagePosition(x=-6.3996762e-05, y=7.3994976e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x3.794198495370377e-05
+INFO:current_positionStagePosition(x=-0.00010199845, y=3.9995182e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 33 / 61. Current tilt angle = -2.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 4.00e+01
+INFO:disp [[[-508.72543  547.0053 ]]]
+INFO:match_x 5.09e+02 match_y 5.07e+02
+INFO:beam shift prev(3.794198495370377e-05, 3.39456741898148e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[-3.794198495370377e-05, -3.39456741898148e-05]
+INFO:dx_pix 0.00e+00 dy_pix 0.00e+00
+INFO:correction_x 2.05e-05
+INFO:correction_y 2.04e-05
+INFO:Image 34 / 61. Current tilt angle = -3.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 4.00e+01 0.00e+00
+INFO:disp [[[  6.1930337 -51.849262 ]]]
+INFO:match_x -6.00e+00 match_y -1.20e+01
+INFO:beam shift prev(0.0, 0.0)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[0.0, 0.0]
+INFO:dx_pix -6.00e+00 dy_pix -1.20e+01
+INFO:correction_x -1.74e-05
+INFO:correction_y -1.35e-05
+INFO:dx_pix -6.00e+00 dy_pix -1.20e+01
+INFO:dx_si -2.76e-07 dy_si -5.51e-07
+INFO:correction_x -1.71e-05 correction_y -1.30e-05
+INFO:anticipation_x -1.71e-05 anticipation_y -1.30e-05
+INFO:value_x, value_y -3.43e-05-2.59e-05
+INFO:current_positionStagePosition(x=-0.00010199845, y=3.9995182e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x-3.426721643518523e-05
+INFO:current_positionStagePosition(x=-6.7662448e-05, y=6.5994915e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:Beam shift + stage
+INFO:Correction Done
+INFO:Image 35 / 61. Current tilt angle = -4.00e+00
+INFO:Position increased of: [0.0, 0.0, -1000000.0]
+INFO:mid_strips_mastermid_strips_template 0.00e+00 0.00e+00
+INFO:disp [[[827.7634 158.1589]]]
+INFO:match_x -8.28e+02 match_y 1.58e+02
+INFO:beam shift prev(-3.426721643518523e-05, -2.5907118055555557e-05)
+INFO:beam shift actPoint(x=0, y=0)
+INFO:beam shift diff[3.426721643518523e-05, 2.5907118055555557e-05]
+INFO:dx_pix -8.28e+02 dy_pix 1.58e+02
+INFO:correction_x -1.71e-05
+INFO:correction_y -1.30e-05
+INFO:dx_pix -8.28e+02 dy_pix 1.58e+02
+INFO:dx_si -7.23e-05 dy_si -1.86e-05
+INFO:correction_x 5.52e-05 correction_y 5.70e-06
+INFO:anticipation_x 3.80e-05 anticipation_y -7.26e-06
+INFO:value_x, value_y 9.32e-05-1.56e-06
+INFO:current_positionStagePosition(x=-6.7662448e-05, y=6.5994915e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
+INFO:value_x9.320131655092597e-05
+INFO:current_positionStagePosition(x=-0.00016091391, y=6.7578163e-05, z=0.0094971769, t=1.7644197e-10, r=0.78444398, coordinate_system=Specimen)
