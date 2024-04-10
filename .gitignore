@@ -11,3 +11,4 @@ gui/__pycache__/GUI.cpython-37.pyc
 smaract/__pycache__/__init__.cpython-37.pyc
 ~$Functions.xlsx
 *.db
+*.log
