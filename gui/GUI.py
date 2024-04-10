@@ -291,7 +291,6 @@ class App(object):
         self.lbl_eucent.update()
 
         if self.microscope.microscope_type == 'ESEM':
-            # set_eucentric_status = scripts.set_eucentric_ESEM_2(self.microscope, self.positioner)
             self.eucentric_ESEM = threading.Thread(target=scripts.set_eucentric, args=(self.microscope, self.positioner))
             self.eucentric_ESEM.start()
         else:
@@ -426,7 +425,7 @@ class App(object):
         x, y, z, a, b = self.positioner.current_position()
         if None in (y, z, a):
             return 1
-        scripts.absolute_move_with_autocorrect(self.positioner, y, z, angle)
+        self.positioner.absolute_move(self.positioner, y, z, angle)
         positioner_t_pos = self.positioner.current_position()[3]
         self.lbl_t_pos.config(text=scripts.number_format(positioner_t_pos) + ' °')
         self.lbl_t_pos.update()

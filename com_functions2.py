@@ -290,10 +290,10 @@ class FEI_QUATTRO_ESEM(microscope):
                 return
             elif -limits_extra < y < limits_extra:
                 self.quattro.imaging.stop_acquisition()
-                logging.info('current_position', self.current_position())
-                logging.info('value_x', value_x)
+                logging.info('current_position' + str(self.current_position()))
+                logging.info('value_x' + str(value_x))
                 self.relative_move(-x, -y)
-                logging.info('current_position', self.current_position())
+                logging.info('current_position' + str(self.current_position()))
                 shift = Point(0, 0)
                 self.quattro.beams.electron_beam.beam_shift.value = shift
                 time.sleep(1)
