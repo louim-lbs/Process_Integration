@@ -63,37 +63,3 @@ Install my-project with pip
 ## Documentation
 
 [Documentation](https://linktodocumentation)
-
-
-## Support
-
-For support, email louis-marie.lebas@insa-lyon.fr
-
-
-## Features enhancement
-
-** TO DO
-
-- Improve performances
-- Investigate threading
-
-### Smaract
-- **Calibrate and Set software limits** and check it to prevent breaking device
-
-### Microscope
-- **Eucentric**. Write operation steps.
-    - match filtre passe bas
-    - **Pondérer** le match par la confiance.
-    - IF NOT MATCHED INCREASE DWELL TIME.
-    - Calculer le décalage une fois qu'il a été fait la première fois.
-    - Le HAADF donne le meilleur contraste.
-    - Augmenter le dwell time pour augmenter la précision.
-    - Corriger le décalage de l'axe de tilt grâce à une analyse avec un déplacement horizontal de y
-    - Logging
-    - Check limits of displacement.
-    - Centering image on particle after correction.
-- Angles file
-
-### GUI
-- Button to open help/tutorial to remember acquisition settings.
-- Button position with fraction of size, not with element height.
